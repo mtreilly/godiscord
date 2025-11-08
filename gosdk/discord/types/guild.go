@@ -60,6 +60,26 @@ type Role struct {
 	Mentionable bool   `json:"mentionable"`
 }
 
+// RoleCreateParams represents payload for creating a role.
+type RoleCreateParams struct {
+	Name        string `json:"name,omitempty"`
+	Permissions string `json:"permissions,omitempty"`
+	Color       int    `json:"color,omitempty"`
+	Hoist       bool   `json:"hoist,omitempty"`
+	Mentionable bool   `json:"mentionable,omitempty"`
+	AuditLogReason string `json:"-"`
+}
+
+// RoleModifyParams represents payload for updating a role.
+type RoleModifyParams struct {
+	Name        string `json:"name,omitempty"`
+	Permissions string `json:"permissions,omitempty"`
+	Color       int    `json:"color,omitempty"`
+	Hoist       bool   `json:"hoist,omitempty"`
+	Mentionable bool   `json:"mentionable,omitempty"`
+	AuditLogReason string `json:"-"`
+}
+
 // Member represents a guild member.
 type Member struct {
 	User         *User      `json:"user,omitempty"`
@@ -70,6 +90,12 @@ type Member struct {
 	Deaf         bool       `json:"deaf"`
 	Mute         bool       `json:"mute"`
 	Pending      bool       `json:"pending,omitempty"`
+}
+
+// ListMembersParams controls pagination when listing guild members.
+type ListMembersParams struct {
+	Limit int
+	After string
 }
 
 // GuildPreview provides limited information about a guild.
@@ -128,6 +154,36 @@ func (r *Role) Validate() error {
 	}
 	if r.Name == "" {
 		return &ValidationError{Field: "role.name", Message: "role name is required"}
+	}
+	return nil
+}
+
+// Validate ensures create params are valid.
+func (p *RoleCreateParams) Validate() error {
+	if p == nil {
+		return &ValidationError{Field: "params", Message: "role create params required"}
+	}
+	if p.Name == "" {
+		return &ValidationError{Field: "name", Message: "role name is required"}
+	}
+	return nil
+}
+
+// Validate ensures modify params are valid.
+func (p *RoleModifyParams) Validate() error {
+	if p == nil {
+		return &ValidationError{Field: "params", Message: "role modify params required"}
+	}
+	return nil
+}
+
+// Validate ensures member list params are within Discord bounds.
+func (p *ListMembersParams) Validate() error {
+	if p == nil {
+		return nil
+	}
+	if p.Limit < 0 || p.Limit > 1000 {
+		return &ValidationError{Field: "limit", Message: "limit must be between 0 and 1000"}
 	}
 	return nil
 }

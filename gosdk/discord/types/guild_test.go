@@ -43,6 +43,31 @@ func TestGuildModifyParamsValidate(t *testing.T) {
 	}
 }
 
+func TestRoleParamValidation(t *testing.T) {
+	create := &RoleCreateParams{Name: "Admin"}
+	if err := create.Validate(); err != nil {
+		t.Fatalf("expected create params valid: %v", err)
+	}
+	create.Name = ""
+	if err := create.Validate(); err == nil {
+		t.Fatal("expected create validation error")
+	}
+
+	modify := &RoleModifyParams{Name: "Helper"}
+	if err := modify.Validate(); err != nil {
+		t.Fatalf("expected modify params valid: %v", err)
+	}
+}
+
+func TestListMembersParamsValidate(t *testing.T) {
+	if err := (&ListMembersParams{Limit: 100}).Validate(); err != nil {
+		t.Fatalf("expected valid params: %v", err)
+	}
+	if err := (&ListMembersParams{Limit: 2000}).Validate(); err == nil {
+		t.Fatal("expected error for high limit")
+	}
+}
+
 func TestGuildJSONMarshaling(t *testing.T) {
 	now := time.Now().UTC()
 	guild := &Guild{

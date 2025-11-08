@@ -57,16 +57,16 @@ Total: ~10 weeks, ~70 atomic tasks
 
 ## Next Actions (Phase 3)
 
-### 3.4.2: Guild Operations [3 days]
-**Focus**: Implement guild REST helpers (Get/Modify/Channels) using new models.
+### 3.5.1: Client Integration Tests [2 days]
+**Focus**: Build integration suite (build tag `integration`) covering webhook + bot client flows.
 
 **Tasks**:
-1. Add `client/guilds.go` with `GetGuild`, `GetGuildPreview`, `ModifyGuild`, `GetGuildChannels`, `CreateGuildChannel`.
-2. Reuse validation + audit-log reason headers similar to channels.
-3. Tests verifying auth headers, request payloads, and query params.
+1. Spin up mock Discord API or recorded fixtures for end-to-end tests.
+2. Cover webhook send, bot client channel CRUD, guild basics.
+3. Capture coverage metrics and performance baselines.
 
 ### Preview
-- Role/member helpers (Task 3.4.3) + guild-level pagination/integration examples
+- Task 3.5.2 docs + Phase 4 planning once integration tests land
 
 ## Agentic Workflow Features
 

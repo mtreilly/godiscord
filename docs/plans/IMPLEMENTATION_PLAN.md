@@ -493,30 +493,16 @@ const (
 **Next**: Task 3.4.3 to cover guild roles/members built atop these helpers.
 
 ### Task 3.4.3: Role & Member Operations
-**Complexity**: Medium
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: Medium  
 **Dependencies**: Task 3.4.2
 
-**Implementation**:
-```go
-// Add to guilds.go
-func (c *Client) GetGuildRoles(ctx context.Context, guildID string) ([]*types.Role, error)
-func (c *Client) CreateGuildRole(ctx context.Context, guildID string, params *CreateRoleParams) (*types.Role, error)
-func (c *Client) ModifyGuildRole(ctx context.Context, guildID, roleID string, params *ModifyRoleParams) (*types.Role, error)
-func (c *Client) DeleteGuildRole(ctx context.Context, guildID, roleID string) error
+**Delivered**:
+1. Role CRUD helpers plus member get/list/add/remove endpoints added to `guilds.go`, all reusing audit-log headers + validation.
+2. New role/member parameter structs + validation (`types/guild.go`) for create/modify/list operations, with tests.
+3. Client tests covering role CRUD, member pagination, and role assignment flows (`guilds_test.go`).
 
-func (c *Client) GetGuildMember(ctx context.Context, guildID, userID string) (*types.Member, error)
-func (c *Client) ListGuildMembers(ctx context.Context, guildID string, params *ListMembersParams) ([]*types.Member, error)
-func (c *Client) AddGuildMemberRole(ctx context.Context, guildID, userID, roleID string) error
-func (c *Client) RemoveGuildMemberRole(ctx context.Context, guildID, userID, roleID string) error
-```
-
-**Steps**:
-1. Implement role CRUD operations
-2. Implement member operations
-3. Handle role permissions
-4. Pagination for member lists
-5. Tests for all operations
-6. Examples with role management
+**Next**: Move to Phase 3.5 (integration tests/docs) or transition into Phase 4 interactions planning.
 
 ## 3.5: Testing & Documentation (2 days)
 

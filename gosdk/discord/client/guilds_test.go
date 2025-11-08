@@ -66,3 +66,76 @@ func TestGuildsCreateChannel(t *testing.T) {
 		t.Fatalf("expected channel ID 10")
 	}
 }
+
+func TestGuildRoleOperations(t *testing.T) {
+	var recordedPath string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		recordedPath = r.URL.Path
+		switch r.Method {
+		case http.MethodGet:
+			json.NewEncoder(w).Encode([]*types.Role{{ID: "1", Name: "Admin"}})
+		case http.MethodPost, http.MethodPatch:
+			json.NewEncoder(w).Encode(types.Role{ID: "1", Name: "Admin"})
+		default:
+			w.WriteHeader(http.StatusNoContent)
+		}
+	}))
+	defer server.Close()
+
+	client := newTestClient(t, server.URL)
+	roles, err := client.Guilds().GetGuildRoles(context.Background(), "1")
+	if err != nil || len(roles) != 1 {
+		t.Fatalf("GetGuildRoles error: %v", err)
+	}
+
+	role, err := client.Guilds().CreateGuildRole(context.Background(), "1", &types.RoleCreateParams{Name: "Admin"})
+	if err != nil || role == nil {
+		t.Fatalf("CreateGuildRole error: %v", err)
+	}
+
+	if _, err := client.Guilds().ModifyGuildRole(context.Background(), "1", "2", &types.RoleModifyParams{}); err != nil {
+		t.Fatalf("ModifyGuildRole error: %v", err)
+	}
+
+	if err := client.Guilds().DeleteGuildRole(context.Background(), "1", "2"); err != nil {
+		t.Fatalf("DeleteGuildRole error: %v", err)
+	}
+
+	if recordedPath == "" {
+		t.Fatalf("expected requests to hit server")
+	}
+}
+
+func TestGuildMemberOperations(t *testing.T) {
+	var requests []string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests = append(requests, r.Method+" "+r.URL.Path)
+		if r.Method == http.MethodGet {
+			if r.URL.Path == "/guilds/1/members" {
+				json.NewEncoder(w).Encode([]*types.Member{{Roles: []string{"1"}}})
+				return
+			}
+			json.NewEncoder(w).Encode(types.Member{Roles: []string{"1"}})
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	defer server.Close()
+
+	client := newTestClient(t, server.URL)
+	if _, err := client.Guilds().GetGuildMember(context.Background(), "1", "42"); err != nil {
+		t.Fatalf("GetGuildMember error: %v", err)
+	}
+	if _, err := client.Guilds().ListGuildMembers(context.Background(), "1", &types.ListMembersParams{Limit: 10}); err != nil {
+		t.Fatalf("ListGuildMembers error: %v", err)
+	}
+	if err := client.Guilds().AddGuildMemberRole(context.Background(), "1", "42", "99"); err != nil {
+		t.Fatalf("AddGuildMemberRole error: %v", err)
+	}
+	if err := client.Guilds().RemoveGuildMemberRole(context.Background(), "1", "42", "99"); err != nil {
+		t.Fatalf("RemoveGuildMemberRole error: %v", err)
+	}
+	if len(requests) == 0 {
+		t.Fatalf("expected requests")
+	}
+}

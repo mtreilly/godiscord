@@ -147,7 +147,15 @@ Last Updated: 2025-11-08
   - [x] Added Guild/Role/Member/Emoji structs and validation helpers
   - [x] JSON + validation tests (`discord/types/guild_test.go`)
   - **Files**: discord/types/guild.go, guild_test.go
-- [ ] **Task 3.4.2**: Guild operations
+- [x] **Task 3.4.2**: Guild operations ✅
+  - [x] Implemented guild Get/Preview/Modify + channel list/create helpers
+  - [x] Tests covering query params + audit log headers
+  - **Files**: discord/client/guilds.go, guilds_test.go
+- [x] **Task 3.4.3**: Role & member operations ✅
+  - [x] Added role CRUD + member list/get + role assignment helpers
+  - [x] Added role/member param types with validation/tests
+  - **Files**: discord/types/guild.go, guild_test.go, client/guilds.go, guilds_test.go
+- [ ] **Task 3.5.1**: Client integration tests
 
 ### Phase 4: Integration & Polish
 - [ ] vibe CLI integration guide
@@ -199,9 +207,9 @@ See [../OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md) for active design discussions:
 
 ## Next Actions
 
-1. **Current**: Implement guild REST helpers (Task 3.4.2) using new models.
-2. Next: Role/member operations (Task 3.4.3) and guild channels integration.
-3. Then: Integration smoke tests / CLI wiring leveraging webhook + client packages.
+1. **Current**: Client integration tests + documentation (Tasks 3.5.1-3.5.2).
+2. Next: Plan Phase 4 (interactions) after integration coverage.
+3. Then: CLI wiring leveraging webhook + bot client packages.
 
 ## Known Issues
 
