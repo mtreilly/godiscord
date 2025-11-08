@@ -106,7 +106,10 @@ Last Updated: 2025-11-08
 	  - [x] Added runnable thread example + env scaffolding
 	  - [x] Expanded tests covering new validation branch
 	  - **Files**: discord/types/webhook.go, discord/webhook/thread_test.go, examples/webhook-thread/, .env.example, README.md
-	- [ ] **Task 2.4.1**: Comprehensive tests
+		- [x] **Task 2.4.1**: Comprehensive tests ✅
+		  - [x] Achieved 82.6% coverage on webhook package (`go test ./discord/webhook -cover`)
+		  - [x] Added golden JSON fixtures + benchmark + race tests + optional integration harness
+		  - [x] Documented outputs in plan + instructions
 	- [ ] **Task 2.4.2**: Documentation
 
 ## Backlog
@@ -159,7 +162,7 @@ See [../OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md) for active design discussions:
 
 ## Next Actions
 
-1. **Current**: Continue with coverage push + docs (Tasks 2.4.1–2.4.2).
+1. **Current**: Documentation cleanup (Task 2.4.2) – godoc polish + webhook guide.
 2. Next: Prep bot client scaffolding (Phase 3) once webhook/RL stack is stable.
 3. Schedule integration smoke tests / CLI wiring after docs/tests land.
 

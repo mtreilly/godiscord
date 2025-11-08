@@ -276,12 +276,14 @@ client:
 ## 2.4: Testing & Documentation (1 day)
 
 ### Task 2.4.1: Comprehensive Tests
-**Steps**:
-1. Achieve >80% coverage on webhook package
-2. Add integration tests (optional, marked with build tags)
-3. Golden tests for JSON serialization
-4. Benchmark tests for performance
-5. Race condition tests
+**Status**: ✅ Completed (2025-11-08)  
+
+**Delivered**:
+1. Coverage now sits at **82.6%** for `discord/webhook` (`go test ./discord/webhook -cover`).
+2. Golden JSON tests guard serialized payloads (`discord/webhook/json_golden_test.go` + `testdata/golden/`).
+3. Optional integration test behind `//go:build integration` allows real webhook smoke tests when `DISCORD_WEBHOOK` is set (`integration_test.go`).
+4. Added `BenchmarkClientSend` for steady-state throughput measurements and `TestClientSendConcurrent` for race detection (validated via `go test -race ./discord/webhook`).
+5. New test data + harness ensures multipart/rate-limit logging changes remain observable without HTTP regressions.
 
 ### Task 2.4.2: Documentation
 **Steps**:
