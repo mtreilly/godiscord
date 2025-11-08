@@ -70,7 +70,16 @@ Last Updated: 2025-11-08
   - [x] MessageEditParams type for edit parameters
   - [x] Tests for all CRUD operations (23 tests total, all passing)
   - **Files**: crud.go, crud_test.go
-- [ ] **Task 2.2.1**: Rate limit tracker
+- [x] **Task 2.2.1**: Rate limit tracker ✅
+  - [x] Create ratelimit package
+  - [x] Implement Bucket type for rate limit data
+  - [x] Implement MemoryTracker with thread-safe operations
+  - [x] Parse Discord rate limit headers
+  - [x] Wait() method with context support
+  - [x] Automatic cleanup of expired buckets
+  - [x] Global rate limit support
+  - [x] 13 tests covering all functionality (all passing)
+  - **Files**: ratelimit/tracker.go, ratelimit/tracker_test.go
 - [ ] **Task 2.2.2**: Rate limit strategies
 - [ ] **Task 2.2.3**: Integrate rate limiting
 - [ ] **Task 2.3.1**: Thread operations
@@ -108,11 +117,13 @@ Last Updated: 2025-11-08
 
 ## Metrics
 
-- **Packages**: 5 (types, webhook, config, logger, + examples)
-- **Test Coverage**: webhook package has comprehensive tests (all 23 tests passing)
+- **Packages**: 6 (types, webhook, config, logger, ratelimit, + examples)
+- **Test Coverage**: 36 tests total (all passing)
+  - webhook: 23 tests
+  - ratelimit: 13 tests
 - **Examples**: 2 (webhook, webhook-files)
 - **Documentation**: 15+ docs (README, AGENTS, design docs, implementation plan, etc.)
-- **Lines of Code**: ~2,000 LOC (Go)
+- **Lines of Code**: ~2,500 LOC (Go)
 
 ## Open Questions
 
