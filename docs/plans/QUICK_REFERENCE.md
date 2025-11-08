@@ -57,16 +57,16 @@ Total: ~10 weeks, ~70 atomic tasks
 
 ## Next Actions (Phase 4)
 
-### 4.4.2: Component Builders [3 days]
-**Focus**: Layer fluent builders atop the new typed components so CLI code can assemble action rows/buttons/selects/text inputs ergonomically.
+### 4.5.1: Interaction Server [3 days]
+**Focus**: Stand up an HTTP handler layer that verifies signatures, routes interactions by type, and plugs into the new builders/client stack.
 
 **Tasks**:
-1. Add `interactions/components_builder.go` with button/select/text-input/action-row builders returning typed components.
-2. Provide helpers to convert builder output into `MessageComponent` slices for response builders.
-3. Cover builders with tests mirroring validation scenarios (link buttons, select options, modal inputs).
+1. Implement `interactions/server.go` with signature verification (Ed25519), handler registration, and ping handling.
+2. Provide routing helpers for commands/components/modals plus structured logging hooks.
+3. Add httptest coverage for happy paths, signature failures, and routing errors.
 
 ### Preview
-- Task 4.5.x: Interaction server wiring once component ergonomics & builders are complete.
+- Task 4.5.2: Router/middleware system on top of the server primitives.
 
 ## Agentic Workflow Features
 

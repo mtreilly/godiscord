@@ -658,46 +658,17 @@ const (
 - Task 4.4.2 to build ergonomic component builders on top of these typed structures.
 
 ### Task 4.4.2: Component Builders
-**Complexity**: Medium
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: Medium  
 **Dependencies**: Task 4.4.1
 
-**Implementation**:
-```go
-// gosdk/discord/interactions/components.go
-type ButtonBuilder struct {
-    button *types.Button
-}
+**Delivered**:
+1. Fluent builders for buttons, select menus (string + typed variants), text inputs, and action rows (`gosdk/discord/interactions/components_builder.go`) with validation baked in via the typed component structs.
+2. Response builders now accept typed components (`SetComponents`, `AddComponentRows`, `SetModalComponents`) and convert them into the raw message-component format automatically.
+3. Ample tests covering builder success/error flows plus response-builder integration with typed components (`components_builder_test.go`, updated `response_builder_test.go`).
 
-func NewButton(customID, label string, style types.ButtonStyle) *ButtonBuilder
-func NewLinkButton(label, url string) *ButtonBuilder
-func (b *ButtonBuilder) SetEmoji(emoji types.Emoji) *ButtonBuilder
-func (b *ButtonBuilder) SetDisabled(disabled bool) *ButtonBuilder
-func (b *ButtonBuilder) Build() *types.Button
-
-type SelectMenuBuilder struct {
-    menu *types.SelectMenu
-}
-
-func NewSelectMenu(customID string) *SelectMenuBuilder
-func (b *SelectMenuBuilder) AddOption(label, value, description string) *SelectMenuBuilder
-func (b *SelectMenuBuilder) SetPlaceholder(placeholder string) *SelectMenuBuilder
-func (b *SelectMenuBuilder) SetMinMaxValues(min, max int) *SelectMenuBuilder
-func (b *SelectMenuBuilder) Build() *types.SelectMenu
-
-type ActionRowBuilder struct {
-    row *types.ActionRow
-}
-
-func NewActionRow() *ActionRowBuilder
-func (b *ActionRowBuilder) AddButton(button *types.Button) *ActionRowBuilder
-func (b *ActionRowBuilder) AddSelectMenu(menu *types.SelectMenu) *ActionRowBuilder
-func (b *ActionRowBuilder) Build() *types.ActionRow
-```
-
-**Steps**:
-1. Create button builder
-2. Create select menu builder
-3. Create action row builder
+**Next**:
+- Move to Task 4.5.x (interaction server/router) now that components + responses are ergonomic.
 4. Add validation in builders
 5. Tests for all builders
 6. Examples with component usage

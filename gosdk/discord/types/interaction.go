@@ -142,11 +142,18 @@ type ApplicationCommandChoice struct {
 type ComponentType int
 
 const (
-	ComponentTypeActionRow  ComponentType = 1
-	ComponentTypeButton     ComponentType = 2
-	ComponentTypeSelectMenu ComponentType = 3
-	ComponentTypeTextInput  ComponentType = 4
+	ComponentTypeActionRow         ComponentType = 1
+	ComponentTypeButton            ComponentType = 2
+	ComponentTypeStringSelect      ComponentType = 3
+	ComponentTypeTextInput         ComponentType = 4
+	ComponentTypeUserSelect        ComponentType = 5
+	ComponentTypeRoleSelect        ComponentType = 6
+	ComponentTypeMentionableSelect ComponentType = 7
+	ComponentTypeChannelSelect     ComponentType = 8
 )
+
+// ComponentTypeSelectMenu is kept for backwards compatibility with the old naming.
+const ComponentTypeSelectMenu ComponentType = ComponentTypeStringSelect
 
 // Validate ensures interactions are well-formed.
 func (i *Interaction) Validate() error {

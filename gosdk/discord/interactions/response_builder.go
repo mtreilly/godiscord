@@ -90,19 +90,45 @@ func (b *ResponseBuilder) AddAttachment(attachment types.Attachment) *ResponseBu
 }
 
 // AddComponentRow appends a top-level action row.
-func (b *ResponseBuilder) AddComponentRow(row types.MessageComponent) *ResponseBuilder {
-	if row.Type != types.ComponentTypeActionRow {
-		b.err = fmt.Errorf("components[%d].type: only action rows are allowed at the top level", len(b.ensureData().Components))
-		return b
-	}
-	if data := b.ensureData(); data != nil {
-		data.Components = append(data.Components, row)
+func (b *ResponseBuilder) AddComponentRow(row types.Component) *ResponseBuilder {
+	return b.AddComponentRows(row)
+}
+
+// AddComponentRows appends multiple typed action rows.
+func (b *ResponseBuilder) AddComponentRows(rows ...types.Component) *ResponseBuilder {
+	for _, comp := range rows {
+		if comp == nil {
+			b.err = fmt.Errorf("component is nil")
+			return b
+		}
+		mc, err := comp.ToMessageComponent()
+		if err != nil {
+			b.err = err
+			return b
+		}
+		if mc.Type != types.ComponentTypeActionRow {
+			b.err = fmt.Errorf("components[%d].type: only action rows are allowed at the top level", len(b.ensureData().Components))
+			return b
+		}
+		if data := b.ensureData(); data != nil {
+			data.Components = append(data.Components, mc)
+		}
 	}
 	return b
 }
 
 // SetComponents replaces the component rows.
-func (b *ResponseBuilder) SetComponents(rows ...types.MessageComponent) *ResponseBuilder {
+func (b *ResponseBuilder) SetComponents(rows ...types.Component) *ResponseBuilder {
+	data := b.ensureData()
+	if data == nil {
+		return b
+	}
+	data.Components = data.Components[:0]
+	return b.AddComponentRows(rows...)
+}
+
+// SetRawComponents allows setting raw message components (transition helper).
+func (b *ResponseBuilder) SetRawComponents(rows ...types.MessageComponent) *ResponseBuilder {
 	if data := b.ensureData(); data != nil {
 		data.Components = rows
 	}
@@ -110,12 +136,30 @@ func (b *ResponseBuilder) SetComponents(rows ...types.MessageComponent) *Respons
 }
 
 // SetModalComponents replaces modal components (modal responses only).
-func (b *ResponseBuilder) SetModalComponents(rows ...types.MessageComponent) *ResponseBuilder {
+func (b *ResponseBuilder) SetModalComponents(rows ...types.Component) *ResponseBuilder {
 	if !b.ensureResponseType(types.InteractionResponseModal) {
 		return b
 	}
-	if data := b.ensureData(); data != nil {
-		data.Components = rows
+	data := b.ensureData()
+	if data == nil {
+		return b
+	}
+	data.Components = data.Components[:0]
+	for _, comp := range rows {
+		if comp == nil {
+			b.err = fmt.Errorf("component is nil")
+			return b
+		}
+		if comp.ComponentType() != types.ComponentTypeActionRow {
+			b.err = fmt.Errorf("modal components must be action rows containing text inputs")
+			return b
+		}
+		mc, err := comp.ToMessageComponent()
+		if err != nil {
+			b.err = err
+			return b
+		}
+		data.Components = append(data.Components, mc)
 	}
 	return b
 }
