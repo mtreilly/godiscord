@@ -246,5 +246,9 @@ Links
 - gosdk/ratelimit/*
 - docs/plans/IMPLEMENTATION_PLAN.md (Tasks 3.1.1 / 3.1.2)
 
+2025-11-08 Update
+- Middleware scaffolding (logging, retry, metrics, dry-run) is in place via `discord/client/middleware.go` and `Client.Use`.
+- Need to validate tracker sharing + middleware ordering once channel operations / CLI integration begin; still open until cross-package coordination is documented.
+
 Status
 - open

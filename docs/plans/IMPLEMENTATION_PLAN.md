@@ -353,7 +353,7 @@ func (c *Client) delete(ctx context.Context, path string) error
 - Dry-run mode (validate without executing)
 
 ### Task 3.1.2: Client Middleware System
-**Status**: 🆕 Not started  
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: Medium  
 **Dependencies**: Task 3.1.1
 
@@ -373,19 +373,17 @@ func MetricsMiddleware(collector MetricsCollector) Middleware
 func TracingMiddleware(tracer Tracer) Middleware
 ```
 
-**Steps**:
-1. Define middleware interface
-2. Implement middleware chain
-3. Create logging middleware
-4. Create retry middleware
-5. Create metrics middleware
-6. Create tracing middleware (optional)
-7. Tests for middleware composition
+**Delivered**:
+1. Middleware primitives (`Request`, `Middleware`, `RequestHandler`) + `Client.Use`.
+2. Built-in middleware: logging, retry (exponential backoff), metrics collector hook, dry-run short-circuit (foundation for tracing/custom ones).
+3. Middleware-aware execution path inside `Client.do` so rate-limiter + HTTP transport remain shared.
+4. Tests verify middleware ordering, retry behavior, metrics invocation, and dry-run bypass.
 
 **Agentic Considerations**:
 - Middleware for request/response capture
 - Middleware for operation replay
 - Middleware for cost tracking (API quota)
+- Shared tracker guidance captured in OPEN_QUESTIONS Q6 (still open for CLI-scale coordination)
 
 ## 3.2: Channel Operations (3 days)
 

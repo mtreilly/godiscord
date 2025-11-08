@@ -32,6 +32,8 @@ type Client struct {
 	strategy    ratelimit.Strategy
 	maxRetries  int
 	timeout     time.Duration
+
+	middlewares []Middleware
 }
 
 // Option customises the bot HTTP client.
@@ -214,7 +216,7 @@ func (c *Client) do(ctx context.Context, method, path string, body interface{}, 
 			"attempt", attempt+1,
 		)
 
-		resp, err := c.httpClient.Do(req)
+		resp, err := c.execute(ctx, &Request{Request: req})
 		if err != nil {
 			lastErr = &types.NetworkError{Op: "request", Err: err}
 			continue
@@ -337,6 +339,29 @@ func (c *Client) recordStrategyOutcome(route string, hitLimit bool) {
 		bucket := c.rateLimiter.GetBucket(route)
 		adaptive.RecordRequest(bucket, hitLimit)
 	}
+}
+
+// execute runs the HTTP request through middleware, falling back to the base transport.
+func (c *Client) execute(ctx context.Context, req *Request) (*http.Response, error) {
+	if req == nil {
+		return nil, fmt.Errorf("request is nil")
+	}
+	handler := c.baseHandler()
+	for i := len(c.middlewares) - 1; i >= 0; i-- {
+		handler = c.middlewares[i](handler)
+	}
+	return handler(req)
+}
+
+func (c *Client) baseHandler() RequestHandler {
+	return func(req *Request) (*http.Response, error) {
+		return c.httpClient.Do(req.Request)
+	}
+}
+
+// Use registers one or more middleware in FIFO order (first added, first executed).
+func (c *Client) Use(mw ...Middleware) {
+	c.middlewares = append(c.middlewares, mw...)
 }
 
 func (c *Client) parseErrorResponse(resp *http.Response) *types.APIError {

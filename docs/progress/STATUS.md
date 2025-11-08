@@ -144,7 +144,10 @@ Last Updated: 2025-11-08
   - [x] Added option set (base URL, retries, timeout, custom HTTP client/logger/strategy)
   - [x] Tests for auth headers, retries, context cancellation, API errors, rate-limit waits
   - **Files**: discord/client/client.go, discord/client/client_test.go
-- [ ] **Task 3.1.2**: Client middleware system
+- [x] **Task 3.1.2**: Client middleware system ✅
+  - [x] Added middleware primitives + `Client.Use`
+  - [x] Built-in logging, retry, metrics, and dry-run middleware with tests
+  - **Files**: discord/client/middleware.go, discord/client/middleware_test.go
 - [ ] **Task 3.2.1**: Channel types/models
 
 ### Phase 5: Gateway (Future)
