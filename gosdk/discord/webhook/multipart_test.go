@@ -231,7 +231,7 @@ func TestClient_SendWithFiles_Validation(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "total size too large",
+			name: "total size too large (known sizes)",
 			msg: &types.WebhookMessage{
 				Content: "test",
 			},
@@ -239,12 +239,42 @@ func TestClient_SendWithFiles_Validation(t *testing.T) {
 				{
 					Name:   "large1.txt",
 					Reader: strings.NewReader("test"),
-					Size:   MaxTotalSize / 2 + 1,
+					Size:   MaxTotalSize/2 + 1,
 				},
 				{
 					Name:   "large2.txt",
 					Reader: strings.NewReader("test"),
-					Size:   MaxTotalSize / 2 + 1,
+					Size:   MaxTotalSize/2 + 1,
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "per-file limit enforced without size hint",
+			msg: &types.WebhookMessage{
+				Content: "test",
+			},
+			files: []FileAttachment{
+				{
+					Name:   "huge.bin",
+					Reader: newFixedSizeReader(MaxFileSize + 1),
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "total limit enforced without size hints",
+			msg: &types.WebhookMessage{
+				Content: "test",
+			},
+			files: []FileAttachment{
+				{
+					Name:   "big1.bin",
+					Reader: newFixedSizeReader(MaxTotalSize/2 + 1),
+				},
+				{
+					Name:   "big2.bin",
+					Reader: newFixedSizeReader(MaxTotalSize/2 + 1),
 				},
 			},
 			wantErr: true,
@@ -256,7 +286,7 @@ func TestClient_SendWithFiles_Validation(t *testing.T) {
 			},
 			files: []FileAttachment{
 				{
-					Name: "", // missing name
+					Name:   "", // missing name
 					Reader: strings.NewReader("test"),
 					Size:   4,
 				},
@@ -273,6 +303,32 @@ func TestClient_SendWithFiles_Validation(t *testing.T) {
 			}
 		})
 	}
+}
+
+type fixedSizeReader struct {
+	remaining int64
+}
+
+func newFixedSizeReader(size int64) io.Reader {
+	return &fixedSizeReader{remaining: size}
+}
+
+func (r *fixedSizeReader) Read(p []byte) (int, error) {
+	if r.remaining <= 0 {
+		return 0, io.EOF
+	}
+
+	if int64(len(p)) > r.remaining {
+		p = p[:int(r.remaining)]
+	}
+
+	for i := range p {
+		p[i] = 'a'
+	}
+
+	n := len(p)
+	r.remaining -= int64(n)
+	return n, nil
 }
 
 func TestClient_SendWithFiles_Retry(t *testing.T) {
@@ -414,8 +470,9 @@ func TestWriteFile(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 	writer := multipart.NewWriter(buf)
+	counter := &uploadCounter{limit: MaxTotalSize}
 
-	err := client.writeFile(writer, 0, file)
+	err := client.writeFile(writer, 0, file, counter)
 	if err != nil {
 		t.Fatalf("writeFile() error = %v", err)
 	}

@@ -27,7 +27,8 @@ func TestMemoryTracker_Update(t *testing.T) {
 	headers.Set("X-RateLimit-Reset-After", "60")
 	headers.Set("X-RateLimit-Bucket", "test-bucket")
 
-	tracker.Update("/test/route", headers)
+	route := "POST:/test/route"
+	tracker.Update(route, headers)
 
 	bucket := tracker.GetBucket("test-bucket")
 	if bucket == nil {
@@ -44,6 +45,14 @@ func TestMemoryTracker_Update(t *testing.T) {
 
 	if bucket.Key != "test-bucket" {
 		t.Errorf("Expected bucket key 'test-bucket', got '%s'", bucket.Key)
+	}
+
+	aliasBucket := tracker.GetBucket(route)
+	if aliasBucket == nil {
+		t.Fatal("GetBucket() should resolve route alias")
+	}
+	if aliasBucket.Key != "test-bucket" {
+		t.Errorf("Alias bucket key mismatch: got %s", aliasBucket.Key)
 	}
 }
 
@@ -109,13 +118,14 @@ func TestMemoryTracker_Wait_RateLimited(t *testing.T) {
 	headers.Set("X-RateLimit-Reset-After", "1")
 	headers.Set("X-RateLimit-Bucket", "test-bucket")
 
-	tracker.Update("/test/route", headers)
+	route := "POST:/test/route"
+	tracker.Update(route, headers)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
 	start := time.Now()
-	err := tracker.Wait(ctx, "test-bucket")
+	err := tracker.Wait(ctx, route)
 	elapsed := time.Since(start)
 
 	if err != nil {
@@ -124,6 +134,38 @@ func TestMemoryTracker_Wait_RateLimited(t *testing.T) {
 
 	if elapsed < 900*time.Millisecond {
 		t.Errorf("Expected wait time >= 900ms, got %v", elapsed)
+	}
+}
+
+func TestMemoryTracker_RouteAliasCleanup(t *testing.T) {
+	tracker := NewMemoryTracker()
+
+	headers := make(http.Header)
+	headers.Set("X-RateLimit-Limit", "5")
+	headers.Set("X-RateLimit-Remaining", "0")
+	headers.Set("X-RateLimit-Reset", "0") // expired
+	headers.Set("X-RateLimit-Bucket", "bucket-alias")
+
+	route := "POST:/channels/123/messages"
+	tracker.Update(route, headers)
+
+	// Trigger cleanup with fresh bucket
+	fresh := make(http.Header)
+	fresh.Set("X-RateLimit-Limit", "1")
+	fresh.Set("X-RateLimit-Remaining", "1")
+	fresh.Set("X-RateLimit-Reset-After", "60")
+	tracker.Update("/another/route", fresh)
+
+	if tracker.GetBucket(route) != nil {
+		t.Fatalf("Expected route alias bucket to expire")
+	}
+
+	// Wait should not block because alias is gone
+	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+	defer cancel()
+
+	if err := tracker.Wait(ctx, route); err != nil && err != context.DeadlineExceeded {
+		t.Fatalf("Wait() returned unexpected error: %v", err)
 	}
 }
 
@@ -228,9 +270,9 @@ func TestMemoryTracker_CleanupExpired(t *testing.T) {
 
 func TestParseIntHeader(t *testing.T) {
 	tests := []struct {
-		name   string
-		value  string
-		want   int
+		name  string
+		value string
+		want  int
 	}{
 		{"valid int", "42", 42},
 		{"zero", "0", 0},
@@ -255,9 +297,9 @@ func TestParseIntHeader(t *testing.T) {
 
 func TestParseFloatHeader(t *testing.T) {
 	tests := []struct {
-		name   string
-		value  string
-		want   float64
+		name  string
+		value string
+		want  float64
 	}{
 		{"valid float", "1.5", 1.5},
 		{"integer", "42", 42.0},

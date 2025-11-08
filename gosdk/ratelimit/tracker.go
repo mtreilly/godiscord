@@ -44,15 +44,17 @@ type Tracker interface {
 
 // MemoryTracker implements an in-memory rate limit tracker
 type MemoryTracker struct {
-	buckets map[string]*Bucket
-	global  *Bucket
-	mu      sync.RWMutex
+	buckets       map[string]*Bucket
+	routeToBucket map[string]string
+	global        *Bucket
+	mu            sync.RWMutex
 }
 
 // NewMemoryTracker creates a new in-memory rate limit tracker
 func NewMemoryTracker() *MemoryTracker {
 	return &MemoryTracker{
-		buckets: make(map[string]*Bucket),
+		buckets:       make(map[string]*Bucket),
+		routeToBucket: make(map[string]string),
 	}
 }
 
@@ -75,7 +77,7 @@ func (t *MemoryTracker) Wait(ctx context.Context, route string) error {
 	}
 
 	// Check route-specific rate limit
-	bucket, exists := t.buckets[route]
+	bucket, exists := t.getBucketByRouteLocked(route)
 	if !exists || bucket.Remaining > 0 {
 		t.mu.RUnlock()
 		return nil
@@ -133,12 +135,13 @@ func (t *MemoryTracker) Update(route string, headers http.Header) {
 	if global {
 		t.global = bucket
 	} else {
-		// Use bucket key if available, otherwise use route
 		key := bucketKey
 		if key == "" {
 			key = route
 		}
+
 		t.buckets[key] = bucket
+		t.routeToBucket[route] = key
 	}
 
 	// Clean up expired buckets
@@ -150,7 +153,7 @@ func (t *MemoryTracker) GetBucket(route string) *Bucket {
 	t.mu.RLock()
 	defer t.mu.RUnlock()
 
-	bucket, exists := t.buckets[route]
+	bucket, exists := t.getBucketByRouteLocked(route)
 	if !exists {
 		return nil
 	}
@@ -171,16 +174,27 @@ func (t *MemoryTracker) Clear() {
 	defer t.mu.Unlock()
 
 	t.buckets = make(map[string]*Bucket)
+	t.routeToBucket = make(map[string]string)
 	t.global = nil
 }
 
 // cleanupExpired removes expired buckets (must be called with lock held)
 func (t *MemoryTracker) cleanupExpired() {
 	now := time.Now()
+	expiredKeys := make(map[string]struct{})
 
 	for key, bucket := range t.buckets {
 		if now.After(bucket.Reset) {
+			expiredKeys[key] = struct{}{}
 			delete(t.buckets, key)
+		}
+	}
+
+	if len(expiredKeys) > 0 {
+		for route, key := range t.routeToBucket {
+			if _, ok := expiredKeys[key]; ok {
+				delete(t.routeToBucket, route)
+			}
 		}
 	}
 
@@ -188,6 +202,18 @@ func (t *MemoryTracker) cleanupExpired() {
 	if t.global != nil && now.After(t.global.Reset) {
 		t.global = nil
 	}
+}
+
+// getBucketByRouteLocked retrieves a bucket using route aliases.
+// Caller must hold at least a read lock.
+func (t *MemoryTracker) getBucketByRouteLocked(route string) (*Bucket, bool) {
+	if key, ok := t.routeToBucket[route]; ok {
+		bucket, exists := t.buckets[key]
+		return bucket, exists
+	}
+
+	bucket, exists := t.buckets[route]
+	return bucket, exists
 }
 
 // Helper functions

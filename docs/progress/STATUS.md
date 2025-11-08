@@ -80,11 +80,26 @@ Last Updated: 2025-11-08
   - [x] Global rate limit support
   - [x] 13 tests covering all functionality (all passing)
   - **Files**: ratelimit/tracker.go, ratelimit/tracker_test.go
-- [ ] **Task 2.2.2**: Rate limit strategies
-- [ ] **Task 2.2.3**: Integrate rate limiting
-- [ ] **Task 2.3.1**: Thread operations
-- [ ] **Task 2.4.1**: Comprehensive tests
-- [ ] **Task 2.4.2**: Documentation
+	- [x] **Task 2.2.1b**: Route-aware bucket mapping ✅
+	  - [x] Store tracker buckets by Discord `X-RateLimit-Bucket` while keeping per-route aliases
+	  - [x] Ensure `Wait`/`GetBucket` resolve aliases so proactive/adaptive strategies receive data
+	  - [x] Tests for aliasing + expiry cleanup
+	  - **Files**: ratelimit/tracker.go, ratelimit/tracker_test.go
+	- [x] **Task 2.2.2**: Rate limit strategies ✅
+	  - [x] Define Strategy interface
+	  - [x] Implement Reactive, Proactive, Adaptive strategies
+	  - [x] Adaptive learning stats + RecordRequest hooks
+	  - [x] Unit tests for strategy decision logic
+	  - **Files**: ratelimit/strategy.go, ratelimit/strategy_test.go
+	- [x] Attachment validation hardening ✅
+	  - [x] Runtime byte counting for per-file + aggregate limits (unknown sizes supported)
+	  - [x] Size detection via Len/Seeker heuristics for totals
+	  - [x] Raised aggregate cap to match 25MB per file (future configurable)
+	  - **Files**: discord/webhook/multipart.go, multipart_test.go
+	- [ ] **Task 2.2.3**: Integrate rate limiting
+	- [ ] **Task 2.3.1**: Thread operations
+	- [ ] **Task 2.4.1**: Comprehensive tests
+	- [ ] **Task 2.4.2**: Documentation
 
 ## Backlog
 
@@ -136,11 +151,11 @@ See [../OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md) for active design discussions:
 
 ## Next Actions
 
-1. **Current**: Implement multipart form support for file uploads
-2. Next: Add webhook edit/delete operations
-3. Then: Implement rate limit tracker package
-4. Continue with rate limit strategies
-5. Complete Phase 2 testing and documentation
+1. **Current**: Integrate tracker + strategies across webhook CRUD + file sends (Task 2.2.3) and expose config knobs.
+2. Next: Implement webhook thread operations (Task 2.3.1) leveraging existing validation.
+3. Then: Continue with coverage push + docs (Tasks 2.4.1–2.4.2).
+4. Prep bot client scaffolding (Phase 3) once webhook/RL stack is stable.
+5. Draft rate-limit guide + config schema once integration done.
 
 ## Known Issues
 

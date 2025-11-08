@@ -59,6 +59,10 @@ Hypotheses / Options
 - B) Proactive: Track rate limits from headers, queue requests, prevent 429s (complex, optimal)
 - C) Hybrid: Reactive with optional proactive mode via config flag
 
+2025-11-08 Update
+- Implemented route-alias-aware tracker so proactive/adaptive strategies share bucket state across endpoints (`gosdk/ratelimit/tracker.go`).
+- Need to validate real-world alias coverage once webhook + bot clients share trackers; keep telemetry hooks in Task 2.2.3.
+
 Proposed Experiment(s)
 - Implement reactive approach first in webhook package
 - Measure 429 frequency in real usage (vibe CLI integration)

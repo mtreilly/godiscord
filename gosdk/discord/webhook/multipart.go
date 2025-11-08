@@ -12,12 +12,13 @@ import (
 )
 
 const (
-	// MaxFileSize is the maximum size for a single file (25MB)
+	// MaxFileSize is the maximum size for a single file.
+	// Discord defaults to 25MB for most servers; higher tiers can override via configuration later.
 	MaxFileSize = 25 * 1024 * 1024
 
-	// MaxTotalSize is the maximum total size for all files (8MB for free, 100MB for nitro)
-	// Using conservative 8MB limit
-	MaxTotalSize = 8 * 1024 * 1024
+	// MaxTotalSize is the maximum total size for all files in a single message.
+	// Kept in sync with MaxFileSize to avoid rejecting valid uploads (server boosts may increase this further).
+	MaxTotalSize = 25 * 1024 * 1024
 
 	// MaxFiles is the maximum number of files per message
 	MaxFiles = 10
@@ -65,6 +66,50 @@ func (f *FileAttachment) Validate() error {
 	return nil
 }
 
+// resolvedSize returns the declared or detected size of the attachment.
+// The second return value indicates whether the size is known.
+func (f *FileAttachment) resolvedSize() (int64, bool, error) {
+	if f.Size > 0 {
+		return f.Size, true, nil
+	}
+
+	if f.Reader == nil {
+		return 0, false, nil
+	}
+
+	// Prefer interfaces with Len() to avoid touching the underlying reader state.
+	type lenInt interface{ Len() int }
+	type lenInt64 interface{ Len() int64 }
+
+	if l, ok := f.Reader.(lenInt); ok && l.Len() >= 0 {
+		return int64(l.Len()), true, nil
+	}
+	if l, ok := f.Reader.(lenInt64); ok && l.Len() >= 0 {
+		return l.Len(), true, nil
+	}
+
+	// Fall back to io.Seeker if available.
+	if seeker, ok := f.Reader.(io.Seeker); ok {
+		current, err := seeker.Seek(0, io.SeekCurrent)
+		if err != nil {
+			return 0, false, fmt.Errorf("failed to read current position for %s: %w", f.Name, err)
+		}
+
+		end, err := seeker.Seek(0, io.SeekEnd)
+		if err != nil {
+			return 0, false, fmt.Errorf("failed to determine size for %s: %w", f.Name, err)
+		}
+
+		if _, err := seeker.Seek(current, io.SeekStart); err != nil {
+			return 0, false, fmt.Errorf("failed to restore reader position for %s: %w", f.Name, err)
+		}
+
+		return end - current, true, nil
+	}
+
+	return 0, false, nil
+}
+
 // SendWithFiles sends a webhook message with file attachments
 func (c *Client) SendWithFiles(ctx context.Context, msg *types.WebhookMessage, files []FileAttachment) error {
 	if err := msg.Validate(); err != nil {
@@ -85,19 +130,33 @@ func (c *Client) SendWithFiles(ctx context.Context, msg *types.WebhookMessage, f
 		}
 	}
 
-	// Validate all files
+	// Validate all files and accumulate known sizes
 	var totalSize int64
-	for i, file := range files {
-		if err := file.Validate(); err != nil {
+	for i := range files {
+		if err := (&files[i]).Validate(); err != nil {
 			return fmt.Errorf("file %d validation failed: %w", i, err)
 		}
-		totalSize += file.Size
+
+		size, known, err := files[i].resolvedSize()
+		if err != nil {
+			return fmt.Errorf("file %d size detection failed: %w", i, err)
+		}
+
+		if known {
+			if size > MaxFileSize {
+				return &types.ValidationError{
+					Field:   "files",
+					Message: fmt.Sprintf("file %s exceeds maximum %d bytes", files[i].Name, MaxFileSize),
+				}
+			}
+			totalSize += size
+		}
 	}
 
-	if totalSize > MaxTotalSize {
+	if MaxTotalSize > 0 && totalSize > MaxTotalSize {
 		return &types.ValidationError{
 			Field:   "files",
-			Message: fmt.Sprintf("total file size %d exceeds maximum %d bytes (8MB)", totalSize, MaxTotalSize),
+			Message: fmt.Sprintf("total file size %d exceeds maximum %d bytes", totalSize, MaxTotalSize),
 		}
 	}
 
@@ -111,8 +170,9 @@ func (c *Client) SendWithFiles(ctx context.Context, msg *types.WebhookMessage, f
 	}
 
 	// Add files
+	counter := &uploadCounter{limit: MaxTotalSize}
 	for i, file := range files {
-		if err := c.writeFile(writer, i, file); err != nil {
+		if err := c.writeFile(writer, i, file, counter); err != nil {
 			return fmt.Errorf("failed to write file %d: %w", i, err)
 		}
 	}
@@ -149,7 +209,7 @@ func (c *Client) writeJSONPayload(writer *multipart.Writer, msg *types.WebhookMe
 }
 
 // writeFile writes a file attachment to the multipart form
-func (c *Client) writeFile(writer *multipart.Writer, index int, file FileAttachment) error {
+func (c *Client) writeFile(writer *multipart.Writer, index int, file FileAttachment, counter *uploadCounter) error {
 	// Create form file with unique field name
 	fieldName := fmt.Sprintf("file%d", index)
 
@@ -172,7 +232,8 @@ func (c *Client) writeFile(writer *multipart.Writer, index int, file FileAttachm
 	}
 
 	// Copy file content to part
-	_, err = io.Copy(part, file.Reader)
+	reader := newCountingReader(file.Reader, file.Name, MaxFileSize, counter)
+	_, err = io.Copy(part, reader)
 	return err
 }
 
@@ -257,4 +318,75 @@ func (c *Client) sendMultipartWithRetry(ctx context.Context, body []byte, conten
 	}
 
 	return fmt.Errorf("multipart request failed after %d attempts", c.maxRetries+1)
+}
+
+type uploadCounter struct {
+	limit int64
+	read  int64
+}
+
+type countingReader struct {
+	reader       io.Reader
+	fileName     string
+	perFileLimit int64
+	fileRead     int64
+	total        *uploadCounter
+}
+
+func newCountingReader(r io.Reader, name string, perFileLimit int64, total *uploadCounter) *countingReader {
+	return &countingReader{
+		reader:       r,
+		fileName:     name,
+		perFileLimit: perFileLimit,
+		total:        total,
+	}
+}
+
+func (cr *countingReader) Read(p []byte) (int, error) {
+	if len(p) == 0 {
+		return 0, nil
+	}
+
+	if cr.perFileLimit > 0 {
+		remaining := cr.perFileLimit - cr.fileRead
+		if remaining <= 0 {
+			return 0, cr.perFileExceededErr()
+		}
+		if int64(len(p)) > remaining {
+			p = p[:remaining]
+		}
+	}
+
+	if cr.total != nil && cr.total.limit > 0 {
+		remaining := cr.total.limit - cr.total.read
+		if remaining <= 0 {
+			return 0, cr.totalExceededErr()
+		}
+		if int64(len(p)) > remaining {
+			p = p[:remaining]
+		}
+	}
+
+	n, err := cr.reader.Read(p)
+	if n > 0 {
+		cr.fileRead += int64(n)
+		if cr.total != nil {
+			cr.total.read += int64(n)
+		}
+	}
+	return n, err
+}
+
+func (cr *countingReader) perFileExceededErr() error {
+	return &types.ValidationError{
+		Field:   "files",
+		Message: fmt.Sprintf("file %s exceeds maximum size of %d bytes", cr.fileName, cr.perFileLimit),
+	}
+}
+
+func (cr *countingReader) totalExceededErr() error {
+	return &types.ValidationError{
+		Field:   "files",
+		Message: fmt.Sprintf("total attachment size exceeds maximum %d bytes", cr.total.limit),
+	}
 }

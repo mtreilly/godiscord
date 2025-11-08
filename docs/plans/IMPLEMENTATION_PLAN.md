@@ -98,6 +98,11 @@ func (c *Client) SendWithFiles(ctx context.Context, msg *WebhookMessage, files [
 - Size limit validation
 - Content-Type handling
 
+**2025-11-08 Update**:
+- Added runtime byte counting to enforce per-file and aggregate limits even when attachment sizes are unknown.
+- Detect attachment sizes via `Len()`/`io.Seeker` heuristics to validate totals before upload.
+- Raised aggregate limit to match per-file limits to avoid rejecting valid single-file uploads; future work can make these configurable per-server tier.
+
 **Agentic Considerations**:
 - Clear error messages for file size violations
 - JSON-serializable file metadata in logs
@@ -180,8 +185,20 @@ type MemoryTracker struct {
 - Predictable wait times (no random jitter by default)
 - Optional callback for rate limit events
 
+#### Follow-up 2.2.1b: Route-aware bucket mapping _(added 2025-11-08 during Phase 2 review)_
+- **Status**: ✅ Completed (2025-11-08)
+- Problem: `MemoryTracker.Update` stores bucket data by `bucketKey`, but `Wait`/`GetBucket` read by route (`POST:https://...`). When Discord sends a bucket ID (most endpoints do), per-route waits never trigger and adaptive strategies never learn (see `gosdk/ratelimit/tracker.go:122-154`).
+- Fix: Track both the canonical bucket (`bucketKey`) and route aliases. Store bucket structs by `bucketKey` and maintain a separate `routeToBucket` map so `Wait/GetBucket` can resolve quickly. Clean up both maps when a bucket expires.
+- Steps:
+  1. Extend `MemoryTracker` to include `routeToBucket map[string]string`.
+  2. When updating, map the provided `route` to the resolved bucket key and reuse existing structs when possible.
+  3. Update `Wait`/`GetBucket` to translate the incoming route through `routeToBucket`.
+  4. Add tests covering: (a) Discord provides `bucketKey`, (b) Discord omits `bucketKey`, (c) bucket expiry removes stale aliases.
+  5. Document the behavior in `docs/OPEN_QUESTIONS.md` once the approach is validated.
+
 ### Task 2.2.2: Rate Limit Strategies
-**Complexity**: Medium
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: Medium  
 **Dependencies**: Task 2.2.1
 
 **Implementation**:
@@ -207,22 +224,26 @@ type AdaptiveStrategy struct{}   // Learn from patterns
 7. Benchmarks comparing strategies
 
 **Testing**:
-- Strategy behavior validation
-- Performance benchmarks
-- Real-world scenario simulation
+- ✅ `gosdk/ratelimit/strategy_test.go` covers Reactive, Proactive, and Adaptive behavior (table-driven tests for thresholds, safety margins, adaptive learning).
+- TODO: Add longer-running simulations/benchmarks after tracker routing fix (see Follow-up 2.2.1b) so adaptive stats receive real bucket data.
+
+**Verification Notes**:
+- Implementation lives in `gosdk/ratelimit/strategy.go`. Ensure webhook client continues to default to `AdaptiveStrategy` (`gosdk/discord/webhook/webhook.go:61-84`).
+- Adaptive `RecordRequest` is currently called only from webhook client; once bot client exists, reuse helpers to keep metrics consistent.
 
 ### Task 2.2.3: Integrate Rate Limiting
 **Complexity**: Medium
-**Dependencies**: Tasks 2.2.1, 2.2.2
+**Dependencies**: Tasks 2.2.1, 2.2.1b, 2.2.2
 
 **Steps**:
-1. Add rate limiter to webhook client
-2. Add rate limiter to bot client (Phase 3)
-3. Update all HTTP requests to use rate limiting
-4. Add debug logging for rate limit events
-5. Update configuration with rate limit options
-6. Integration tests with real Discord API
-7. Documentation and examples
+1. **Webhooks**: Wire the fixed tracker (2.2.1b) + strategy hooks through all webhook code paths (`Send`, `SendWithFiles`, CRUD). Confirm `Wait` is invoked even when strategies are disabled (fallback to reactive waits).
+2. **Bot client (Phase 3 dependency)**: Design constructor options that accept a `ratelimit.Tracker` and `ratelimit.Strategy` so CLI can plug in shared state when multiple clients run in one process.
+3. Ensure every outbound HTTP helper uses a shared `route := ratelimit.RouteFromEndpoint(...)` helper so tracker/strategy see normalized routes.
+4. Emit structured debug logs for every wait/hit (`logger.Debug` before waits, `logger.Warn` on 429) with fields: `route`, `strategy`, `wait_ms`, `reset_at`, `bucket_key`.
+5. Configuration: extend `config.ClientConfig` with `RateLimit struct { Strategy string; Tracker string; }` (or similar) and document precedence (env > file > option).
+6. Update examples (`gosdk/examples/webhook*`) to show configuring strategies via env/config for regression testing.
+7. Integration tests: add httptest-based simulations that inject fake headers to confirm waits trigger (leveraging new tracker alias map). Schedule a real Discord dry-run later (docs/progress/STATUS to capture).
+8. Documentation: summarize the available strategies, configuration flags, and troubleshooting steps in `docs/guides/rate-limits.md` (new) and ensure AGENTS.md references it.
 
 **Configuration**:
 ```yaml
