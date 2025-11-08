@@ -66,11 +66,11 @@ Last Updated: 2025-11-08
 - [x] **Task 4.3.1**: Interaction response types — expanded response data structures, validation (content/embeds/components/choices/modals), and unit tests to guarantee payload correctness before client wiring.
 - [x] **Task 4.3.2**: Interaction client — added `InteractionClient` with create/edit/delete helpers for original + follow-up responses, plus httptest coverage for every route.
 - [x] **Task 4.3.3**: Response builders — fluent helpers for message/deferred/modal responses with validation-backed ergonomics and unit tests.
+- [x] **Task 4.4.1**: Component types — typed action rows/buttons/selects/text inputs with validation + conversion helpers (`discord/types/components.go`) and dedicated tests.
 
 ## Backlog
 
 - ### Phase 4: Interaction Features
-- [ ] **Task 4.4.1**: Component types (button/select/text input structs + validation).
 - [ ] **Task 4.4.2**: Component builders (fluent APIs atop typed components).
 - [ ] **Task 4.5.x**: CLI/docs updates once responses + builders are ready.
 

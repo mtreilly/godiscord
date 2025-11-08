@@ -57,16 +57,16 @@ Total: ~10 weeks, ~70 atomic tasks
 
 ## Next Actions (Phase 4)
 
-### 4.4.1: Component Types [3 days]
-**Focus**: Define strongly-typed button/select/text-input structs + validation to replace the generic `MessageComponent` usage ahead of builder ergonomics.
+### 4.4.2: Component Builders [3 days]
+**Focus**: Layer fluent builders atop the new typed components so CLI code can assemble action rows/buttons/selects/text inputs ergonomically.
 
 **Tasks**:
-1. Add `types/components.go` with button, select menu, and text-input structs + enums.
-2. Implement validation helpers (option counts, placeholder lengths, select value bounds).
-3. Update response validation to work with typed components and add tests.
+1. Add `interactions/components_builder.go` with button/select/text-input/action-row builders returning typed components.
+2. Provide helpers to convert builder output into `MessageComponent` slices for response builders.
+3. Cover builders with tests mirroring validation scenarios (link buttons, select options, modal inputs).
 
 ### Preview
-- Task 4.4.2: Component builders layered atop the typed structs.
+- Task 4.5.x: Interaction server wiring once component ergonomics & builders are complete.
 
 ## Agentic Workflow Features
 

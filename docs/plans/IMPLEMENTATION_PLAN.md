@@ -645,77 +645,17 @@ const (
 ## 4.4: Message Components (3 days)
 
 ### Task 4.4.1: Component Types
-**Complexity**: High
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: High  
 **Dependencies**: Task 4.3.1
 
-**Implementation**:
-```go
-// gosdk/discord/types/components.go
-type Component interface {
-    Type() ComponentType
-}
+**Delivered**:
+1. Introduced typed component structs + validation in `gosdk/discord/types/components.go` (action rows, buttons, select menus, text inputs) with conversion helpers that emit the existing `MessageComponent` shape.
+2. Expanded `MessageComponent` to carry channel types + text-input metadata so typed components serialize losslessly, and wired validations for labels/placeholders/options/min/max constraints.
+3. Added unit tests for the new component types plus conversion coverage (`gosdk/discord/types/components_test.go`) keeping parity with Discord limits.
 
-type ComponentType int
-
-const (
-    ComponentTypeActionRow ComponentType = iota + 1
-    ComponentTypeButton
-    ComponentTypeSelectMenu
-    ComponentTypeTextInput
-)
-
-type ActionRow struct {
-    Type       ComponentType `json:"type"`
-    Components []Component   `json:"components"`
-}
-
-type Button struct {
-    Type     ComponentType `json:"type"`
-    Style    ButtonStyle   `json:"style"`
-    Label    string        `json:"label,omitempty"`
-    Emoji    *Emoji        `json:"emoji,omitempty"`
-    CustomID string        `json:"custom_id,omitempty"`
-    URL      string        `json:"url,omitempty"`
-    Disabled bool          `json:"disabled,omitempty"`
-}
-
-type ButtonStyle int
-
-const (
-    ButtonStylePrimary ButtonStyle = iota + 1
-    ButtonStyleSecondary
-    ButtonStyleSuccess
-    ButtonStyleDanger
-    ButtonStyleLink
-)
-
-type SelectMenu struct {
-    Type        ComponentType    `json:"type"`
-    CustomID    string           `json:"custom_id"`
-    Options     []SelectOption   `json:"options,omitempty"`
-    Placeholder string           `json:"placeholder,omitempty"`
-    MinValues   int              `json:"min_values,omitempty"`
-    MaxValues   int              `json:"max_values,omitempty"`
-    Disabled    bool             `json:"disabled,omitempty"`
-}
-
-type SelectOption struct {
-    Label       string  `json:"label"`
-    Value       string  `json:"value"`
-    Description string  `json:"description,omitempty"`
-    Emoji       *Emoji  `json:"emoji,omitempty"`
-    Default     bool    `json:"default,omitempty"`
-}
-```
-
-**Steps**:
-1. Define component interfaces
-2. Define button types and styles
-3. Define select menu types (string, user, role, channel, mentionable)
-4. Define text input for modals
-5. Custom JSON marshaling for polymorphic types
-6. Validation (limits, required fields)
-7. Comprehensive tests
+**Next**:
+- Task 4.4.2 to build ergonomic component builders on top of these typed structures.
 
 ### Task 4.4.2: Component Builders
 **Complexity**: Medium
