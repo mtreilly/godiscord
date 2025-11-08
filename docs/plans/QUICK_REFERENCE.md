@@ -57,19 +57,17 @@ Total: ~10 weeks, ~70 atomic tasks
 
 ## Next Actions (Phase 3)
 
-### 3.2.3: Channel Message Operations [3 days]
-**Focus**: Build message creation/edit/delete helpers (reuse webhook multipart logic later).
+### 3.3.1: Reaction Operations [1 day]
+**Focus**: Implement reaction endpoints (create/delete/list) on top of message helpers.
 
 **Tasks**:
-1. Implement `CreateMessage`, `EditMessage`, `DeleteMessage`, `BulkDeleteMessages`, `GetMessage`.
-2. Support JSON-only payloads first (content/embeds) + table-driven tests; file uploads can leverage webhook multipart in a follow-up.
-3. Ensure rate limiter + middleware flow through (re-use base client).
-4. Tests: payload validation, 4xx/5xx handling, bulk delete constraints.
-5. Examples: send message to channel + edit message content.
+1. Add `CreateReaction`, `DeleteOwnReaction`, `DeleteUserReaction`, `GetReactions`, `DeleteAllReactions`.
+2. Handle emoji encoding (URL encode custom emoji). Validate inputs.
+3. Tests with `httptest.Server` verifying routes/methods and emoji encoding.
 
 ### Preview
-- Reaction operations (Task 3.3.1)
-- Thread helpers + CLI wiring once message endpoints stabilize
+- Guild operations scaffolding (Phase 3.4)
+- CLI wiring + integration tests once channels/messages solid
 
 ## Agentic Workflow Features
 

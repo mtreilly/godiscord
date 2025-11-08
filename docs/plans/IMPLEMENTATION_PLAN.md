@@ -441,33 +441,17 @@ const (
 - Add CLI/godoc snippets once CRUD integrates with vibe CLI (tracked for Phase 4 docs).
 
 ### Task 3.2.3: Channel Message Operations
-**Complexity**: High
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: Medium  
 **Dependencies**: Task 3.2.2
 
-**Implementation**:
-```go
-// Add to channels.go
-func (c *Client) CreateMessage(ctx context.Context, channelID string, params *MessageCreateParams) (*types.Message, error)
-func (c *Client) EditMessage(ctx context.Context, channelID, messageID string, params *MessageEditParams) (*types.Message, error)
-func (c *Client) DeleteMessage(ctx context.Context, channelID, messageID string) error
-func (c *Client) BulkDeleteMessages(ctx context.Context, channelID string, messageIDs []string) error
-func (c *Client) GetMessage(ctx context.Context, channelID, messageID string) (*types.Message, error)
-```
+**Delivered**:
+1. `gosdk/discord/client/messages.go` with message service exposing Create/Edit/Delete/Get/BulkDelete helpers backed by the base client + middleware stack.
+2. Reused existing `types.MessageCreateParams` + new `MessageEditParams`; added validation + tests for service-level inputs (empty IDs, >100 bulk) in `messages_test.go`.
+3. Tests simulate Discord responses via `httptest.Server` to verify HTTP method, path, payload, and error handling per endpoint.
+4. File uploads/components left for later (defer to webhook multipart path); ready for CLI integration for text/embeds flows.
 
-**Steps**:
-1. Implement POST /channels/{id}/messages
-2. Implement PATCH /channels/{id}/messages/{id}
-3. Implement DELETE /channels/{id}/messages/{id}
-4. Implement POST /channels/{id}/messages/bulk-delete
-5. Implement GET /channels/{id}/messages/{id}
-6. Handle file uploads (multipart)
-7. Handle embeds and components
-8. Comprehensive tests
-
-**Agentic Considerations**:
-- Batch operations for efficiency
-- Message templates for common formats
-- Preview mode (validate without sending)
+**Next**: Reaction helpers (Task 3.3.1) + file upload parity once message CLI needs attachments.
 
 ## 3.3: Reaction Operations (1 day)
 

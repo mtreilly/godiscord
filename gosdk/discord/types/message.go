@@ -84,3 +84,9 @@ type MessageCreateParams struct {
 	Embeds  []Embed `json:"embeds,omitempty"`
 	// Add more fields as needed (components, attachments, etc.)
 }
+
+// MessageEditParams represents editable message fields.
+type MessageEditParams struct {
+	Content string  `json:"content,omitempty"`
+	Embeds  []Embed `json:"embeds,omitempty"`
+}

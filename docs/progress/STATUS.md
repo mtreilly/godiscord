@@ -131,7 +131,15 @@ Last Updated: 2025-11-08
   - [x] Added channel structs/enums, builder, and validation helpers
   - [x] JSON + validation tests ensure constraints match Discord limits
   - **Files**: discord/types/channel.go, discord/types/channel_test.go
-- [ ] **Task 3.2.2**: Channel CRUD operations
+- [x] **Task 3.2.2**: Channel CRUD operations ✅
+  - [x] `Get/Modify/Delete/GetMessages` helpers + pagination validation
+  - [x] Tests for auth headers, audit log reasons, and query params
+  - **Files**: discord/client/channels.go, channels_test.go
+- [x] **Task 3.2.3**: Channel message operations ✅
+  - [x] Message service for create/edit/get/delete/bulk delete
+  - [x] Tests for payload validation + server interactions
+  - **Files**: discord/client/messages.go, messages_test.go, types/message.go
+- [ ] **Task 3.3.1**: Reaction helpers
 
 ### Phase 4: Integration & Polish
 - [ ] vibe CLI integration guide
@@ -183,8 +191,8 @@ See [../OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md) for active design discussions:
 
 ## Next Actions
 
-1. **Current**: Implement channel message operations (Task 3.2.3) atop the CRUD helpers.
-2. Next: Reaction helpers + thread-specific utilities (Tasks 3.3.x).
+1. **Current**: Implement reaction helpers (Task 3.3.1) and thread utilities (Task 3.3.x).
+2. Next: Guild operations scaffolding (Phase 3.4).
 3. Then: Integration smoke tests / CLI wiring leveraging webhook + client packages.
 
 ## Known Issues
