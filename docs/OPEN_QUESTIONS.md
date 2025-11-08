@@ -215,3 +215,36 @@ Links
 
 Status
 - open
+
+## Q6: Shared rate limiter & middleware ordering for bot client
+Scope: SDK | Owner: unassigned | Last Updated: 2025-11-08
+
+Context
+- Phase 3 introduces `gosdk/discord/client`, which will sit alongside the webhook package. Both need to share a `ratelimit.Tracker`/`Strategy` instance so a single CLI run doesn’t double-count requests. We also plan to add middleware (logging, retry, metrics) that must execute deterministically.
+
+Open Question(s)
+- How do we let multiple clients share a tracker/strategy safely without leaking per-package routes?
+- What is the canonical middleware contract (function signature, error propagation) so webhook + bot clients can use the same building blocks?
+- Should middleware run before or after the rate-limit wait call (or both)?
+
+Hypotheses / Options
+- A) Inject tracker/strategy via options and document that callers pass the same instance (simplest, relies on user discipline).
+- B) Provide a shared `ratelimit.Manager` that hands out route-scoped trackers per package (more code, central coordination).
+- C) Wrap the HTTP client in middleware-aware `RoundTripper`s so rate limiting stays closest to the transport while higher-level middleware wraps request builders.
+
+Proposed Experiment(s)
+- Define middleware interfaces while implementing Task 3.1.1 so we can prototype ordering.
+- Build unit tests simulating simultaneous webhook + bot calls sharing a tracker to ensure buckets stay in sync.
+- Capture findings in docs/guides or AGENTS once the approach is validated.
+
+Signals / Success Criteria
+- Shared tracker prevents duplicate waits and keeps `rateLimitHits` <1% even with concurrent clients.
+- Middleware ordering documented + enforced so logging/retry metrics look identical across packages.
+
+Links
+- gosdk/discord/webhook/webhook.go (current rate limit integration)
+- gosdk/ratelimit/*
+- docs/plans/IMPLEMENTATION_PLAN.md (Tasks 3.1.1 / 3.1.2)
+
+Status
+- open

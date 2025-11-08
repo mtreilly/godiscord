@@ -303,11 +303,12 @@ client:
 **Focus**: Core Discord Bot API, channels, messages, guilds
 **Agent Tasks**: 12-15 atomic tasks
 
-## 3.1: HTTP Client Foundation (2 days)
+## 3.1: HTTP Client Foundation (2 days) _(Current focus — kick-off 2025-11-08)_
 
 ### Task 3.1.1: Base HTTP Client
-**Complexity**: High
-**Dependencies**: Phase 2
+**Status**: 🆕 Not started  
+**Complexity**: High  
+**Dependencies**: Phase 2 (rate limiter, logger, config)
 
 **Architecture**:
 ```go
@@ -333,14 +334,20 @@ func (c *Client) delete(ctx context.Context, path string) error
 ```
 
 **Steps**:
-1. Create `discord/client` package
-2. Implement base client with authentication
-3. Integrate rate limiter from Phase 2
-4. Add request/response logging
-5. Implement retry logic
-6. Handle Discord error responses
-7. Add middleware support for cross-cutting concerns
-8. Comprehensive tests with mock HTTP
+1. Scaffold `gosdk/discord/client` with module docs + package comment tying back to CLI principles.
+2. Implement `Client` constructor with options for HTTP client, base URL, logger, rate limiter, retry config.
+3. Port webhook rate-limit integration (shared tracker + strategy) so CLI can reuse the same limiter instance.
+4. Add internal `do` helper that:
+   - Injects `Authorization: Bot <token>`
+   - Encodes/decodes JSON payloads
+   - Wraps errors into `types.APIError` + typed sentinel errors.
+5. Instrument request/response logging (debug-level) and return structured metadata for CLI to emit JSON.
+6. Implement `get/post/patch/delete` helpers (thin wrappers) and stub channel/message methods for next tasks.
+7. Tests:
+   - Auth header injection
+   - Retry behavior and rate-limit waits via mock tracker
+   - Error decoding for 4xx/5xx
+   - Context cancellation mid-request
 
 **Testing**:
 - Mock HTTP server for all status codes

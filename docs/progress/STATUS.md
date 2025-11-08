@@ -147,12 +147,12 @@ Last Updated: 2025-11-08
 ## Metrics
 
 - **Packages**: 6 (types, webhook, config, logger, ratelimit, + examples)
-- **Test Coverage**: 36 tests total (all passing)
-  - webhook: 23 tests
-  - ratelimit: 13 tests
-- **Examples**: 2 (webhook, webhook-files)
-- **Documentation**: 15+ docs (README, AGENTS, design docs, implementation plan, etc.)
-- **Lines of Code**: ~2,500 LOC (Go)
+- **Test Artifacts**: 40+ tests/benchmarks (webhook coverage 82.6% per `go test -cover`)
+  - webhook: golden tests, concurrency race test, bench, optional integration harness
+  - ratelimit: 13 unit tests
+- **Examples**: 3 (webhook, webhook-files, webhook-thread)
+- **Documentation**: 17+ docs (README, AGENTS, design docs, guides, plans)
+- **Lines of Code**: ~2,700 LOC (Go)
 
 ## Open Questions
 
@@ -162,12 +162,13 @@ See [../OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md) for active design discussions:
 - Q3: Testing strategy
 - Q4: Gateway implementation priority
 - Q5: Error handling patterns
+- Q6: Shared rate limiter + middleware ordering
 
 ## Next Actions
 
-1. **Current**: Documentation cleanup (Task 2.4.2) – godoc polish + webhook guide.
-2. Next: Prep bot client scaffolding (Phase 3) once webhook/RL stack is stable.
-3. Schedule integration smoke tests / CLI wiring after docs/tests land.
+1. **Current**: Phase 3 kick-off — implement base bot HTTP client (Task 3.1.1) leveraging existing rate limiter/logger patterns.
+2. Next: Layer middleware system (Task 3.1.2) + shared tracker guidance (see OPEN_QUESTIONS Q6).
+3. Then: Channel operations (Task 3.2) and integration smoke tests once HTTP foundation lands.
 
 ## Known Issues
 
