@@ -50,6 +50,13 @@ func (w *WebhookMessage) Validate() error {
 		}
 	}
 
+	if w.ThreadID != "" && w.ThreadName != "" {
+		return &ValidationError{
+			Field:   "thread_id/thread_name",
+			Message: "cannot set both thread_id and thread_name",
+		}
+	}
+
 	for i, embed := range w.Embeds {
 		if err := validateEmbed(&embed); err != nil {
 			return err

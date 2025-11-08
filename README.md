@@ -19,6 +19,7 @@ A production-ready Go SDK for Discord interactions, designed for integration wit
 - **[Implementation Plan](docs/plans/IMPLEMENTATION_PLAN.md)** - Complete phased development plan (7 phases, ~10 weeks)
 - **[Quick Reference](docs/plans/QUICK_REFERENCE.md)** - Quick reference for agents
 - **[Roadmap](docs/plans/ROADMAP.md)** - High-level roadmap and milestones
+- **[Rate Limit Guide](docs/guides/RATE_LIMITS.md)** - Strategy/configuration reference
 - **[Design Principles](docs/design/CLI_DESIGN_PRINCIPLES.md)** - Core design principles
 - **[Open Questions](docs/OPEN_QUESTIONS.md)** - Active design discussions
 
@@ -136,6 +137,10 @@ export DISCORD_WEBHOOK="https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN"
 # Run webhook example
 cd gosdk/examples/webhook
 go run main.go
+
+# Threaded webhook example (requires DISCORD_WEBHOOK_THREAD_ID or forum channel)
+cd ../webhook-thread
+go run main.go
 ```
 
 ## Configuration
@@ -161,7 +166,10 @@ discord:
 client:
   timeout: 30s
   retries: 3
-  rate_limit_strategy: adaptive
+  rate_limit:
+    strategy: adaptive
+    backoff_base: 1s
+    backoff_max: 60s
 
 logging:
   level: info

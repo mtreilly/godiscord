@@ -261,30 +261,17 @@ client:
 ## 2.3: Webhook Thread Support (1 day)
 
 ### Task 2.3.1: Thread Operations
-**Complexity**: Low
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: Low  
 **Dependencies**: Task 2.1.1
 
-**Implementation**:
-```go
-// Add to WebhookMessage
-type WebhookMessage struct {
-    // ... existing fields
-    ThreadID   string `json:"thread_id,omitempty"`
-    ThreadName string `json:"thread_name,omitempty"`
-}
+**Highlights**:
+- `types.WebhookMessage` enforces that only one of `thread_id` or `thread_name` is set, preventing invalid API calls.
+- Webhook client already supports `SendToThread` and `CreateThread`; tests cover validation, query params, and multipart flows (`discord/webhook/thread_test.go`).
+- Added runnable example `gosdk/examples/webhook-thread` plus `.env`/README updates so agents can try posting to a thread or creating forum threads locally.
 
-// Add to webhook client
-func (c *Client) SendToThread(ctx context.Context, threadID string, msg *WebhookMessage) error
-func (c *Client) CreateThread(ctx context.Context, msg *WebhookMessage, threadName string) (string, error)
-```
-
-**Steps**:
-1. Add thread_id support to webhook messages
-2. Implement thread creation via webhooks
-3. Add thread_name for auto-creation
-4. Handle thread permissions
-5. Tests for thread operations
-6. Examples with thread workflows
+**Remaining Considerations**:
+- When the bot client lands (Phase 3), expose helper utilities for listing/validating thread IDs to help CLI users pick targets.
 
 ## 2.4: Testing & Documentation (1 day)
 

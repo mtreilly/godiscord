@@ -214,6 +214,15 @@ func TestWebhookMessage_ThreadValidation(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "both thread_id and thread_name set",
+			msg: &types.WebhookMessage{
+				Content:    "test",
+				ThreadID:   "123",
+				ThreadName: "should-error",
+			},
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {

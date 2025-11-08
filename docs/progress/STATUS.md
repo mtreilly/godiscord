@@ -101,7 +101,11 @@ Last Updated: 2025-11-08
 	  - [x] Added proactive+reactive wait logging and adaptive outcome tracking
 	  - [x] Extended config/env defaults + added rate limit guide + example usage
 	  - **Files**: discord/webhook/webhook.go, config/config.go, config/config_test.go, docs/guides/RATE_LIMITS.md, examples/webhook/main.go
-	- [ ] **Task 2.3.1**: Thread operations
+	- [x] **Task 2.3.1**: Thread operations ✅
+	  - [x] Validation guards against setting both `thread_id` and `thread_name`
+	  - [x] Added runnable thread example + env scaffolding
+	  - [x] Expanded tests covering new validation branch
+	  - **Files**: discord/types/webhook.go, discord/webhook/thread_test.go, examples/webhook-thread/, .env.example, README.md
 	- [ ] **Task 2.4.1**: Comprehensive tests
 	- [ ] **Task 2.4.2**: Documentation
 
@@ -155,10 +159,9 @@ See [../OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md) for active design discussions:
 
 ## Next Actions
 
-1. **Current**: Implement webhook thread operations (Task 2.3.1) leveraging existing validation.
-2. Next: Continue with coverage push + docs (Tasks 2.4.1–2.4.2).
-3. Then: Prep bot client scaffolding (Phase 3) once webhook/RL stack is stable.
-4. Schedule integration smoke tests / CLI wiring after thread + docs land.
+1. **Current**: Continue with coverage push + docs (Tasks 2.4.1–2.4.2).
+2. Next: Prep bot client scaffolding (Phase 3) once webhook/RL stack is stable.
+3. Schedule integration smoke tests / CLI wiring after docs/tests land.
 
 ## Known Issues
 
