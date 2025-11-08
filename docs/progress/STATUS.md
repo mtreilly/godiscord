@@ -96,7 +96,11 @@ Last Updated: 2025-11-08
 	  - [x] Size detection via Len/Seeker heuristics for totals
 	  - [x] Raised aggregate cap to match 25MB per file (future configurable)
 	  - **Files**: discord/webhook/multipart.go, multipart_test.go
-	- [ ] **Task 2.2.3**: Integrate rate limiting
+	- [x] **Task 2.2.3**: Integrate rate limiting ✅
+	  - [x] Centralized wait logic across webhook JSON/multipart/CRUD paths
+	  - [x] Added proactive+reactive wait logging and adaptive outcome tracking
+	  - [x] Extended config/env defaults + added rate limit guide + example usage
+	  - **Files**: discord/webhook/webhook.go, config/config.go, config/config_test.go, docs/guides/RATE_LIMITS.md, examples/webhook/main.go
 	- [ ] **Task 2.3.1**: Thread operations
 	- [ ] **Task 2.4.1**: Comprehensive tests
 	- [ ] **Task 2.4.2**: Documentation
@@ -151,11 +155,10 @@ See [../OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md) for active design discussions:
 
 ## Next Actions
 
-1. **Current**: Integrate tracker + strategies across webhook CRUD + file sends (Task 2.2.3) and expose config knobs.
-2. Next: Implement webhook thread operations (Task 2.3.1) leveraging existing validation.
-3. Then: Continue with coverage push + docs (Tasks 2.4.1–2.4.2).
-4. Prep bot client scaffolding (Phase 3) once webhook/RL stack is stable.
-5. Draft rate-limit guide + config schema once integration done.
+1. **Current**: Implement webhook thread operations (Task 2.3.1) leveraging existing validation.
+2. Next: Continue with coverage push + docs (Tasks 2.4.1–2.4.2).
+3. Then: Prep bot client scaffolding (Phase 3) once webhook/RL stack is stable.
+4. Schedule integration smoke tests / CLI wiring after thread + docs land.
 
 ## Known Issues
 

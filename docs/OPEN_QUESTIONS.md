@@ -61,6 +61,7 @@ Hypotheses / Options
 
 2025-11-08 Update
 - Implemented route-alias-aware tracker so proactive/adaptive strategies share bucket state across endpoints (`gosdk/ratelimit/tracker.go`).
+- Added `docs/guides/RATE_LIMITS.md` to document strategy/telemetry knobs exposed via config/env.
 - Need to validate real-world alias coverage once webhook + bot clients share trackers; keep telemetry hooks in Task 2.2.3.
 
 Proposed Experiment(s)

@@ -24,9 +24,17 @@ type DiscordConfig struct {
 
 // ClientConfig contains HTTP client configuration
 type ClientConfig struct {
-	Timeout           time.Duration `yaml:"timeout"`
-	Retries           int           `yaml:"retries"`
-	RateLimitStrategy string        `yaml:"rate_limit_strategy"`
+	Timeout           time.Duration   `yaml:"timeout"`
+	Retries           int             `yaml:"retries"`
+	RateLimit         RateLimitConfig `yaml:"rate_limit"`
+	RateLimitStrategy string          `yaml:"rate_limit_strategy,omitempty"` // legacy support
+}
+
+// RateLimitConfig configures client-side rate limiting
+type RateLimitConfig struct {
+	Strategy    string        `yaml:"strategy"`
+	BackoffBase time.Duration `yaml:"backoff_base"`
+	BackoffMax  time.Duration `yaml:"backoff_max"`
 }
 
 // LoggingConfig contains logging configuration
@@ -58,9 +66,7 @@ func Load(path string) (*Config, error) {
 	if cfg.Client.Retries == 0 {
 		cfg.Client.Retries = 3
 	}
-	if cfg.Client.RateLimitStrategy == "" {
-		cfg.Client.RateLimitStrategy = "adaptive"
-	}
+	applyRateLimitDefaults(&cfg.Client)
 	if cfg.Logging.Level == "" {
 		cfg.Logging.Level = "info"
 	}
@@ -82,15 +88,35 @@ func Default() *Config {
 			},
 		},
 		Client: ClientConfig{
-			Timeout:           30 * time.Second,
-			Retries:           3,
-			RateLimitStrategy: "adaptive",
+			Timeout: 30 * time.Second,
+			Retries: 3,
+			RateLimit: RateLimitConfig{
+				Strategy:    getEnvOrDefault("DISCORD_RATE_LIMIT_STRATEGY", "adaptive"),
+				BackoffBase: time.Second,
+				BackoffMax:  60 * time.Second,
+			},
 		},
 		Logging: LoggingConfig{
 			Level:  getEnvOrDefault("DISCORD_LOG_LEVEL", "info"),
 			Format: "json",
 			Output: "stderr",
 		},
+	}
+}
+
+func applyRateLimitDefaults(cfg *ClientConfig) {
+	if cfg.RateLimit.Strategy == "" {
+		if cfg.RateLimitStrategy != "" {
+			cfg.RateLimit.Strategy = cfg.RateLimitStrategy
+		} else {
+			cfg.RateLimit.Strategy = getEnvOrDefault("DISCORD_RATE_LIMIT_STRATEGY", "adaptive")
+		}
+	}
+	if cfg.RateLimit.BackoffBase == 0 {
+		cfg.RateLimit.BackoffBase = time.Second
+	}
+	if cfg.RateLimit.BackoffMax == 0 {
+		cfg.RateLimit.BackoffMax = 60 * time.Second
 	}
 }
 

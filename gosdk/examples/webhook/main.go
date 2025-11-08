@@ -19,11 +19,17 @@ func main() {
 	}
 
 	// Create webhook client
-	client, err := webhook.NewClient(
-		webhookURL,
+	opts := []webhook.Option{
 		webhook.WithMaxRetries(3),
-		webhook.WithTimeout(30*time.Second),
-	)
+		webhook.WithTimeout(30 * time.Second),
+	}
+
+	if strategy := os.Getenv("DISCORD_RATE_LIMIT_STRATEGY"); strategy != "" {
+		fmt.Printf("Using rate limit strategy: %s\n", strategy)
+		opts = append(opts, webhook.WithStrategyName(strategy))
+	}
+
+	client, err := webhook.NewClient(webhookURL, opts...)
 	if err != nil {
 		log.Fatalf("Failed to create webhook client: %v", err)
 	}

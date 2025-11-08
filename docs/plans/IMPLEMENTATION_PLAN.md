@@ -232,18 +232,20 @@ type AdaptiveStrategy struct{}   // Learn from patterns
 - Adaptive `RecordRequest` is currently called only from webhook client; once bot client exists, reuse helpers to keep metrics consistent.
 
 ### Task 2.2.3: Integrate Rate Limiting
-**Complexity**: Medium
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: Medium  
 **Dependencies**: Tasks 2.2.1, 2.2.1b, 2.2.2
 
-**Steps**:
-1. **Webhooks**: Wire the fixed tracker (2.2.1b) + strategy hooks through all webhook code paths (`Send`, `SendWithFiles`, CRUD). Confirm `Wait` is invoked even when strategies are disabled (fallback to reactive waits).
-2. **Bot client (Phase 3 dependency)**: Design constructor options that accept a `ratelimit.Tracker` and `ratelimit.Strategy` so CLI can plug in shared state when multiple clients run in one process.
-3. Ensure every outbound HTTP helper uses a shared `route := ratelimit.RouteFromEndpoint(...)` helper so tracker/strategy see normalized routes.
-4. Emit structured debug logs for every wait/hit (`logger.Debug` before waits, `logger.Warn` on 429) with fields: `route`, `strategy`, `wait_ms`, `reset_at`, `bucket_key`.
-5. Configuration: extend `config.ClientConfig` with `RateLimit struct { Strategy string; Tracker string; }` (or similar) and document precedence (env > file > option).
-6. Update examples (`gosdk/examples/webhook*`) to show configuring strategies via env/config for regression testing.
-7. Integration tests: add httptest-based simulations that inject fake headers to confirm waits trigger (leveraging new tracker alias map). Schedule a real Discord dry-run later (docs/progress/STATUS to capture).
-8. Documentation: summarize the available strategies, configuration flags, and troubleshooting steps in `docs/guides/rate-limits.md` (new) and ensure AGENTS.md references it.
+**What Shipped**:
+1. **Webhook client parity**: `sendWithRetryToURL` now uses the shared `waitForRateLimit` helper + `buildRoute`, so every code path (JSON, multipart, CRUD) honors proactive waits and reactive tracker blocks even when no strategy is configured.
+2. **Observability**: `waitForRateLimit` logs proactive and reactive waits, `c.recordStrategyOutcome` is reused everywhere, and rate-limit logs now include strategy names and durations.
+3. **Configuration**: `ClientConfig` gained a `rate_limit` block with strategy/backoff knobs (`config/config.go`, new tests in `config_test.go`). ENV override `DISCORD_RATE_LIMIT_STRATEGY` and `.env.example` reflect the new option.
+4. **Examples**: `gosdk/examples/webhook/main.go` reads the env var to demonstrate swapping strategies on the fly.
+5. **Docs**: Added `docs/guides/RATE_LIMITS.md` covering strategies, configuration, and troubleshooting; STATUS/OPEN_QUESTIONS reference it.
+
+**Next (Phase 3 tie-in)**:
+- Bot API client constructors must accept injected trackers/strategies to share rate-limit state across packages.
+- Add integration smoke tests against Discord’s staging server once CLI wiring is ready.
 
 **Configuration**:
 ```yaml

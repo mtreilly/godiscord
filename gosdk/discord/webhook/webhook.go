@@ -164,7 +164,7 @@ func (c *Client) SendSimple(ctx context.Context, content string) error {
 func (c *Client) sendWithRetryToURL(ctx context.Context, body []byte, url string) error {
 	var lastErr error
 	backoff := time.Second
-	route := ratelimit.RouteFromEndpoint("POST", url)
+	route := c.buildRoute("POST", url)
 
 	for attempt := 0; attempt <= c.maxRetries; attempt++ {
 		if attempt > 0 {
@@ -176,33 +176,9 @@ func (c *Client) sendWithRetryToURL(ctx context.Context, body []byte, url string
 			}
 		}
 
-		// Rate limiting: check strategy and wait if necessary
-		if c.rateLimiter != nil && c.strategy != nil {
-			bucket := c.rateLimiter.GetBucket(route)
-			if bucket != nil && c.strategy.ShouldWait(bucket) {
-				waitDuration := c.strategy.CalculateWait(bucket)
-				if waitDuration > 0 {
-					c.logger.Debug("rate limit: waiting before request",
-						"route", route,
-						"wait_duration", waitDuration,
-						"strategy", c.strategy.Name(),
-						"remaining", bucket.Remaining,
-						"limit", bucket.Limit,
-					)
-
-					select {
-					case <-ctx.Done():
-						return ctx.Err()
-					case <-time.After(waitDuration):
-						// Continue with request
-					}
-				}
-			}
-
-			// Wait for rate limit (handles both proactive and reactive waits)
-			if err := c.rateLimiter.Wait(ctx, route); err != nil {
-				return fmt.Errorf("rate limit wait failed: %w", err)
-			}
+		// Rate limiting: centralize proactive + reactive waits
+		if err := c.waitForRateLimit(ctx, route); err != nil {
+			return fmt.Errorf("rate limit wait failed: %w", err)
 		}
 
 		req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
@@ -229,10 +205,7 @@ func (c *Client) sendWithRetryToURL(ctx context.Context, body []byte, url string
 			resp.Body.Close()
 
 			// Record successful request for adaptive strategy
-			if adaptive, ok := c.strategy.(*ratelimit.AdaptiveStrategy); ok {
-				bucket := c.rateLimiter.GetBucket(route)
-				adaptive.RecordRequest(bucket, false)
-			}
+			c.recordStrategyOutcome(route, false)
 
 			return nil
 		}
@@ -271,10 +244,7 @@ func (c *Client) sendWithRetryToURL(ctx context.Context, body []byte, url string
 			)
 
 			// Record rate limit hit for adaptive strategy
-			if adaptive, ok := c.strategy.(*ratelimit.AdaptiveStrategy); ok {
-				bucket := c.rateLimiter.GetBucket(route)
-				adaptive.RecordRequest(bucket, true)
-			}
+			c.recordStrategyOutcome(route, true)
 
 			if apiErr.RetryAfter > 0 {
 				backoff = time.Duration(apiErr.RetryAfter) * time.Second
@@ -359,33 +329,61 @@ func createStrategy(name string) ratelimit.Strategy {
 
 // waitForRateLimit handles rate limiting before making a request
 func (c *Client) waitForRateLimit(ctx context.Context, route string) error {
-	if c.rateLimiter == nil || c.strategy == nil {
+	if c.rateLimiter == nil {
 		return nil
 	}
 
-	bucket := c.rateLimiter.GetBucket(route)
-	if bucket != nil && c.strategy.ShouldWait(bucket) {
-		waitDuration := c.strategy.CalculateWait(bucket)
-		if waitDuration > 0 {
-			c.logger.Debug("rate limit: waiting before request",
-				"route", route,
-				"wait_duration", waitDuration,
-				"strategy", c.strategy.Name(),
-				"remaining", bucket.Remaining,
-				"limit", bucket.Limit,
-			)
+	var strategyName string
+	if c.strategy != nil {
+		strategyName = c.strategy.Name()
+		bucket := c.rateLimiter.GetBucket(route)
+		if bucket != nil && c.strategy.ShouldWait(bucket) {
+			waitDuration := c.strategy.CalculateWait(bucket)
+			if waitDuration > 0 {
+				c.logger.Debug("rate limit: proactive wait",
+					"route", route,
+					"wait_duration", waitDuration,
+					"strategy", strategyName,
+					"remaining", bucket.Remaining,
+					"limit", bucket.Limit,
+				)
 
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			case <-time.After(waitDuration):
-				// Continue
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				case <-time.After(waitDuration):
+					c.logger.Debug("rate limit: proactive wait complete",
+						"route", route,
+						"strategy", strategyName,
+					)
+				}
 			}
 		}
+	} else {
+		strategyName = "none"
 	}
 
-	// Wait for rate limit (handles reactive waits)
-	return c.rateLimiter.Wait(ctx, route)
+	reactiveWait := false
+	if bucket := c.rateLimiter.GetBucket(route); bucket != nil && bucket.Remaining <= 0 && time.Now().Before(bucket.Reset) {
+		reactiveWait = true
+		c.logger.Debug("rate limit: reactive wait scheduled",
+			"route", route,
+			"reset_in", time.Until(bucket.Reset),
+		)
+	}
+
+	if err := c.rateLimiter.Wait(ctx, route); err != nil {
+		return err
+	}
+
+	if reactiveWait {
+		c.logger.Debug("rate limit: reactive wait complete",
+			"route", route,
+			"strategy", strategyName,
+		)
+	}
+
+	return nil
 }
 
 // buildRoute creates a route identifier for rate limiting
