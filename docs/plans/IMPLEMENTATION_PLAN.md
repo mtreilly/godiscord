@@ -545,51 +545,17 @@ const (
 
 **Next**: Task 4.1.2 to expand application command option builders and advanced validation.
 
-### Task 4.1.2: Application Command Types
-**Complexity**: High
+### Task 4.1.2: Application Command Builder
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: Medium  
 **Dependencies**: Task 4.1.1
 
-**Implementation**:
-```go
-// Add to interaction.go
-type ApplicationCommand struct {
-    ID                       string                     `json:"id,omitempty"`
-    Type                     ApplicationCommandType     `json:"type,omitempty"`
-    ApplicationID            string                     `json:"application_id,omitempty"`
-    GuildID                  string                     `json:"guild_id,omitempty"`
-    Name                     string                     `json:"name"`
-    Description              string                     `json:"description"`
-    Options                  []ApplicationCommandOption `json:"options,omitempty"`
-    DefaultMemberPermissions *int64                     `json:"default_member_permissions,omitempty"`
-    DMPermission             *bool                      `json:"dm_permission,omitempty"`
-}
+**Delivered**:
+1. `gosdk/discord/interactions/builder.go` with a fluent `CommandBuilder` for chat-input commands plus option helpers and DM permission toggles.
+2. Builder reuses `types.ApplicationCommand` validation, ensuring generated commands respect Discord limits.
+3. Unit test verifies builder success (`gosdk/discord/interactions/builder_test.go`).
 
-type ApplicationCommandType int
-
-const (
-    ApplicationCommandTypeChatInput ApplicationCommandType = iota + 1
-    ApplicationCommandTypeUser
-    ApplicationCommandTypeMessage
-)
-
-type ApplicationCommandOption struct {
-    Type        ApplicationCommandOptionType `json:"type"`
-    Name        string                       `json:"name"`
-    Description string                       `json:"description"`
-    Required    bool                         `json:"required,omitempty"`
-    Choices     []ApplicationCommandChoice   `json:"choices,omitempty"`
-    Options     []ApplicationCommandOption   `json:"options,omitempty"`
-    // ... more fields
-}
-```
-
-**Steps**:
-1. Define command types (chat input, user, message)
-2. Define option types (string, integer, boolean, user, channel, role, etc.)
-3. Define choices for options
-4. Add validation (name length, option limits)
-5. Builder pattern for complex commands
-6. Tests for all command types
+**Next**: Task 4.2.1 to wire command registration endpoints.
 
 ## 4.2: Command Registration (2 days)
 

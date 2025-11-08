@@ -162,7 +162,11 @@ Last Updated: 2025-11-08
 - [x] **Task 4.1.1**: Interaction types/models ✅
   - [x] Added Interaction + ApplicationCommand types with validation/tests
   - **Files**: discord/types/interaction.go, interaction_test.go
-- [ ] **Task 4.1.2**: Application command option/builder
+- [x] **Task 4.1.2**: Application command builder ✅
+  - [x] Added fluent builder helpers under `discord/interactions`
+  - [x] Builder validated via unit tests
+  - **Files**: discord/interactions/builder.go, builder_test.go
+- [ ] **Task 4.2.1**: Command management endpoints
 
 ### Phase 4: Integration & Polish
 - [ ] vibe CLI integration guide
