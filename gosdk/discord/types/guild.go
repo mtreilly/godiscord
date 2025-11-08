@@ -1,0 +1,117 @@
+package types
+
+import "time"
+
+// Guild represents a Discord guild (server).
+type Guild struct {
+	ID                          string         `json:"id"`
+	Name                        string         `json:"name"`
+	Icon                        string         `json:"icon,omitempty"`
+	IconHash                    string         `json:"icon_hash,omitempty"`
+	Splash                      string         `json:"splash,omitempty"`
+	DiscoverySplash             string         `json:"discovery_splash,omitempty"`
+	Owner                       bool           `json:"owner,omitempty"`
+	OwnerID                     string         `json:"owner_id"`
+	Permissions                 string         `json:"permissions,omitempty"`
+	Region                      string         `json:"region,omitempty"`
+	AFKChannelID                string         `json:"afk_channel_id,omitempty"`
+	AFKTimeout                  int            `json:"afk_timeout,omitempty"`
+	WidgetEnabled               bool           `json:"widget_enabled,omitempty"`
+	WidgetChannelID             string         `json:"widget_channel_id,omitempty"`
+	VerificationLevel           int            `json:"verification_level,omitempty"`
+	DefaultMessageNotifications int            `json:"default_message_notifications,omitempty"`
+	ExplicitContentFilter       int            `json:"explicit_content_filter,omitempty"`
+	Roles                       []Role         `json:"roles,omitempty"`
+	Members                     []Member       `json:"members,omitempty"`
+	Channels                    []Channel      `json:"channels,omitempty"`
+	Description                 string         `json:"description,omitempty"`
+	Banner                      string         `json:"banner,omitempty"`
+	Features                    []string       `json:"features,omitempty"`
+	ApproximateMemberCount      int            `json:"approximate_member_count,omitempty"`
+	ApproximatePresenceCount    int            `json:"approximate_presence_count,omitempty"`
+	WelcomeScreen               *WelcomeScreen `json:"welcome_screen,omitempty"`
+}
+
+// Role represents a guild role.
+type Role struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Permissions string `json:"permissions"`
+	Position    int    `json:"position"`
+	Color       int    `json:"color"`
+	Hoist       bool   `json:"hoist"`
+	Managed     bool   `json:"managed"`
+	Mentionable bool   `json:"mentionable"`
+}
+
+// Member represents a guild member.
+type Member struct {
+	User         *User      `json:"user,omitempty"`
+	Nick         string     `json:"nick,omitempty"`
+	Roles        []string   `json:"roles"`
+	JoinedAt     time.Time  `json:"joined_at"`
+	PremiumSince *time.Time `json:"premium_since,omitempty"`
+	Deaf         bool       `json:"deaf"`
+	Mute         bool       `json:"mute"`
+	Pending      bool       `json:"pending,omitempty"`
+}
+
+// GuildPreview provides limited information about a guild.
+type GuildPreview struct {
+	ID                       string   `json:"id"`
+	Name                     string   `json:"name"`
+	Icon                     string   `json:"icon,omitempty"`
+	Splash                   string   `json:"splash,omitempty"`
+	DiscoverySplash          string   `json:"discovery_splash,omitempty"`
+	Emojis                   []Emoji  `json:"emojis,omitempty"`
+	Features                 []string `json:"features,omitempty"`
+	ApproximateMemberCount   int      `json:"approximate_member_count"`
+	ApproximatePresenceCount int      `json:"approximate_presence_count"`
+	Description              string   `json:"description,omitempty"`
+}
+
+// Emoji represents a custom emoji.
+type Emoji struct {
+	ID        string   `json:"id"`
+	Name      string   `json:"name"`
+	Roles     []string `json:"roles,omitempty"`
+	Available bool     `json:"available"`
+}
+
+// WelcomeScreen describes the welcome screen configuration.
+type WelcomeScreen struct {
+	Description     string                 `json:"description,omitempty"`
+	WelcomeChannels []WelcomeScreenChannel `json:"welcome_channels"`
+}
+
+type WelcomeScreenChannel struct {
+	ChannelID   string `json:"channel_id"`
+	Description string `json:"description"`
+	EmojiID     string `json:"emoji_id,omitempty"`
+	EmojiName   string `json:"emoji_name,omitempty"`
+}
+
+// Validate ensures guild fields meet Discord requirements.
+func (g *Guild) Validate() error {
+	if g == nil {
+		return nil
+	}
+	if g.ID == "" {
+		return &ValidationError{Field: "id", Message: "guild ID is required"}
+	}
+	if g.Name == "" {
+		return &ValidationError{Field: "name", Message: "guild name is required"}
+	}
+	return nil
+}
+
+// Validate ensures role fields are valid.
+func (r *Role) Validate() error {
+	if r == nil {
+		return nil
+	}
+	if r.Name == "" {
+		return &ValidationError{Field: "role.name", Message: "role name is required"}
+	}
+	return nil
+}

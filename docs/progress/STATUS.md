@@ -143,7 +143,11 @@ Last Updated: 2025-11-08
   - [x] Added reaction endpoints (create/delete/list) with emoji encoding + pagination
   - [x] Tests validating route construction and parameter validation
   - **Files**: discord/client/messages.go, messages_test.go
-- [ ] **Task 3.4.1**: Guild types/models
+- [x] **Task 3.4.1**: Guild types/models ✅
+  - [x] Added Guild/Role/Member/Emoji structs and validation helpers
+  - [x] JSON + validation tests (`discord/types/guild_test.go`)
+  - **Files**: discord/types/guild.go, guild_test.go
+- [ ] **Task 3.4.2**: Guild operations
 
 ### Phase 4: Integration & Polish
 - [ ] vibe CLI integration guide
@@ -195,8 +199,8 @@ See [../OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md) for active design discussions:
 
 ## Next Actions
 
-1. **Current**: Implement reaction helpers (Task 3.3.1) and thread utilities (Task 3.3.x).
-2. Next: Guild operations scaffolding (Phase 3.4).
+1. **Current**: Implement guild REST helpers (Task 3.4.2) using new models.
+2. Next: Role/member operations (Task 3.4.3) and guild channels integration.
 3. Then: Integration smoke tests / CLI wiring leveraging webhook + client packages.
 
 ## Known Issues

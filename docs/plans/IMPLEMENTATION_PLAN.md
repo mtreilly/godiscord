@@ -471,44 +471,14 @@ const (
 ## 3.4: Guild Operations (3 days)
 
 ### Task 3.4.1: Guild Types and Models
-**Complexity**: High
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: Medium  
 **Dependencies**: Task 3.1.1
 
-**Implementation**:
-```go
-// gosdk/discord/types/guild.go
-type Guild struct {
-    ID                          string    `json:"id"`
-    Name                        string    `json:"name"`
-    Icon                        string    `json:"icon,omitempty"`
-    Owner                       bool      `json:"owner,omitempty"`
-    OwnerID                     string    `json:"owner_id"`
-    Permissions                 int64     `json:"permissions,omitempty"`
-    Region                      string    `json:"region"`
-    AFKChannelID                string    `json:"afk_channel_id,omitempty"`
-    MemberCount                 int       `json:"member_count,omitempty"`
-    Roles                       []*Role   `json:"roles,omitempty"`
-    Channels                    []*Channel `json:"channels,omitempty"`
-    // ... more fields
-}
-
-type Role struct {
-    ID          string `json:"id"`
-    Name        string `json:"name"`
-    Color       int    `json:"color"`
-    Hoist       bool   `json:"hoist"`
-    Position    int    `json:"position"`
-    Permissions int64  `json:"permissions"`
-    // ... more fields
-}
-```
-
-**Steps**:
-1. Define guild models
-2. Define role models
-3. Define member models
-4. Add JSON marshaling
-5. Validation methods
+**Delivered**:
+1. `gosdk/discord/types/guild.go` with Guild, Role, Member, Emoji, WelcomeScreen, and preview structs mirroring Discord’s API.
+2. Validation helpers for guild/role objects plus unit tests covering happy-path JSON + validation failures (`guild_test.go`).
+3. Types reference existing Channel/User/Message structures without circular deps, clearing the way for guild REST operations in Task 3.4.2.
 
 ### Task 3.4.2: Guild Operations
 **Complexity**: Medium

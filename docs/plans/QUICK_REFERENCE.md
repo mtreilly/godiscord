@@ -57,17 +57,16 @@ Total: ~10 weeks, ~70 atomic tasks
 
 ## Next Actions (Phase 3)
 
-### 3.4.1: Guild Types & Models [2 days]
-**Focus**: Define guild structs + validation to support upcoming guild APIs.
+### 3.4.2: Guild Operations [3 days]
+**Focus**: Implement guild REST helpers (Get/Modify/Channels) using new models.
 
 **Tasks**:
-1. Create `types/guild.go` (guilds, previews, roles, members).
-2. Validation helpers for role permissions, member limits.
-3. Tests covering JSON marshaling and constraints.
+1. Add `client/guilds.go` with `GetGuild`, `GetGuildPreview`, `ModifyGuild`, `GetGuildChannels`, `CreateGuildChannel`.
+2. Reuse validation + audit-log reason headers similar to channels.
+3. Tests verifying auth headers, request payloads, and query params.
 
 ### Preview
-- Guild operations (Task 3.4.2) using new models
-- Role/member helpers + integration tests once guild scaffolding lands
+- Role/member helpers (Task 3.4.3) + guild-level pagination/integration examples
 
 ## Agentic Workflow Features
 
