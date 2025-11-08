@@ -57,16 +57,16 @@ Total: ~10 weeks, ~70 atomic tasks
 
 ## Next Actions (Phase 4)
 
-### 4.5.1: Interaction Server [3 days]
-**Focus**: Stand up an HTTP handler layer that verifies signatures, routes interactions by type, and plugs into the new builders/client stack.
+### 4.6.1: Interaction Test Suite [2 days]
+**Focus**: Expand test coverage across interactions packages (builders, client, server) targeting >80% coverage and integration flows.
 
 **Tasks**:
-1. Implement `interactions/server.go` with signature verification (Ed25519), handler registration, and ping handling.
-2. Provide routing helpers for commands/components/modals plus structured logging hooks.
-3. Add httptest coverage for happy paths, signature failures, and routing errors.
+1. Add integration-style tests that run the server + client end-to-end with signed requests.
+2. Expand component/response builder coverage and add table-driven cases for router/middleware scenarios.
+3. Wire tests into STATUS metrics and document how to run integration targets.
 
 ### Preview
-- Task 4.5.2: Router/middleware system on top of the server primitives.
+- Task 4.6.2: Interaction documentation (guides, godoc updates, examples).
 
 ## Agentic Workflow Features
 

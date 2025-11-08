@@ -741,39 +741,17 @@ func (b *ModalBuilder) Build() *Modal
 - Task 4.5.2 will introduce a richer router + middleware system atop the new server.
 
 ### Task 4.5.2: Interaction Router
-**Complexity**: Medium
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: Medium  
 **Dependencies**: Task 4.5.1
 
-**Implementation**:
-```go
-// Add to server.go
-type Router struct {
-    commands   map[string]Handler
-    components map[string]Handler
-    modals     map[string]Handler
-    middleware []Middleware
-}
+**Delivered**:
+1. `Router` + middleware system (`gosdk/discord/interactions/router.go`) supporting command/component/modal registration, regex-based component patterns, and middleware chaining.
+2. Server now accepts custom routers via `WithRouter` and uses the router to resolve handlers before falling back to legacy maps.
+3. Tests cover command resolution, component pattern matching, and middleware execution order (`router_test.go`).
 
-func NewRouter() *Router
-
-func (r *Router) Command(name string, handler Handler)
-func (r *Router) Component(customID string, handler Handler)
-func (r *Router) Modal(customID string, handler Handler)
-func (r *Router) Use(middleware Middleware)
-
-// Pattern matching for dynamic custom IDs
-func (r *Router) ComponentPattern(pattern string, handler Handler)
-
-type Middleware func(next Handler) Handler
-```
-
-**Steps**:
-1. Create flexible router
-2. Support exact and pattern matching
-3. Add middleware support
-4. Implement command groups
-5. Tests for routing
-6. Examples with complex routing
+**Next**:
+- Focus shifts to Task 4.6.x (broader interaction test suite + docs).
 
 ## 4.6: Testing & Documentation (2 days)
 

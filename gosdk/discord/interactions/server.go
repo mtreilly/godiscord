@@ -27,6 +27,7 @@ type Server struct {
 	publicKey ed25519.PublicKey
 	logger    *logger.Logger
 	dryRun    bool
+	router    *Router
 
 	commandHandlers   map[string]Handler
 	componentHandlers map[string]Handler
@@ -52,6 +53,15 @@ func WithDryRun(enabled bool) ServerOption {
 	}
 }
 
+// WithRouter injects a custom router implementation.
+func WithRouter(r *Router) ServerOption {
+	return func(s *Server) {
+		if r != nil {
+			s.router = r
+		}
+	}
+}
+
 // NewServer constructs a new interaction server.
 func NewServer(publicKey string, opts ...ServerOption) (*Server, error) {
 	pubBytes, err := hex.DecodeString(strings.TrimSpace(publicKey))
@@ -68,6 +78,7 @@ func NewServer(publicKey string, opts ...ServerOption) (*Server, error) {
 		commandHandlers:   make(map[string]Handler),
 		componentHandlers: make(map[string]Handler),
 		modalHandlers:     make(map[string]Handler),
+		router:            NewRouter(),
 	}
 
 	for _, opt := range opts {
@@ -82,6 +93,9 @@ func (s *Server) RegisterCommand(name string, handler Handler) {
 		return
 	}
 	s.commandHandlers[strings.ToLower(name)] = handler
+	if s.router != nil {
+		s.router.Command(name, handler)
+	}
 }
 
 // RegisterComponent registers a handler for a component custom ID.
@@ -90,6 +104,9 @@ func (s *Server) RegisterComponent(customID string, handler Handler) {
 		return
 	}
 	s.componentHandlers[customID] = handler
+	if s.router != nil {
+		s.router.Component(customID, handler)
+	}
 }
 
 // RegisterModal registers a handler for a modal custom ID.
@@ -98,6 +115,9 @@ func (s *Server) RegisterModal(customID string, handler Handler) {
 		return
 	}
 	s.modalHandlers[customID] = handler
+	if s.router != nil {
+		s.router.Modal(customID, handler)
+	}
 }
 
 // HandleInteraction handles HTTP requests from Discord's interaction endpoint.
@@ -174,6 +194,11 @@ func (s *Server) verifyRequest(r *http.Request, body []byte) bool {
 }
 
 func (s *Server) resolveHandler(i *types.Interaction) Handler {
+	if s.router != nil {
+		if handler := s.router.Resolve(i); handler != nil {
+			return handler
+		}
+	}
 	if i == nil || i.Data == nil {
 		return nil
 	}

@@ -68,13 +68,14 @@ Last Updated: 2025-11-08
 - [x] **Task 4.3.3**: Response builders — fluent helpers for message/deferred/modal responses with validation-backed ergonomics and unit tests.
 - [x] **Task 4.4.1**: Component types — typed action rows/buttons/selects/text inputs with validation + conversion helpers (`discord/types/components.go`) and dedicated tests.
 - [x] **Task 4.4.2**: Component builders — fluent builders for buttons/selects/text inputs/action rows plus typed-component support in response builders/tests.
+- [x] **Task 4.5.1**: HTTP interaction handler — Ed25519-verified HTTP server with ping handling, handler registration, and tests.
+- [x] **Task 4.5.2**: Interaction router — middleware-enabled router with pattern support wired into the server + tests.
 
 ## Backlog
 
 - ### Phase 4: Interaction Features
-- [ ] **Task 4.5.1**: Interaction server (signature verification + routing).
-- [ ] **Task 4.5.2**: Router/middleware system for commands/components/modals.
-- [ ] **Task 4.5.x**: CLI/docs updates once responses + builders are ready.
+- [ ] **Task 4.6.1**: Interaction test suite (integration + coverage).
+- [ ] **Task 4.6.2**: Interaction documentation + guides.
 
 ### Phase 5: Gateway (Future)
 - [ ] WebSocket gateway connection
