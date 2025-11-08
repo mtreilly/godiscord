@@ -32,6 +32,22 @@ type Guild struct {
 	WelcomeScreen               *WelcomeScreen `json:"welcome_screen,omitempty"`
 }
 
+// GuildModifyParams represents the payload for modifying a guild.
+type GuildModifyParams struct {
+	Name                        string `json:"name,omitempty"`
+	Region                      string `json:"region,omitempty"`
+	VerificationLevel           int    `json:"verification_level,omitempty"`
+	DefaultMessageNotifications int    `json:"default_message_notifications,omitempty"`
+	ExplicitContentFilter       int    `json:"explicit_content_filter,omitempty"`
+	AFKChannelID                string `json:"afk_channel_id,omitempty"`
+	AFKTimeout                  int    `json:"afk_timeout,omitempty"`
+	Splash                      string `json:"splash,omitempty"`
+	Banner                      string `json:"banner,omitempty"`
+	Description                 string `json:"description,omitempty"`
+	PreferredLocale             string `json:"preferred_locale,omitempty"`
+	AuditLogReason              string `json:"-"`
+}
+
 // Role represents a guild role.
 type Role struct {
 	ID          string `json:"id"`
@@ -112,6 +128,17 @@ func (r *Role) Validate() error {
 	}
 	if r.Name == "" {
 		return &ValidationError{Field: "role.name", Message: "role name is required"}
+	}
+	return nil
+}
+
+// Validate ensures guild modification payloads are valid.
+func (p *GuildModifyParams) Validate() error {
+	if p == nil {
+		return &ValidationError{Field: "params", Message: "guild modify params required"}
+	}
+	if p.Name != "" && len(p.Name) > 100 {
+		return &ValidationError{Field: "name", Message: "guild name exceeds 100 characters"}
 	}
 	return nil
 }

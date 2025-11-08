@@ -481,26 +481,16 @@ const (
 3. Types reference existing Channel/User/Message structures without circular deps, clearing the way for guild REST operations in Task 3.4.2.
 
 ### Task 3.4.2: Guild Operations
-**Complexity**: Medium
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: Medium  
 **Dependencies**: Task 3.4.1
 
-**Implementation**:
-```go
-// gosdk/discord/client/guilds.go
-func (c *Client) GetGuild(ctx context.Context, guildID string, withCounts bool) (*types.Guild, error)
-func (c *Client) GetGuildPreview(ctx context.Context, guildID string) (*types.GuildPreview, error)
-func (c *Client) ModifyGuild(ctx context.Context, guildID string, params *ModifyGuildParams) (*types.Guild, error)
-func (c *Client) GetGuildChannels(ctx context.Context, guildID string) ([]*types.Channel, error)
-func (c *Client) CreateGuildChannel(ctx context.Context, guildID string, params *CreateChannelParams) (*types.Channel, error)
-```
+**Delivered**:
+1. Guild service (`gosdk/discord/client/guilds.go`) exposing Get/Preview/Modify plus channel list/create helpers with audit-log reason support.
+2. Validation across methods (guild IDs, modify params, channel params) and reuse of existing channel validation.
+3. Tests covering query params, headers, and payloads (`guilds_test.go`).
 
-**Steps**:
-1. Implement guild retrieval
-2. Implement guild modification
-3. Implement guild channel operations
-4. Handle permissions
-5. Tests with mock data
-6. Examples
+**Next**: Task 3.4.3 to cover guild roles/members built atop these helpers.
 
 ### Task 3.4.3: Role & Member Operations
 **Complexity**: Medium
