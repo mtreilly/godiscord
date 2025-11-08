@@ -2,7 +2,7 @@
 
 Last Updated: 2025-11-08
 
-## Current Phase: Phase 2 - Enhanced Webhook & Rate Limiting 🚧
+## Current Phase: Phase 4 - Interactions & Command Registration 🚧
 
 ## Completed
 
@@ -51,143 +51,28 @@ Last Updated: 2025-11-08
   - Build notifications
   - README with setup instructions
 
+### Phase 3: Bot API Client ✅
+- Base HTTP client + middleware stack with shared rate limiting, retries, and structured logging (`discord/client`).
+- Channel/message/reaction helpers plus guild/role/member operations with exhaustive validation + audit-log propagation.
+- Types for channels/guilds/members/messages expanded with builders + tests, keeping coverage >80% for core packages.
+
 ## In Progress
 
-### Phase 2: Enhanced Webhook & Rate Limiting (Current - Week 1)
-- [x] Phase 2 kickoff and planning
-- [x] **Task 2.1.1**: Multipart form support ✅
-  - [x] Create FileAttachment type
-  - [x] Implement SendWithFiles method
-  - [x] Handle multipart/form-data encoding
-  - [x] Validate file size limits (25MB per file, 8MB total)
-  - [x] Write tests with mock files (all passing)
-  - [x] Add example with file uploads
-  - **Files**: multipart.go, multipart_test.go, examples/webhook-files/
-- [x] **Task 2.1.2**: Webhook edit/delete operations ✅
-  - [x] Implement Edit() method for updating messages
-  - [x] Implement Delete() method for removing messages
-  - [x] Implement Get() method for retrieving messages
-  - [x] MessageEditParams type for edit parameters
-  - [x] Tests for all CRUD operations (23 tests total, all passing)
-  - **Files**: crud.go, crud_test.go
-- [x] **Task 2.2.1**: Rate limit tracker ✅
-  - [x] Create ratelimit package
-  - [x] Implement Bucket type for rate limit data
-  - [x] Implement MemoryTracker with thread-safe operations
-  - [x] Parse Discord rate limit headers
-  - [x] Wait() method with context support
-  - [x] Automatic cleanup of expired buckets
-  - [x] Global rate limit support
-  - [x] 13 tests covering all functionality (all passing)
-  - **Files**: ratelimit/tracker.go, ratelimit/tracker_test.go
-	- [x] **Task 2.2.1b**: Route-aware bucket mapping ✅
-	  - [x] Store tracker buckets by Discord `X-RateLimit-Bucket` while keeping per-route aliases
-	  - [x] Ensure `Wait`/`GetBucket` resolve aliases so proactive/adaptive strategies receive data
-	  - [x] Tests for aliasing + expiry cleanup
-	  - **Files**: ratelimit/tracker.go, ratelimit/tracker_test.go
-	- [x] **Task 2.2.2**: Rate limit strategies ✅
-	  - [x] Define Strategy interface
-	  - [x] Implement Reactive, Proactive, Adaptive strategies
-	  - [x] Adaptive learning stats + RecordRequest hooks
-	  - [x] Unit tests for strategy decision logic
-	  - **Files**: ratelimit/strategy.go, ratelimit/strategy_test.go
-	- [x] Attachment validation hardening ✅
-	  - [x] Runtime byte counting for per-file + aggregate limits (unknown sizes supported)
-	  - [x] Size detection via Len/Seeker heuristics for totals
-	  - [x] Raised aggregate cap to match 25MB per file (future configurable)
-	  - **Files**: discord/webhook/multipart.go, multipart_test.go
-	- [x] **Task 2.2.3**: Integrate rate limiting ✅
-	  - [x] Centralized wait logic across webhook JSON/multipart/CRUD paths
-	  - [x] Added proactive+reactive wait logging and adaptive outcome tracking
-	  - [x] Extended config/env defaults + added rate limit guide + example usage
-	  - **Files**: discord/webhook/webhook.go, config/config.go, config/config_test.go, docs/guides/RATE_LIMITS.md, examples/webhook/main.go
-	- [x] **Task 2.3.1**: Thread operations ✅
-	  - [x] Validation guards against setting both `thread_id` and `thread_name`
-	  - [x] Added runnable thread example + env scaffolding
-	  - [x] Expanded tests covering new validation branch
-	  - **Files**: discord/types/webhook.go, discord/webhook/thread_test.go, examples/webhook-thread/, .env.example, README.md
-		- [x] **Task 2.4.1**: Comprehensive tests ✅
-		  - [x] Achieved 82.6% coverage on webhook package (`go test ./discord/webhook -cover`)
-		  - [x] Added golden JSON fixtures + benchmark + race tests + optional integration harness
-		  - [x] Documented outputs in plan + instructions
-		- [x] **Task 2.4.2**: Documentation ✅
-		  - [x] Authored webhook how-to guide + linked from README
-		  - [x] Updated AGENTS.md with Phase 2 testing patterns + doc pointers
-		  - [x] Verified godoc coverage for new exports
+### Phase 4: Interactions (Week 1)
+- [x] **Task 4.1.1**: Interaction types/models — types + validation tests landed in `discord/types/interaction.go`.
+- [x] **Task 4.1.2**: Application command builder — fluent builder + tests under `discord/interactions`.
+- [x] **Task 4.2.1**: Command management endpoints — new `ApplicationCommands` service with global/guild CRUD + bulk overwrite helpers and `httptest` coverage.
+- [ ] **Task 4.2.2**: Command builder expansion — add remaining option types, choices, subcommands, and richer tests.
+- [ ] **Task 4.3.x**: Interaction responses + client — response schemas, response client, and builders pending once command registration is stable.
 
 ## Backlog
 
-### Phase 3: Bot API Client (Kickoff - Week 2)
-- [x] **Task 3.1.1**: Base HTTP client ✅
-  - [x] Implemented `gosdk/discord/client` with authenticated request helpers, shared rate limiter, and structured logging
-  - [x] Added option set (base URL, retries, timeout, custom HTTP client/logger/strategy)
-  - [x] Tests for auth headers, retries, context cancellation, API errors, rate-limit waits
-  - **Files**: discord/client/client.go, discord/client/client_test.go
-- [x] **Task 3.1.2**: Client middleware system ✅
-  - [x] Added middleware primitives + `Client.Use`
-  - [x] Built-in logging, retry, metrics, and dry-run middleware with tests
-  - **Files**: discord/client/middleware.go, discord/client/middleware_test.go
-- [x] **Task 3.2.1**: Channel types/models ✅
-  - [x] Added channel structs/enums, builder, and validation helpers
-  - [x] JSON + validation tests ensure constraints match Discord limits
-  - **Files**: discord/types/channel.go, discord/types/channel_test.go
-- [x] **Task 3.2.2**: Channel CRUD operations ✅
-  - [x] `Get/Modify/Delete/GetMessages` helpers + pagination validation
-  - [x] Tests for auth headers, audit log reasons, and query params
-  - **Files**: discord/client/channels.go, channels_test.go
-- [x] **Task 3.2.3**: Channel message operations ✅
-  - [x] Message service for create/edit/get/delete/bulk delete
-  - [x] Tests for payload validation + server interactions
-  - **Files**: discord/client/messages.go, messages_test.go, types/message.go
-- [x] **Task 3.3.1**: Reaction helpers ✅
-  - [x] Added reaction endpoints (create/delete/list) with emoji encoding + pagination
-  - [x] Tests validating route construction and parameter validation
-  - **Files**: discord/client/messages.go, messages_test.go
-- [x] **Task 3.4.1**: Guild types/models ✅
-  - [x] Added Guild/Role/Member/Emoji structs and validation helpers
-  - [x] JSON + validation tests (`discord/types/guild_test.go`)
-  - **Files**: discord/types/guild.go, guild_test.go
-- [x] **Task 3.4.2**: Guild operations ✅
-  - [x] Implemented guild Get/Preview/Modify + channel list/create helpers
-  - [x] Tests covering query params + audit log headers
-  - **Files**: discord/client/guilds.go, guilds_test.go
-- [x] **Task 3.4.3**: Role & member operations ✅
-  - [x] Added role CRUD + member list/get + role assignment helpers
-  - [x] Added role/member param types with validation/tests
-  - **Files**: discord/types/guild.go, guild_test.go, client/guilds.go, guilds_test.go
-- [ ] **Task 3.5.1**: Client integration tests
-- [ ] **Task 3.5.2**: Client documentation
-
-### Phase 4: Interactions (Planning)
-- [x] **Task 4.1.1**: Interaction types/models ✅
-  - [x] Added Interaction + ApplicationCommand types with validation/tests
-  - **Files**: discord/types/interaction.go, interaction_test.go
-- [x] **Task 4.1.2**: Application command builder ✅
-  - [x] Added fluent builder helpers under `discord/interactions`
-  - [x] Builder validated via unit tests
-  - **Files**: discord/interactions/builder.go, builder_test.go
-- [ ] **Task 4.2.1**: Command management endpoints
-
-### Phase 4: Integration & Polish
-- [ ] vibe CLI integration guide
-- [ ] Integration examples
-- [ ] Performance benchmarks
-- [ ] API stability review
-- [ ] Complete godoc documentation
-
-### Phase 3: Advanced Features
-- [ ] Slash commands
-  - Command registration
-  - Interaction handling
-  - Response types
-- [ ] Component interactions
-  - Buttons
-  - Select menus
-  - Modals
-- [ ] Embed builder
-  - Fluent API
-  - Validation
-  - Templates
+### Phase 4: Interaction Features
+- [ ] **Task 4.3.1**: Response types (message, deferred, modal) with validation.
+- [ ] **Task 4.3.2**: Interaction client (response/follow-up helpers + tests).
+- [ ] **Task 4.3.3**: Response builders (ephemeral helpers, embeds/components wiring).
+- [ ] **Task 4.4.x**: Component types + builders (buttons, select menus, text inputs).
+- [ ] **Task 4.5.x**: CLI/docs updates once responses + builders are ready.
 
 ### Phase 5: Gateway (Future)
 - [ ] WebSocket gateway connection

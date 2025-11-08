@@ -560,34 +560,21 @@ const (
 ## 4.2: Command Registration (2 days)
 
 ### Task 4.2.1: Command Management
-**Complexity**: Medium
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: Medium  
 **Dependencies**: Task 4.1.2
 
-**Implementation**:
-```go
-// gosdk/discord/client/commands.go
-func (c *Client) GetGlobalApplicationCommands(ctx context.Context) ([]*types.ApplicationCommand, error)
-func (c *Client) CreateGlobalApplicationCommand(ctx context.Context, cmd *types.ApplicationCommand) (*types.ApplicationCommand, error)
-func (c *Client) EditGlobalApplicationCommand(ctx context.Context, cmdID string, cmd *types.ApplicationCommand) (*types.ApplicationCommand, error)
-func (c *Client) DeleteGlobalApplicationCommand(ctx context.Context, cmdID string) error
+**Delivered**:
+1. New `ApplicationCommands` service (`gosdk/discord/client/commands.go`) that scopes all REST helpers to an application ID and reuses shared validation.
+2. Global + guild CRUD helpers plus atomic bulk overwrite endpoints, each honoring `ApplicationCommand.Validate()` and propagating `X-Audit-Log-Reason` headers.
+3. Support for guild + global bulk overwrite flows (empty slice clears commands) to enable deterministic command syncing from declarative specs.
 
-func (c *Client) GetGuildApplicationCommands(ctx context.Context, guildID string) ([]*types.ApplicationCommand, error)
-func (c *Client) CreateGuildApplicationCommand(ctx context.Context, guildID string, cmd *types.ApplicationCommand) (*types.ApplicationCommand, error)
-func (c *Client) BulkOverwriteGlobalApplicationCommands(ctx context.Context, cmds []*types.ApplicationCommand) ([]*types.ApplicationCommand, error)
-```
+**Testing**:
+- `gosdk/discord/client/commands_test.go` covers global/guild CRUD paths, audit-log propagation, validation failures, and bulk overwrite payloads using `httptest.Server`.
 
-**Steps**:
-1. Implement global command endpoints
-2. Implement guild command endpoints
-3. Implement bulk overwrite (atomic updates)
-4. Handle command permissions
-5. Tests with mock API
-6. Examples with command registration
-
-**Agentic Considerations**:
-- Declarative command definitions (YAML/JSON)
-- Command diff and sync utilities
-- Version control for command schemas
+**Follow-ups**:
+- Examples/docs for declarative command sync + CLI wiring (tracked under Phase 4 docs tasks).
+- Builders (Task 4.2.2) now unblock richer command definitions before sync.
 
 ### Task 4.2.2: Command Builder
 **Complexity**: Medium

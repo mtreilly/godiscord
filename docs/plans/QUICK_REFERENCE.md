@@ -12,13 +12,13 @@ Phase 1: Foundation [1 day] ✅ COMPLETE
 ├── Config & logging
 └── Initial tests
 
-Phase 2: Enhanced Webhook & Rate Limiting [1 week]
+Phase 2: Enhanced Webhook & Rate Limiting [1 week] ✅ COMPLETE
 ├── 2.1: Webhook file uploads (2 days)
 ├── 2.2: Advanced rate limiting (3 days)
 ├── 2.3: Webhook thread support (1 day)
 └── 2.4: Testing & docs (1 day)
 
-Phase 3: Bot API Client [2 weeks]
+Phase 3: Bot API Client [2 weeks] ✅ COMPLETE
 ├── 3.1: HTTP client foundation (2 days)
 ├── 3.2: Channel operations (3 days)
 ├── 3.3: Reaction operations (1 day)
@@ -55,18 +55,19 @@ Phase 7: vibe CLI Integration [1 week]
 Total: ~10 weeks, ~70 atomic tasks
 ```
 
-## Next Actions (Phase 3)
+## Next Actions (Phase 4)
 
-### 4.1.2: Application Command Types [2 days]
-**Focus**: Flesh out application command option builders + validations.
+### 4.2.2: Command Builder Expansion [2 days]
+**Focus**: Expand the builder to cover every option type, choices, permissions, and subcommand nests now that registration endpoints exist.
 
 **Tasks**:
-1. Add builder helpers for slash commands (string/integer/boolean/user/channel etc.).
-2. Validate choices, subcommands, localization fields.
-3. Tests for builder validation + JSON output.
+1. Add builder helpers for integer, boolean, user, channel, role, mentionable, number, attachment, and subcommands/groups.
+2. Add choice helpers + localization setters + autocomplete toggles.
+3. Validate nested options + enforce option limits through builder methods.
+4. Extend tests to cover new helpers + error paths.
 
 ### Preview
-- Command registration endpoints (Task 4.2.1) and builder API (Task 4.2.2)
+- Interaction response schemas + client (Tasks 4.3.1-4.3.3) once command builder parity is achieved.
 
 ## Agentic Workflow Features
 
