@@ -55,30 +55,36 @@ Phase 7: vibe CLI Integration [1 week]
 Total: ~10 weeks, ~70 atomic tasks
 ```
 
-## Next Actions (Phase 2)
+## Next Actions (Phase 3)
 
-### 2.1.1: Multipart Form Support [2 days]
-**Priority**: High
-**File**: `gosdk/discord/webhook/multipart.go`
+### 3.1.1: Bot HTTP Client [2 days]
+**Focus**: Stand up `gosdk/discord/client` with authenticated REST helpers.
 
 **Tasks**:
-1. Create FileAttachment type
-2. Implement SendWithFiles method
-3. Handle multipart/form-data encoding
-4. Validate file size limits
-5. Write tests with mock files
-6. Add example with image upload
+1. Create `client` package skeleton with `Client` struct + options.
+2. Implement base request helpers (`do/get/post/patch/delete`) w/ JSON encode/decode + typed `types.APIError`.
+3. Integrate existing `ratelimit.Tracker` + strategies (shared config).
+4. Add request/response logging hooks + godoc examples.
+5. Unit tests using `httptest.Server` covering auth headers, retry logic, rate-limit plumbing, and error parsing.
+6. Prep for middleware system (Task 3.1.2) by defining `RoundTripper`/`Middleware` interfaces.
 
 **Entry Point**:
 ```go
-type FileAttachment struct {
-    Name        string
-    ContentType string
-    Reader      io.Reader
-}
-
-func (c *Client) SendWithFiles(ctx context.Context, msg *WebhookMessage, files []FileAttachment) error
+client, err := client.New(token,
+    client.WithHTTPClient(httpClient),
+    client.WithRateLimiter(sharedLimiter),
+)
+resp, err := client.GetChannel(ctx, channelID) // wrapper built on internal `get`
 ```
+
+### 3.1.2: Middleware System [1 day]
+- Chainable middleware around the internal `RequestHandler`.
+- Built-ins: logging, retry, metrics, tracing.
+- Tests verifying order of execution + short-circuiting.
+
+### 3.2 Preview: Channel Operations
+- Define channel types (reuse `discord/types`).
+- CRUD helpers built atop the base client once task 3.1.x lands.
 
 ## Agentic Workflow Features
 
