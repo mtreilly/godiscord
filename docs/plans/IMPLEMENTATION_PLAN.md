@@ -534,54 +534,16 @@ const (
 ## 4.1: Interaction Models (2 days)
 
 ### Task 4.1.1: Interaction Types
-**Complexity**: High
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: High  
 **Dependencies**: Phase 3
 
-**Implementation**:
-```go
-// gosdk/discord/types/interaction.go
-type Interaction struct {
-    ID            string          `json:"id"`
-    ApplicationID string          `json:"application_id"`
-    Type          InteractionType `json:"type"`
-    Data          *InteractionData `json:"data,omitempty"`
-    GuildID       string          `json:"guild_id,omitempty"`
-    ChannelID     string          `json:"channel_id,omitempty"`
-    Member        *Member         `json:"member,omitempty"`
-    User          *User           `json:"user,omitempty"`
-    Token         string          `json:"token"`
-    Version       int             `json:"version"`
-    Message       *Message        `json:"message,omitempty"`
-}
+**Delivered**:
+1. `gosdk/discord/types/interaction.go` with Interaction, InteractionData, ResolvedData, ApplicationCommand, command option/choice structs, and response types.
+2. Validation helpers for interactions/commands/options + unit tests (`interaction_test.go`).
+3. Component/allowed-mention definitions ready for upcoming command registration + response tasks.
 
-type InteractionType int
-
-const (
-    InteractionTypePing InteractionType = iota + 1
-    InteractionTypeApplicationCommand
-    InteractionTypeMessageComponent
-    InteractionTypeApplicationCommandAutocomplete
-    InteractionTypeModalSubmit
-)
-
-type InteractionData struct {
-    ID       string                       `json:"id,omitempty"`
-    Name     string                       `json:"name,omitempty"`
-    Type     ApplicationCommandType       `json:"type,omitempty"`
-    Resolved *ResolvedData                `json:"resolved,omitempty"`
-    Options  []ApplicationCommandOption   `json:"options,omitempty"`
-    CustomID string                       `json:"custom_id,omitempty"`
-    Values   []string                     `json:"values,omitempty"`
-}
-```
-
-**Steps**:
-1. Define all interaction types
-2. Define interaction data structures
-3. Define resolved data types
-4. Add JSON marshaling/unmarshaling
-5. Validation methods
-6. Comprehensive tests
+**Next**: Task 4.1.2 to expand application command option builders and advanced validation.
 
 ### Task 4.1.2: Application Command Types
 **Complexity**: High

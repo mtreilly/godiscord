@@ -156,6 +156,13 @@ Last Updated: 2025-11-08
   - [x] Added role/member param types with validation/tests
   - **Files**: discord/types/guild.go, guild_test.go, client/guilds.go, guilds_test.go
 - [ ] **Task 3.5.1**: Client integration tests
+- [ ] **Task 3.5.2**: Client documentation
+
+### Phase 4: Interactions (Planning)
+- [x] **Task 4.1.1**: Interaction types/models ✅
+  - [x] Added Interaction + ApplicationCommand types with validation/tests
+  - **Files**: discord/types/interaction.go, interaction_test.go
+- [ ] **Task 4.1.2**: Application command option/builder
 
 ### Phase 4: Integration & Polish
 - [ ] vibe CLI integration guide

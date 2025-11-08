@@ -57,16 +57,16 @@ Total: ~10 weeks, ~70 atomic tasks
 
 ## Next Actions (Phase 3)
 
-### 3.5.1: Client Integration Tests [2 days]
-**Focus**: Build integration suite (build tag `integration`) covering webhook + bot client flows.
+### 4.1.2: Application Command Types [2 days]
+**Focus**: Flesh out application command option builders + validations.
 
 **Tasks**:
-1. Spin up mock Discord API or recorded fixtures for end-to-end tests.
-2. Cover webhook send, bot client channel CRUD, guild basics.
-3. Capture coverage metrics and performance baselines.
+1. Add builder helpers for slash commands (string/integer/boolean/user/channel etc.).
+2. Validate choices, subcommands, localization fields.
+3. Tests for builder validation + JSON output.
 
 ### Preview
-- Task 3.5.2 docs + Phase 4 planning once integration tests land
+- Command registration endpoints (Task 4.2.1) and builder API (Task 4.2.2)
 
 ## Agentic Workflow Features
 
