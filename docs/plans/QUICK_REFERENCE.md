@@ -57,17 +57,17 @@ Total: ~10 weeks, ~70 atomic tasks
 
 ## Next Actions (Phase 4)
 
-### 4.2.2: Command Builder Expansion [2 days]
-**Focus**: Expand the builder to cover every option type, choices, permissions, and subcommand nests now that registration endpoints exist.
+### 4.3.1: Interaction Response Types [3 days]
+**Focus**: Define response payloads (message/deferred/modal) with validation + tests to unblock the interaction client.
 
 **Tasks**:
-1. Add builder helpers for integer, boolean, user, channel, role, mentionable, number, attachment, and subcommands/groups.
-2. Add choice helpers + localization setters + autocomplete toggles.
-3. Validate nested options + enforce option limits through builder methods.
-4. Extend tests to cover new helpers + error paths.
+1. Implement `types.InteractionResponse` variants (message, deferred, autocomplete, modal).
+2. Add validation helpers covering ephemeral flags, component/attachment limits, and autocomplete choices.
+3. Golden tests for JSON payloads and table-driven validation coverage.
 
 ### Preview
-- Interaction response schemas + client (Tasks 4.3.1-4.3.3) once command builder parity is achieved.
+- Task 4.3.2: Interaction client for response/follow-up helpers.
+- Task 4.3.3: Response builders (ephemeral shortcuts, embed/component wiring).
 
 ## Agentic Workflow Features
 

@@ -577,42 +577,20 @@ const (
 - Builders (Task 4.2.2) now unblock richer command definitions before sync.
 
 ### Task 4.2.2: Command Builder
-**Complexity**: Medium
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: Medium  
 **Dependencies**: Task 4.2.1
 
-**Implementation**:
-```go
-// gosdk/discord/interactions/builder.go
-type CommandBuilder struct {
-    cmd *types.ApplicationCommand
-}
+**Delivered**:
+1. Expanded `CommandBuilder` with fluent helpers for every option type (string, integer, boolean, user, channel, role, mentionable, number, attachment) plus choice attachment, DM/default permission toggles, and NSFW flagging.
+2. Added exported sub-builders for subcommands and subcommand groups so nested options/choices can be configured declaratively with shared validation + error propagation.
+3. Builder now records configuration errors early and reuses `ApplicationCommand.Validate()` to ensure generated payloads are always Discord-compliant.
 
-func NewSlashCommand(name, description string) *CommandBuilder
-func (b *CommandBuilder) AddStringOption(name, description string, required bool) *CommandBuilder
-func (b *CommandBuilder) AddIntegerOption(name, description string, required bool) *CommandBuilder
-func (b *CommandBuilder) AddBooleanOption(name, description string, required bool) *CommandBuilder
-func (b *CommandBuilder) AddUserOption(name, description string, required bool) *CommandBuilder
-func (b *CommandBuilder) AddChannelOption(name, description string, required bool) *CommandBuilder
-func (b *CommandBuilder) AddRoleOption(name, description string, required bool) *CommandBuilder
-func (b *CommandBuilder) AddChoices(optionName string, choices ...ApplicationCommandChoice) *CommandBuilder
-func (b *CommandBuilder) SetDefaultPermission(perm bool) *CommandBuilder
-func (b *CommandBuilder) Build() (*types.ApplicationCommand, error)
+**Testing**:
+- `gosdk/discord/interactions/builder_test.go` covers advanced builder flows, nested subcommands/groups, choice validation, and error scenarios.
 
-// Example usage:
-cmd, err := NewSlashCommand("greet", "Greet a user").
-    AddUserOption("user", "User to greet", true).
-    AddStringOption("message", "Custom message", false).
-    Build()
-```
-
-**Steps**:
-1. Create fluent builder API
-2. Add all option types
-3. Add validation in Build()
-4. Add choice builders
-5. Add subcommand/subcommand group support
-6. Comprehensive tests
-7. Examples showing builder usage
+**Next**:
+- Move to Task 4.3.x (response types + interaction client) now that command schemas + registration endpoints are ready.
 
 ## 4.3: Interaction Responses (3 days)
 

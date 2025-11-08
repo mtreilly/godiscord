@@ -62,7 +62,7 @@ Last Updated: 2025-11-08
 - [x] **Task 4.1.1**: Interaction types/models — types + validation tests landed in `discord/types/interaction.go`.
 - [x] **Task 4.1.2**: Application command builder — fluent builder + tests under `discord/interactions`.
 - [x] **Task 4.2.1**: Command management endpoints — new `ApplicationCommands` service with global/guild CRUD + bulk overwrite helpers and `httptest` coverage.
-- [ ] **Task 4.2.2**: Command builder expansion — add remaining option types, choices, subcommands, and richer tests.
+- [x] **Task 4.2.2**: Command builder expansion — all option types, choices, subcommand/group builders, permission toggles, and validation/error handling landed with comprehensive tests.
 - [ ] **Task 4.3.x**: Interaction responses + client — response schemas, response client, and builders pending once command registration is stable.
 
 ## Backlog
