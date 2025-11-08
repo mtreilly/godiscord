@@ -63,7 +63,13 @@ Last Updated: 2025-11-08
   - [x] Write tests with mock files (all passing)
   - [x] Add example with file uploads
   - **Files**: multipart.go, multipart_test.go, examples/webhook-files/
-- [ ] **Task 2.1.2**: Webhook edit/delete operations (IN PROGRESS)
+- [x] **Task 2.1.2**: Webhook edit/delete operations ✅
+  - [x] Implement Edit() method for updating messages
+  - [x] Implement Delete() method for removing messages
+  - [x] Implement Get() method for retrieving messages
+  - [x] MessageEditParams type for edit parameters
+  - [x] Tests for all CRUD operations (23 tests total, all passing)
+  - **Files**: crud.go, crud_test.go
 - [ ] **Task 2.2.1**: Rate limit tracker
 - [ ] **Task 2.2.2**: Rate limit strategies
 - [ ] **Task 2.2.3**: Integrate rate limiting
@@ -103,10 +109,10 @@ Last Updated: 2025-11-08
 ## Metrics
 
 - **Packages**: 5 (types, webhook, config, logger, + examples)
-- **Test Coverage**: webhook package has comprehensive tests (all 15 tests passing)
+- **Test Coverage**: webhook package has comprehensive tests (all 23 tests passing)
 - **Examples**: 2 (webhook, webhook-files)
 - **Documentation**: 15+ docs (README, AGENTS, design docs, implementation plan, etc.)
-- **Lines of Code**: ~1,500 LOC (Go)
+- **Lines of Code**: ~2,000 LOC (Go)
 
 ## Open Questions
 
