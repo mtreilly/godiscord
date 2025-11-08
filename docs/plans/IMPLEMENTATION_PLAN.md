@@ -611,39 +611,20 @@ const (
 - Proceed to Task 4.3.2 (interaction client) now that response payloads are strongly validated.
 
 ### Task 4.3.2: Interaction Client
-**Complexity**: Medium
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: Medium  
 **Dependencies**: Task 4.3.1
 
-**Implementation**:
-```go
-// gosdk/discord/interactions/client.go
-type InteractionClient struct {
-    baseClient *client.Client
-}
+**Delivered**:
+1. `gosdk/discord/interactions/client.go` introducing `InteractionClient` with helpers for creating the initial interaction response plus managing original/follow-up messages under the webhook routes.
+2. Input validation across all helpers (IDs/tokens/params) + automatic `wait=true` on follow-up POSTs to return created messages.
+3. Shared use of the new response validation to prevent malformed payloads from reaching Discord.
 
-func NewInteractionClient(c *client.Client) *InteractionClient
+**Testing**:
+- `gosdk/discord/interactions/client_test.go` uses `httptest.Server` to validate HTTP methods, paths, query params, payload propagation, and error cases for every helper.
 
-func (ic *InteractionClient) CreateInteractionResponse(ctx context.Context, interactionID, token string, resp *types.InteractionResponse) error
-func (ic *InteractionClient) GetOriginalInteractionResponse(ctx context.Context, token string) (*types.Message, error)
-func (ic *InteractionClient) EditOriginalInteractionResponse(ctx context.Context, token string, params *MessageEditParams) (*types.Message, error)
-func (ic *InteractionClient) DeleteOriginalInteractionResponse(ctx context.Context, token string) error
-
-func (ic *InteractionClient) CreateFollowupMessage(ctx context.Context, token string, params *MessageCreateParams) (*types.Message, error)
-func (ic *InteractionClient) EditFollowupMessage(ctx context.Context, token, messageID string, params *MessageEditParams) (*types.Message, error)
-func (ic *InteractionClient) DeleteFollowupMessage(ctx context.Context, token, messageID string) error
-```
-
-**Steps**:
-1. Implement interaction response endpoint
-2. Implement followup message endpoints
-3. Handle interaction tokens (15-minute expiry)
-4. Tests with mock responses
-5. Examples with interaction flows
-
-**Agentic Considerations**:
-- Deferred response helpers (for long-running operations)
-- Response templates
-- Automatic followup for timeouts
+**Next**:
+- Task 4.3.3 to add ergonomic response builders on top of the new client + validated response types.
 
 ### Task 4.3.3: Response Builders
 **Complexity**: Low
