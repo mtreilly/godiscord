@@ -145,25 +145,25 @@ func New(token string, opts ...Option) (*Client, error) {
 
 // Get performs a GET request relative to the Discord API base path.
 func (c *Client) Get(ctx context.Context, path string, out interface{}) error {
-	return c.do(ctx, http.MethodGet, path, nil, out)
+	return c.do(ctx, http.MethodGet, path, nil, out, nil)
 }
 
 // Post performs a POST request.
 func (c *Client) Post(ctx context.Context, path string, body interface{}, out interface{}) error {
-	return c.do(ctx, http.MethodPost, path, body, out)
+	return c.do(ctx, http.MethodPost, path, body, out, nil)
 }
 
 // Patch performs a PATCH request.
 func (c *Client) Patch(ctx context.Context, path string, body interface{}, out interface{}) error {
-	return c.do(ctx, http.MethodPatch, path, body, out)
+	return c.do(ctx, http.MethodPatch, path, body, out, nil)
 }
 
 // Delete performs a DELETE request.
 func (c *Client) Delete(ctx context.Context, path string) error {
-	return c.do(ctx, http.MethodDelete, path, nil, nil)
+	return c.do(ctx, http.MethodDelete, path, nil, nil, nil)
 }
 
-func (c *Client) do(ctx context.Context, method, path string, body interface{}, out interface{}) error {
+func (c *Client) do(ctx context.Context, method, path string, body interface{}, out interface{}, headers http.Header) error {
 	route := c.buildRoute(method, path)
 	url := c.buildURL(path)
 
@@ -208,6 +208,11 @@ func (c *Client) do(ctx context.Context, method, path string, body interface{}, 
 		}
 		req.Header.Set("Authorization", "Bot "+c.token)
 		req.Header.Set("User-Agent", defaultUserAgent)
+		for key, values := range headers {
+			for _, v := range values {
+				req.Header.Add(key, v)
+			}
+		}
 
 		start := time.Now()
 		c.logger.Debug("discord.client.request",

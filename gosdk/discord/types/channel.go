@@ -123,6 +123,27 @@ type ChannelCreateParams struct {
 	AvailableTags        []ForumTag            `json:"available_tags,omitempty"`
 	DefaultReaction      *DefaultReaction      `json:"default_reaction_emoji,omitempty"`
 	DefaultSortOrder     string                `json:"default_sort_order,omitempty"`
+	AuditLogReason       string                `json:"-"`
+}
+
+// ModifyChannelParams mirrors update payloads (name optional).
+type ModifyChannelParams struct {
+	Name                 string                `json:"name,omitempty"`
+	Type                 ChannelType           `json:"type,omitempty"`
+	Topic                string                `json:"topic,omitempty"`
+	Bitrate              int                   `json:"bitrate,omitempty"`
+	UserLimit            int                   `json:"user_limit,omitempty"`
+	RateLimitPerUser     int                   `json:"rate_limit_per_user,omitempty"`
+	Position             int                   `json:"position,omitempty"`
+	PermissionOverwrites []PermissionOverwrite `json:"permission_overwrites,omitempty"`
+	ParentID             string                `json:"parent_id,omitempty"`
+	NSFW                 bool                  `json:"nsfw,omitempty"`
+	RTCRegion            string                `json:"rtc_region,omitempty"`
+	VideoQualityMode     int                   `json:"video_quality_mode,omitempty"`
+	AvailableTags        []ForumTag            `json:"available_tags,omitempty"`
+	DefaultReaction      *DefaultReaction      `json:"default_reaction_emoji,omitempty"`
+	DefaultSortOrder     string                `json:"default_sort_order,omitempty"`
+	AuditLogReason       string                `json:"-"`
 }
 
 // Validate ensures Channel fields meet Discord constraints.
@@ -164,6 +185,31 @@ func (p *ChannelCreateParams) Validate() error {
 		return &ValidationError{Field: "rate_limit_per_user", Message: "rate limit must be between 0 and 21600 seconds"}
 	}
 
+	return nil
+}
+
+// Validate ensures modify params satisfy Discord requirements.
+func (p *ModifyChannelParams) Validate() error {
+	if p == nil {
+		return &ValidationError{Field: "params", Message: "modify params required"}
+	}
+	if p.Name != "" {
+		if err := validateChannelName(p.Name); err != nil {
+			return err
+		}
+	}
+	if len(p.Topic) > 1024 {
+		return &ValidationError{Field: "topic", Message: "topic exceeds 1024 characters"}
+	}
+	if p.Bitrate < 0 {
+		return &ValidationError{Field: "bitrate", Message: "bitrate cannot be negative"}
+	}
+	if p.UserLimit < 0 {
+		return &ValidationError{Field: "user_limit", Message: "user limit cannot be negative"}
+	}
+	if p.RateLimitPerUser < 0 || p.RateLimitPerUser > 21600 {
+		return &ValidationError{Field: "rate_limit_per_user", Message: "rate limit must be between 0 and 21600 seconds"}
+	}
 	return nil
 }
 

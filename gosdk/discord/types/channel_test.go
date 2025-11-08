@@ -53,6 +53,22 @@ func TestChannelParamsBuilder(t *testing.T) {
 	}
 }
 
+func TestModifyChannelParamsValidate(t *testing.T) {
+	params := &ModifyChannelParams{
+		Name:             "updates",
+		Topic:            "Release info",
+		RateLimitPerUser: 10,
+	}
+	if err := params.Validate(); err != nil {
+		t.Fatalf("expected valid params, got %v", err)
+	}
+
+	params.Name = strings.Repeat("a", 101)
+	if err := params.Validate(); err == nil {
+		t.Fatal("expected error for long name")
+	}
+}
+
 func TestChannelJSONMarshalling(t *testing.T) {
 	now := time.Now().UTC()
 	ch := &Channel{

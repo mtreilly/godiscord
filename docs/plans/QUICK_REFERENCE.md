@@ -57,25 +57,19 @@ Total: ~10 weeks, ~70 atomic tasks
 
 ## Next Actions (Phase 3)
 
-### 3.2.2: Channel CRUD Operations [3 days]
-**Focus**: Implement GET/PATCH/DELETE channel endpoints and basic message listing using the new client.
+### 3.2.3: Channel Message Operations [3 days]
+**Focus**: Build message creation/edit/delete helpers (reuse webhook multipart logic later).
 
 **Tasks**:
-1. Add `client/channels.go` with helpers (`GetChannel`, `ModifyChannel`, `DeleteChannel`, `GetChannelMessages`) built on `Client.Get/Post/...`.
-2. Define `ModifyChannelParams`, `GetMessagesParams` (pagination markers) and reuse validation from channel types.
-3. Tests: `httptest.Server` verifying auth headers, payloads, pagination query params, and error handling.
-4. Examples/godoc snippet: fetch channel info + update the topic.
+1. Implement `CreateMessage`, `EditMessage`, `DeleteMessage`, `BulkDeleteMessages`, `GetMessage`.
+2. Support JSON-only payloads first (content/embeds) + table-driven tests; file uploads can leverage webhook multipart in a follow-up.
+3. Ensure rate limiter + middleware flow through (re-use base client).
+4. Tests: payload validation, 4xx/5xx handling, bulk delete constraints.
+5. Examples: send message to channel + edit message content.
 
-**Entry Point**:
-```go
-resp, err := client.GetChannel(ctx, "123")
-updated, err := client.ModifyChannel(ctx, "123", &types.ChannelCreateParams{Topic: "Deployments"})
-```
-
-### 3.2.x Preview
-- Channel message create/delete helpers
-- Thread-specific channel wrappers
-- Integration smoke tests using `integration` build tag once CLI wiring is ready
+### Preview
+- Reaction operations (Task 3.3.1)
+- Thread helpers + CLI wiring once message endpoints stabilize
 
 ## Agentic Workflow Features
 

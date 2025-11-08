@@ -183,8 +183,8 @@ See [../OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md) for active design discussions:
 
 ## Next Actions
 
-1. **Current**: Implement channel CRUD helpers (Task 3.2.2) on top of the new client.
-2. Next: Add channel message operations + pagination helpers (Task 3.2.3) once CRUD solid.
+1. **Current**: Implement channel message operations (Task 3.2.3) atop the CRUD helpers.
+2. Next: Reaction helpers + thread-specific utilities (Tasks 3.3.x).
 3. Then: Integration smoke tests / CLI wiring leveraging webhook + client packages.
 
 ## Known Issues

@@ -427,32 +427,18 @@ const (
 4. JSON + validation tests covering the builder, marshaling, and failure scenarios (`channel_test.go`).
 
 ### Task 3.2.2: Channel CRUD Operations
-**Complexity**: Medium
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: Medium  
 **Dependencies**: Task 3.2.1
 
-**Implementation**:
-```go
-// gosdk/discord/client/channels.go
-func (c *Client) GetChannel(ctx context.Context, channelID string) (*types.Channel, error)
-func (c *Client) ModifyChannel(ctx context.Context, channelID string, params *ModifyChannelParams) (*types.Channel, error)
-func (c *Client) DeleteChannel(ctx context.Context, channelID string) error
-func (c *Client) GetChannelMessages(ctx context.Context, channelID string, params *GetMessagesParams) ([]*types.Message, error)
-```
+**Delivered**:
+1. `gosdk/discord/client/channels.go` exposing `Channels()` service with `GetChannel`, `ModifyChannel`, `DeleteChannel`, `GetChannelMessages`.
+2. Pagination + query builder with validation (limit bounds, around/before/after exclusivity).
+3. Modify params reuse validation from types package, including audit-log reason header support.
+4. Tests verifying payloads, headers, and query parameters via `httptest.Server` (`channels_test.go`).
 
-**Steps**:
-1. Implement GET /channels/{id}
-2. Implement PATCH /channels/{id}
-3. Implement DELETE /channels/{id}
-4. Implement GET /channels/{id}/messages with pagination
-5. Add query parameter handling
-6. Tests with mock responses
-7. Examples for common operations
-
-**Testing**:
-- CRUD operation flow tests
-- Pagination handling
-- Error cases (404, 403)
-- Parameter validation
+**Examples/TODO**:
+- Add CLI/godoc snippets once CRUD integrates with vibe CLI (tracked for Phase 4 docs).
 
 ### Task 3.2.3: Channel Message Operations
 **Complexity**: High
