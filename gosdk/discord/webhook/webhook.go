@@ -172,3 +172,46 @@ func (c *Client) sendWithRetry(ctx context.Context, body []byte) error {
 
 	return fmt.Errorf("webhook request failed after %d attempts", c.maxRetries+1)
 }
+
+// parseErrorResponse parses an HTTP error response into an APIError
+func (c *Client) parseErrorResponse(resp *http.Response) *types.APIError {
+	respBody, _ := io.ReadAll(resp.Body)
+
+	apiErr := &types.APIError{
+		StatusCode: resp.StatusCode,
+		Message:    string(respBody),
+	}
+
+	// Parse JSON error if available
+	var errData struct {
+		Message    string                 `json:"message"`
+		Code       int                    `json:"code"`
+		Errors     map[string]interface{} `json:"errors"`
+		RetryAfter float64                `json:"retry_after"`
+	}
+	if json.Unmarshal(respBody, &errData) == nil {
+		apiErr.Message = errData.Message
+		apiErr.Code = errData.Code
+		apiErr.Errors = errData.Errors
+		if errData.RetryAfter > 0 {
+			apiErr.RetryAfter = int(errData.RetryAfter)
+		}
+	}
+
+	return apiErr
+}
+
+// marshalJSON marshals a value to JSON
+func marshalJSON(v interface{}) ([]byte, error) {
+	return json.Marshal(v)
+}
+
+// waitWithBackoff returns a channel that closes after the specified duration
+func waitWithBackoff(d time.Duration) <-chan time.Time {
+	return time.After(d)
+}
+
+// backoffFromSeconds converts seconds to a duration for backoff
+func backoffFromSeconds(seconds int) time.Duration {
+	return time.Duration(seconds) * time.Second
+}

@@ -55,14 +55,15 @@ Last Updated: 2025-11-08
 
 ### Phase 2: Enhanced Webhook & Rate Limiting (Current - Week 1)
 - [x] Phase 2 kickoff and planning
-- [ ] **Task 2.1.1**: Multipart form support (IN PROGRESS)
-  - [ ] Create FileAttachment type
-  - [ ] Implement SendWithFiles method
-  - [ ] Handle multipart/form-data encoding
-  - [ ] Validate file size limits
-  - [ ] Write tests with mock files
-  - [ ] Add example with image upload
-- [ ] **Task 2.1.2**: Webhook edit/delete operations
+- [x] **Task 2.1.1**: Multipart form support ✅
+  - [x] Create FileAttachment type
+  - [x] Implement SendWithFiles method
+  - [x] Handle multipart/form-data encoding
+  - [x] Validate file size limits (25MB per file, 8MB total)
+  - [x] Write tests with mock files (all passing)
+  - [x] Add example with file uploads
+  - **Files**: multipart.go, multipart_test.go, examples/webhook-files/
+- [ ] **Task 2.1.2**: Webhook edit/delete operations (IN PROGRESS)
 - [ ] **Task 2.2.1**: Rate limit tracker
 - [ ] **Task 2.2.2**: Rate limit strategies
 - [ ] **Task 2.2.3**: Integrate rate limiting
@@ -102,9 +103,10 @@ Last Updated: 2025-11-08
 ## Metrics
 
 - **Packages**: 5 (types, webhook, config, logger, + examples)
-- **Test Coverage**: webhook package has comprehensive tests
-- **Examples**: 1 (webhook)
-- **Documentation**: 7+ docs (README, AGENTS, design docs, etc.)
+- **Test Coverage**: webhook package has comprehensive tests (all 15 tests passing)
+- **Examples**: 2 (webhook, webhook-files)
+- **Documentation**: 15+ docs (README, AGENTS, design docs, implementation plan, etc.)
+- **Lines of Code**: ~1,500 LOC (Go)
 
 ## Open Questions
 
