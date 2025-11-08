@@ -63,12 +63,12 @@ Last Updated: 2025-11-08
 - [x] **Task 4.1.2**: Application command builder — fluent builder + tests under `discord/interactions`.
 - [x] **Task 4.2.1**: Command management endpoints — new `ApplicationCommands` service with global/guild CRUD + bulk overwrite helpers and `httptest` coverage.
 - [x] **Task 4.2.2**: Command builder expansion — all option types, choices, subcommand/group builders, permission toggles, and validation/error handling landed with comprehensive tests.
-- [ ] **Task 4.3.x**: Interaction responses + client — response schemas, response client, and builders pending once command registration is stable.
+- [x] **Task 4.3.1**: Interaction response types — expanded response data structures, validation (content/embeds/components/choices/modals), and unit tests to guarantee payload correctness before client wiring.
+- [ ] **Task 4.3.x**: Interaction responses + client — interaction client + response builders pending now that schemas are validated.
 
 ## Backlog
 
 ### Phase 4: Interaction Features
-- [ ] **Task 4.3.1**: Response types (message, deferred, modal) with validation.
 - [ ] **Task 4.3.2**: Interaction client (response/follow-up helpers + tests).
 - [ ] **Task 4.3.3**: Response builders (ephemeral helpers, embeds/components wiring).
 - [ ] **Task 4.4.x**: Component types + builders (buttons, select menus, text inputs).

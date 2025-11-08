@@ -57,17 +57,16 @@ Total: ~10 weeks, ~70 atomic tasks
 
 ## Next Actions (Phase 4)
 
-### 4.3.1: Interaction Response Types [3 days]
-**Focus**: Define response payloads (message/deferred/modal) with validation + tests to unblock the interaction client.
+### 4.3.2: Interaction Client [3 days]
+**Focus**: Build the HTTP helpers for creating/editing/deleting interaction responses + follow-up messages using the validated response types.
 
 **Tasks**:
-1. Implement `types.InteractionResponse` variants (message, deferred, autocomplete, modal).
-2. Add validation helpers covering ephemeral flags, component/attachment limits, and autocomplete choices.
-3. Golden tests for JSON payloads and table-driven validation coverage.
+1. Implement `interactions/client.go` wrapper over `discord/client` for the response endpoints (create/edit/delete original + follow-ups).
+2. Handle token-based auth, 15-minute interaction token expiry, and audit-log reasons where applicable.
+3. Add httptest coverage for every endpoint plus error cases, and wire into STATUS/docs.
 
 ### Preview
-- Task 4.3.2: Interaction client for response/follow-up helpers.
-- Task 4.3.3: Response builders (ephemeral shortcuts, embed/component wiring).
+- Task 4.3.3: Response builders (ephemeral shortcuts, embed/component wiring) once the client is available.
 
 ## Agentic Workflow Features
 

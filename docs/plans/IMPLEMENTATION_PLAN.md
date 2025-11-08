@@ -595,49 +595,20 @@ const (
 ## 4.3: Interaction Responses (3 days)
 
 ### Task 4.3.1: Response Types
-**Complexity**: High
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: High  
 **Dependencies**: Task 4.1.2
 
-**Implementation**:
-```go
-// gosdk/discord/types/interaction_response.go
-type InteractionResponse struct {
-    Type InteractionResponseType     `json:"type"`
-    Data *InteractionResponseData   `json:"data,omitempty"`
-}
+**Delivered**:
+1. Expanded `InteractionResponse`/`InteractionApplicationCommandCallbackData` to cover message, modal, and autocomplete responses plus typed `AutocompleteChoice` helpers with validation (`gosdk/discord/types/interaction.go`).
+2. Added comprehensive validation enforcing Discord limits: content <=2k chars, ≤10 embeds, component/attachment bounds, modal-only text inputs, autocomplete-only choices, and choice value typing.
+3. Introduced helper constants + layout validators so future builders/clients can rely on schema guarantees.
 
-type InteractionResponseType int
+**Testing**:
+- `gosdk/discord/types/interaction_test.go` now exercises happy-path message/autocomplete/modal responses and failure scenarios (content limit, embed overflow, invalid components, modal layout, choice typing).
 
-const (
-    InteractionResponseTypePong InteractionResponseType = iota + 1
-    InteractionResponseTypeChannelMessageWithSource InteractionResponseType = 4
-    InteractionResponseTypeDeferredChannelMessageWithSource
-    InteractionResponseTypeDeferredUpdateMessage
-    InteractionResponseTypeUpdateMessage
-    InteractionResponseTypeApplicationCommandAutocompleteResult
-    InteractionResponseTypeModal
-)
-
-type InteractionResponseData struct {
-    TTS             bool              `json:"tts,omitempty"`
-    Content         string            `json:"content,omitempty"`
-    Embeds          []Embed           `json:"embeds,omitempty"`
-    AllowedMentions *AllowedMentions  `json:"allowed_mentions,omitempty"`
-    Flags           int               `json:"flags,omitempty"`
-    Components      []Component       `json:"components,omitempty"`
-    Attachments     []Attachment      `json:"attachments,omitempty"`
-    Choices         []AutocompleteChoice `json:"choices,omitempty"`
-    CustomID        string            `json:"custom_id,omitempty"`
-    Title           string            `json:"title,omitempty"`
-}
-```
-
-**Steps**:
-1. Define all response types
-2. Define response data structures
-3. Handle ephemeral messages (flags)
-4. Add validation
-5. Tests for all response types
+**Next**:
+- Proceed to Task 4.3.2 (interaction client) now that response payloads are strongly validated.
 
 ### Task 4.3.2: Interaction Client
 **Complexity**: Medium
