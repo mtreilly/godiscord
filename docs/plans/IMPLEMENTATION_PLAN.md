@@ -456,25 +456,17 @@ const (
 ## 3.3: Reaction Operations (1 day)
 
 ### Task 3.3.1: Reaction Methods
-**Complexity**: Low
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: Low  
 **Dependencies**: Task 3.2.3
 
-**Implementation**:
-```go
-// Add to channels.go
-func (c *Client) CreateReaction(ctx context.Context, channelID, messageID, emoji string) error
-func (c *Client) DeleteOwnReaction(ctx context.Context, channelID, messageID, emoji string) error
-func (c *Client) DeleteUserReaction(ctx context.Context, channelID, messageID, emoji, userID string) error
-func (c *Client) GetReactions(ctx context.Context, channelID, messageID, emoji string, params *GetReactionsParams) ([]*types.User, error)
-func (c *Client) DeleteAllReactions(ctx context.Context, channelID, messageID string) error
-```
+**Delivered**:
+1. Reaction helpers added to `MessageService` (`CreateReaction`, `DeleteOwnReaction`, `DeleteUserReaction`, `GetReactions`, `DeleteAllReactions`).
+2. Emoji encoding via URL escaping + validation to support unicode/custom emoji formats.
+3. Pagination struct for `GetReactions`, reusing shared HTTP client + middleware stack.
+4. Tests covering route construction, pagination query params, and validation paths (`messages_test.go`).
 
-**Steps**:
-1. Implement reaction endpoints
-2. Handle emoji encoding (URL encoding for custom emojis)
-3. Pagination for GetReactions
-4. Tests for all operations
-5. Example with reaction workflows
+**Next**: Move on to guild operations (Task 3.4.x) once reactions integrate with CLI flows.
 
 ## 3.4: Guild Operations (3 days)
 

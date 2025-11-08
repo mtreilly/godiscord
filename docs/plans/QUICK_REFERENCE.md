@@ -57,17 +57,17 @@ Total: ~10 weeks, ~70 atomic tasks
 
 ## Next Actions (Phase 3)
 
-### 3.3.1: Reaction Operations [1 day]
-**Focus**: Implement reaction endpoints (create/delete/list) on top of message helpers.
+### 3.4.1: Guild Types & Models [2 days]
+**Focus**: Define guild structs + validation to support upcoming guild APIs.
 
 **Tasks**:
-1. Add `CreateReaction`, `DeleteOwnReaction`, `DeleteUserReaction`, `GetReactions`, `DeleteAllReactions`.
-2. Handle emoji encoding (URL encode custom emoji). Validate inputs.
-3. Tests with `httptest.Server` verifying routes/methods and emoji encoding.
+1. Create `types/guild.go` (guilds, previews, roles, members).
+2. Validation helpers for role permissions, member limits.
+3. Tests covering JSON marshaling and constraints.
 
 ### Preview
-- Guild operations scaffolding (Phase 3.4)
-- CLI wiring + integration tests once channels/messages solid
+- Guild operations (Task 3.4.2) using new models
+- Role/member helpers + integration tests once guild scaffolding lands
 
 ## Agentic Workflow Features
 

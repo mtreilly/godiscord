@@ -153,6 +153,11 @@ func (c *Client) Post(ctx context.Context, path string, body interface{}, out in
 	return c.do(ctx, http.MethodPost, path, body, out, nil)
 }
 
+// Put performs a PUT request.
+func (c *Client) Put(ctx context.Context, path string, body interface{}, out interface{}) error {
+	return c.do(ctx, http.MethodPut, path, body, out, nil)
+}
+
 // Patch performs a PATCH request.
 func (c *Client) Patch(ctx context.Context, path string, body interface{}, out interface{}) error {
 	return c.do(ctx, http.MethodPatch, path, body, out, nil)

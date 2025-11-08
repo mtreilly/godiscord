@@ -132,4 +132,66 @@ func TestMessageServiceValidation(t *testing.T) {
 	if err := client.Messages().BulkDeleteMessages(context.Background(), "123", make([]string, 101)); err == nil {
 		t.Fatal("expected error for >100 IDs")
 	}
+	if err := client.Messages().CreateReaction(context.Background(), "", "1", ":smile:"); err == nil {
+		t.Fatal("expected error for empty channel ID in reaction")
+	}
+}
+
+func TestMessageServiceCreateReaction(t *testing.T) {
+	var path string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path = r.RequestURI
+		if r.Method != http.MethodPut {
+			t.Fatalf("expected PUT, got %s", r.Method)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	defer server.Close()
+
+	client := newTestClient(t, server.URL)
+	if err := client.Messages().CreateReaction(context.Background(), "123", "456", ":smile:"); err != nil {
+		t.Fatalf("CreateReaction error: %v", err)
+	}
+	if path != "/channels/123/messages/456/reactions/%3Asmile%3A/@me" {
+		t.Fatalf("unexpected path %s", path)
+	}
+}
+
+func TestMessageServiceDeleteAllReactions(t *testing.T) {
+	var called bool
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		called = true
+		if r.RequestURI != "/channels/123/messages/456/reactions/%F0%9F%98%80" {
+			t.Fatalf("unexpected path %s", r.URL.Path)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	defer server.Close()
+
+	client := newTestClient(t, server.URL)
+	if err := client.Messages().DeleteAllReactions(context.Background(), "123", "456", "😀"); err != nil {
+		t.Fatalf("DeleteAllReactions error: %v", err)
+	}
+	if !called {
+		t.Fatal("expected delete all reactions to be called")
+	}
+}
+
+func TestMessageServiceGetReactions(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if got := r.URL.Query().Get("limit"); got != "25" {
+			t.Fatalf("expected limit=25, got %s", got)
+		}
+		json.NewEncoder(w).Encode([]*types.User{{ID: "u1"}})
+	}))
+	defer server.Close()
+
+	client := newTestClient(t, server.URL)
+	users, err := client.Messages().GetReactions(context.Background(), "123", "456", "🔥", &GetReactionsParams{Limit: 25})
+	if err != nil {
+		t.Fatalf("GetReactions error: %v", err)
+	}
+	if len(users) != 1 || users[0].ID != "u1" {
+		t.Fatalf("unexpected users %+v", users)
+	}
 }

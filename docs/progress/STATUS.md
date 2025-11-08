@@ -139,7 +139,11 @@ Last Updated: 2025-11-08
   - [x] Message service for create/edit/get/delete/bulk delete
   - [x] Tests for payload validation + server interactions
   - **Files**: discord/client/messages.go, messages_test.go, types/message.go
-- [ ] **Task 3.3.1**: Reaction helpers
+- [x] **Task 3.3.1**: Reaction helpers ✅
+  - [x] Added reaction endpoints (create/delete/list) with emoji encoding + pagination
+  - [x] Tests validating route construction and parameter validation
+  - **Files**: discord/client/messages.go, messages_test.go
+- [ ] **Task 3.4.1**: Guild types/models
 
 ### Phase 4: Integration & Polish
 - [ ] vibe CLI integration guide
