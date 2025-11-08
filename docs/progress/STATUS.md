@@ -65,13 +65,13 @@ Last Updated: 2025-11-08
 - [x] **Task 4.2.2**: Command builder expansion — all option types, choices, subcommand/group builders, permission toggles, and validation/error handling landed with comprehensive tests.
 - [x] **Task 4.3.1**: Interaction response types — expanded response data structures, validation (content/embeds/components/choices/modals), and unit tests to guarantee payload correctness before client wiring.
 - [x] **Task 4.3.2**: Interaction client — added `InteractionClient` with create/edit/delete helpers for original + follow-up responses, plus httptest coverage for every route.
-- [ ] **Task 4.3.x**: Interaction response builders — ergonomic builders pending now that the client + validation are in place.
+- [x] **Task 4.3.3**: Response builders — fluent helpers for message/deferred/modal responses with validation-backed ergonomics and unit tests.
 
 ## Backlog
 
-### Phase 4: Interaction Features
-- [ ] **Task 4.3.3**: Response builders (ephemeral helpers, embeds/components wiring).
-- [ ] **Task 4.4.x**: Component types + builders (buttons, select menus, text inputs).
+- ### Phase 4: Interaction Features
+- [ ] **Task 4.4.1**: Component types (button/select/text input structs + validation).
+- [ ] **Task 4.4.2**: Component builders (fluent APIs atop typed components).
 - [ ] **Task 4.5.x**: CLI/docs updates once responses + builders are ready.
 
 ### Phase 5: Gateway (Future)

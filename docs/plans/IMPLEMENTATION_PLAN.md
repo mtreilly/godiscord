@@ -627,32 +627,20 @@ const (
 - Task 4.3.3 to add ergonomic response builders on top of the new client + validated response types.
 
 ### Task 4.3.3: Response Builders
-**Complexity**: Low
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: Low  
 **Dependencies**: Task 4.3.2
 
-**Implementation**:
-```go
-// gosdk/discord/interactions/response_builder.go
-type ResponseBuilder struct {
-    resp *types.InteractionResponse
-}
+**Delivered**:
+1. `ResponseBuilder` helpers (`gosdk/discord/interactions/response_builder.go`) covering message, deferred, and modal responses with fluent methods for embeds, attachments, action rows, modal components, TTS, allowed mentions, and ephemeral flags.
+2. Builder reuses the shared response validation so every constructed payload is guaranteed to satisfy Discord limits before hitting the API.
+3. Guardrails on component shape (action rows at top-level, modal text-input requirements) to surface configuration errors early in builder chains.
 
-func NewMessageResponse(content string) *ResponseBuilder
-func NewDeferredResponse() *ResponseBuilder
-func NewModalResponse(customID, title string) *ResponseBuilder
+**Testing**:
+- `gosdk/discord/interactions/response_builder_test.go` validates happy paths (message + modal) and failure cases (non-action-row components, invalid modal inputs).
 
-func (b *ResponseBuilder) SetEphemeral() *ResponseBuilder
-func (b *ResponseBuilder) AddEmbed(embed types.Embed) *ResponseBuilder
-func (b *ResponseBuilder) AddComponents(components ...types.Component) *ResponseBuilder
-func (b *ResponseBuilder) Build() *types.InteractionResponse
-```
-
-**Steps**:
-1. Create builder patterns
-2. Add convenience methods
-3. Validation
-4. Tests
-5. Examples
+**Next**:
+- Proceed to Phase 4.4 (component types/builders) to round out interaction ergonomics.
 
 ## 4.4: Message Components (3 days)
 

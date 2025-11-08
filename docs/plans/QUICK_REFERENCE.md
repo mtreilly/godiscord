@@ -57,16 +57,16 @@ Total: ~10 weeks, ~70 atomic tasks
 
 ## Next Actions (Phase 4)
 
-### 4.3.3: Response Builders [3 days]
-**Focus**: Provide fluent builders for interaction responses (message/deferred/modal) leveraging the validated response types to simplify CLI usage.
+### 4.4.1: Component Types [3 days]
+**Focus**: Define strongly-typed button/select/text-input structs + validation to replace the generic `MessageComponent` usage ahead of builder ergonomics.
 
 **Tasks**:
-1. Add `response_builder.go` with helpers like `NewMessageResponse`, `NewDeferredResponse`, `NewModalResponse`.
-2. Support fluent config for embeds, components, allowed mentions, ephemeral flags, and follow-up templates.
-3. Cover builders with unit tests verifying generated payloads pass `InteractionResponse.Validate`.
+1. Add `types/components.go` with button, select menu, and text-input structs + enums.
+2. Implement validation helpers (option counts, placeholder lengths, select value bounds).
+3. Update response validation to work with typed components and add tests.
 
 ### Preview
-- Task 4.4.x: Component types/builders once response ergonomics are in place.
+- Task 4.4.2: Component builders layered atop the typed structs.
 
 ## Agentic Workflow Features
 
