@@ -725,44 +725,20 @@ func (b *ModalBuilder) Build() *Modal
 ## 4.5: Interaction Server (2 days)
 
 ### Task 4.5.1: HTTP Interaction Handler
-**Complexity**: High
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: High  
 **Dependencies**: Task 4.3.2
 
-**Implementation**:
-```go
-// gosdk/discord/interactions/server.go
-type Handler func(ctx context.Context, i *types.Interaction) (*types.InteractionResponse, error)
+**Delivered**:
+1. `gosdk/discord/interactions/server.go` implements Ed25519 signature verification, ping handling, and handler registration for commands, components, and modals.
+2. Structured logging and a `WithDryRun` option provide secure defaults while supporting local testing.
+3. Handler routing now reuses our typed `InteractionResponse` pipeline, enabling direct integration with the builders.
 
-type Server struct {
-    publicKey string
-    handlers  map[string]Handler
-    logger    *logger.Logger
-}
+**Testing**:
+- `gosdk/discord/interactions/server_test.go` signs requests with generated key pairs to assert signature enforcement, ping handling, routing, and error propagation.
 
-func NewServer(publicKey string, opts ...ServerOption) *Server
-
-func (s *Server) RegisterCommand(name string, handler Handler)
-func (s *Server) RegisterComponent(customID string, handler Handler)
-func (s *Server) RegisterModal(customID string, handler Handler)
-
-func (s *Server) HandleInteraction(w http.ResponseWriter, r *http.Request)
-func (s *Server) verifyRequest(r *http.Request) bool
-```
-
-**Steps**:
-1. Create interaction server
-2. Implement Ed25519 signature verification
-3. Implement request routing by interaction type
-4. Handle command interactions
-5. Handle component interactions
-6. Handle modal submissions
-7. Auto-respond to ping interactions
-8. Comprehensive tests with signed requests
-
-**Agentic Considerations**:
-- Request logging for debugging
-- Dry-run mode for testing handlers
-- Automatic error handling and logging
+**Next**:
+- Task 4.5.2 will introduce a richer router + middleware system atop the new server.
 
 ### Task 4.5.2: Interaction Router
 **Complexity**: Medium
