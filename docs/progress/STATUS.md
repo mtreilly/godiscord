@@ -138,6 +138,15 @@ Last Updated: 2025-11-08
 - [ ] API stability review
 - [ ] Complete godoc documentation
 
+### Phase 3: Bot API Client (Kickoff - Week 2)
+- [x] **Task 3.1.1**: Base HTTP client ✅
+  - [x] Implemented `gosdk/discord/client` with authenticated request helpers, shared rate limiter, and structured logging
+  - [x] Added option set (base URL, retries, timeout, custom HTTP client/logger/strategy)
+  - [x] Tests for auth headers, retries, context cancellation, API errors, rate-limit waits
+  - **Files**: discord/client/client.go, discord/client/client_test.go
+- [ ] **Task 3.1.2**: Client middleware system
+- [ ] **Task 3.2.1**: Channel types/models
+
 ### Phase 5: Gateway (Future)
 - [ ] WebSocket gateway connection
 - [ ] Event handling
@@ -146,13 +155,14 @@ Last Updated: 2025-11-08
 
 ## Metrics
 
-- **Packages**: 6 (types, webhook, config, logger, ratelimit, + examples)
+- **Packages**: 7 (types, webhook, client, config, logger, ratelimit, + examples)
 - **Test Artifacts**: 40+ tests/benchmarks (webhook coverage 82.6% per `go test -cover`)
   - webhook: golden tests, concurrency race test, bench, optional integration harness
+  - client: 5 HTTP integration-style tests
   - ratelimit: 13 unit tests
 - **Examples**: 3 (webhook, webhook-files, webhook-thread)
-- **Documentation**: 17+ docs (README, AGENTS, design docs, guides, plans)
-- **Lines of Code**: ~2,700 LOC (Go)
+- **Documentation**: 18+ docs (README, AGENTS, design docs, guides, plans)
+- **Lines of Code**: ~2,900 LOC (Go)
 
 ## Open Questions
 
@@ -166,9 +176,9 @@ See [../OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md) for active design discussions:
 
 ## Next Actions
 
-1. **Current**: Phase 3 kick-off — implement base bot HTTP client (Task 3.1.1) leveraging existing rate limiter/logger patterns.
-2. Next: Layer middleware system (Task 3.1.2) + shared tracker guidance (see OPEN_QUESTIONS Q6).
-3. Then: Channel operations (Task 3.2) and integration smoke tests once HTTP foundation lands.
+1. **Current**: Implement client middleware + shared tracker guidance (Task 3.1.2, see OPEN_QUESTIONS Q6).
+2. Next: Channel operations scaffolding (Task 3.2.1) built atop the new client.
+3. Then: Integration smoke tests / CLI wiring leveraging webhook + client packages.
 
 ## Known Issues
 

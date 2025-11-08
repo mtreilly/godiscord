@@ -5,7 +5,7 @@ A production-ready Go SDK for Discord interactions, designed for integration wit
 ## Features
 
 - **Webhooks**: Send messages, embeds, and files via Discord webhooks
-- **Bot API**: Interact with channels, messages, and guilds (planned)
+- **Bot API**: Interact with channels, messages, and guilds (in progress)
 - **Slash Commands**: Register and handle slash commands (planned)
 - **Rate Limiting**: Automatic rate limit handling with exponential backoff
 - **Error Handling**: Comprehensive typed errors for programmatic handling
@@ -34,7 +34,7 @@ agent-discord/
 ├── discord-bot/           # Old Python implementation (reference only)
 ├── gosdk/                 # Go SDK (main development) ⭐
 │   ├── discord/           # Discord API packages
-│   │   ├── client/        # Core API client (planned)
+│   │   ├── client/        # Core API client
 │   │   ├── webhook/       # Webhook functionality ✅
 │   │   ├── interactions/  # Slash commands (planned)
 │   │   └── types/         # Shared types and models ✅

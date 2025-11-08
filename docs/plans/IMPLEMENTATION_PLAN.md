@@ -306,7 +306,7 @@ client:
 ## 3.1: HTTP Client Foundation (2 days) _(Current focus — kick-off 2025-11-08)_
 
 ### Task 3.1.1: Base HTTP Client
-**Status**: 🆕 Not started  
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: High  
 **Dependencies**: Phase 2 (rate limiter, logger, config)
 
@@ -333,21 +333,12 @@ func (c *Client) patch(ctx context.Context, path string, body, v interface{}) er
 func (c *Client) delete(ctx context.Context, path string) error
 ```
 
-**Steps**:
-1. Scaffold `gosdk/discord/client` with module docs + package comment tying back to CLI principles.
-2. Implement `Client` constructor with options for HTTP client, base URL, logger, rate limiter, retry config.
-3. Port webhook rate-limit integration (shared tracker + strategy) so CLI can reuse the same limiter instance.
-4. Add internal `do` helper that:
-   - Injects `Authorization: Bot <token>`
-   - Encodes/decodes JSON payloads
-   - Wraps errors into `types.APIError` + typed sentinel errors.
-5. Instrument request/response logging (debug-level) and return structured metadata for CLI to emit JSON.
-6. Implement `get/post/patch/delete` helpers (thin wrappers) and stub channel/message methods for next tasks.
-7. Tests:
-   - Auth header injection
-   - Retry behavior and rate-limit waits via mock tracker
-   - Error decoding for 4xx/5xx
-   - Context cancellation mid-request
+**Delivered**:
+1. New `gosdk/discord/client` package with constructor + option set (HTTP client, base URL, logger, rate limiter, strategy, retries, timeout).
+2. Shared rate-limit helper + adaptive strategy reuse from webhook; proactive/reactive waits logged via `logger.Debug`.
+3. Authenticated `do` helper with JSON encode/decode, typed error parsing (`types.APIError`) and exponential backoff/429 handling.
+4. Convenience wrappers `Get/Post/Patch/Delete` for downstream channel/guild helpers.
+5. Test suite using `httptest.Server` to cover auth headers, retry behavior, context cancellation, API errors, and rate-limit waits; package now part of `go test ./...`.
 
 **Testing**:
 - Mock HTTP server for all status codes
