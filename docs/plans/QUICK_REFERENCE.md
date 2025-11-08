@@ -57,27 +57,24 @@ Total: ~10 weeks, ~70 atomic tasks
 
 ## Next Actions (Phase 3)
 
-### 3.2.1: Channel Types & Models [3 days]
-**Focus**: Define channel representations + CRUD helpers using the new client.
+### 3.2.2: Channel CRUD Operations [3 days]
+**Focus**: Implement GET/PATCH/DELETE channel endpoints and basic message listing using the new client.
 
 **Tasks**:
-1. Create `gosdk/discord/types/channel.go` (if not already present) with channel structs/enums mirroring Discord API.
-2. Implement `client.ChannelService` (or helper methods) that call `Client.Get/Post/Patch/Delete` for channel CRUD.
-3. Reuse shared rate limiter + middleware (logging/metrics/dry-run) via existing client options.
-4. Tests: `httptest.Server` verifying payloads, auth headers, and response decoding for each operation.
-5. Examples: Add snippet or example command demonstrating fetching a channel + updating topic.
+1. Add `client/channels.go` with helpers (`GetChannel`, `ModifyChannel`, `DeleteChannel`, `GetChannelMessages`) built on `Client.Get/Post/...`.
+2. Define `ModifyChannelParams`, `GetMessagesParams` (pagination markers) and reuse validation from channel types.
+3. Tests: `httptest.Server` verifying auth headers, payloads, pagination query params, and error handling.
+4. Examples/godoc snippet: fetch channel info + update the topic.
 
 **Entry Point**:
 ```go
-channels := client.New(token,
-    client.WithRateLimiter(shared),
-)
-ch, err := channels.GetChannel(ctx, channelID)
+resp, err := client.GetChannel(ctx, "123")
+updated, err := client.ModifyChannel(ctx, "123", &types.ChannelCreateParams{Topic: "Deployments"})
 ```
 
 ### 3.2.x Preview
-- Guild/channel listing pagination helpers
-- Error coverage for missing permissions
+- Channel message create/delete helpers
+- Thread-specific channel wrappers
 - Integration smoke tests using `integration` build tag once CLI wiring is ready
 
 ## Agentic Workflow Features

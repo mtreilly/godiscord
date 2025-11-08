@@ -388,7 +388,8 @@ func TracingMiddleware(tracer Tracer) Middleware
 ## 3.2: Channel Operations (3 days)
 
 ### Task 3.2.1: Channel Types and Models
-**Complexity**: Medium
+**Status**: ✅ Completed (2025-11-08)  
+**Complexity**: Medium  
 **Dependencies**: Task 3.1.1
 
 **Implementation**:
@@ -419,12 +420,11 @@ const (
 )
 ```
 
-**Steps**:
-1. Define all channel types
-2. Define channel models with JSON tags
-3. Add validation methods
-4. Create builder patterns for complex types
-5. JSON marshaling tests
+**Delivered**:
+1. `gosdk/discord/types/channel.go` with channel/permission/thread structs, enums, and flag constants that mirror Discord API payloads.
+2. Validation helpers for channel objects + create params (name/topic limits, rate limit bounds, bitrate constraints).
+3. Fluent `ChannelParamsBuilder` to assemble create payloads with compile-time guarantees.
+4. JSON + validation tests covering the builder, marshaling, and failure scenarios (`channel_test.go`).
 
 ### Task 3.2.2: Channel CRUD Operations
 **Complexity**: Medium

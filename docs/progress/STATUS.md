@@ -117,6 +117,29 @@ Last Updated: 2025-11-08
 
 ## Backlog
 
+### Phase 3: Bot API Client (Kickoff - Week 2)
+- [x] **Task 3.1.1**: Base HTTP client ✅
+  - [x] Implemented `gosdk/discord/client` with authenticated request helpers, shared rate limiter, and structured logging
+  - [x] Added option set (base URL, retries, timeout, custom HTTP client/logger/strategy)
+  - [x] Tests for auth headers, retries, context cancellation, API errors, rate-limit waits
+  - **Files**: discord/client/client.go, discord/client/client_test.go
+- [x] **Task 3.1.2**: Client middleware system ✅
+  - [x] Added middleware primitives + `Client.Use`
+  - [x] Built-in logging, retry, metrics, and dry-run middleware with tests
+  - **Files**: discord/client/middleware.go, discord/client/middleware_test.go
+- [x] **Task 3.2.1**: Channel types/models ✅
+  - [x] Added channel structs/enums, builder, and validation helpers
+  - [x] JSON + validation tests ensure constraints match Discord limits
+  - **Files**: discord/types/channel.go, discord/types/channel_test.go
+- [ ] **Task 3.2.2**: Channel CRUD operations
+
+### Phase 4: Integration & Polish
+- [ ] vibe CLI integration guide
+- [ ] Integration examples
+- [ ] Performance benchmarks
+- [ ] API stability review
+- [ ] Complete godoc documentation
+
 ### Phase 3: Advanced Features
 - [ ] Slash commands
   - Command registration
@@ -130,25 +153,6 @@ Last Updated: 2025-11-08
   - Fluent API
   - Validation
   - Templates
-
-### Phase 4: Integration & Polish
-- [ ] vibe CLI integration guide
-- [ ] Integration examples
-- [ ] Performance benchmarks
-- [ ] API stability review
-- [ ] Complete godoc documentation
-
-### Phase 3: Bot API Client (Kickoff - Week 2)
-- [x] **Task 3.1.1**: Base HTTP client ✅
-  - [x] Implemented `gosdk/discord/client` with authenticated request helpers, shared rate limiter, and structured logging
-  - [x] Added option set (base URL, retries, timeout, custom HTTP client/logger/strategy)
-  - [x] Tests for auth headers, retries, context cancellation, API errors, rate-limit waits
-  - **Files**: discord/client/client.go, discord/client/client_test.go
-- [x] **Task 3.1.2**: Client middleware system ✅
-  - [x] Added middleware primitives + `Client.Use`
-  - [x] Built-in logging, retry, metrics, and dry-run middleware with tests
-  - **Files**: discord/client/middleware.go, discord/client/middleware_test.go
-- [ ] **Task 3.2.1**: Channel types/models
 
 ### Phase 5: Gateway (Future)
 - [ ] WebSocket gateway connection
@@ -179,8 +183,8 @@ See [../OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md) for active design discussions:
 
 ## Next Actions
 
-1. **Current**: Implement client middleware + shared tracker guidance (Task 3.1.2, see OPEN_QUESTIONS Q6).
-2. Next: Channel operations scaffolding (Task 3.2.1) built atop the new client.
+1. **Current**: Implement channel CRUD helpers (Task 3.2.2) on top of the new client.
+2. Next: Add channel message operations + pagination helpers (Task 3.2.3) once CRUD solid.
 3. Then: Integration smoke tests / CLI wiring leveraging webhook + client packages.
 
 ## Known Issues
