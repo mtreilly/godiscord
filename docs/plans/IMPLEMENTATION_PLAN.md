@@ -756,12 +756,16 @@ func (b *ModalBuilder) Build() *Modal
 ## 4.6: Testing & Documentation (2 days)
 
 ### Task 4.6.1: Interaction Tests
-**Steps**:
-1. Unit tests for all interaction types
-2. Integration tests for command workflows
-3. Mock interaction server
-4. Component interaction tests
-5. Achieve >80% coverage
+**Status**: 🚧 In Progress (2025-11-08)  
+**Dependencies**: Task 4.5.2
+
+**Delivered So Far**:
+1. Added router/server integration test with middleware + typed response builders (`server_test.go`) to exercise the full request lifecycle.
+2. Router unit tests now cover command resolution, regex component patterns, and middleware ordering (`router_test.go`).
+3. Documented Go toolchain mismatch blocking `go test ./... -cover` (tool reports go1.25.0 vs stdlib go1.25.3). Standard `go test ./...` passes; coverage metrics will be captured once the environment is consistent.
+
+**Next**:
+- Expand integration scenarios (component + modal flows) and capture coverage numbers as soon as the Go toolchain is aligned.
 
 ### Task 4.6.2: Interaction Documentation
 **Steps**:

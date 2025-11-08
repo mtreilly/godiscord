@@ -74,7 +74,7 @@ Last Updated: 2025-11-08
 ## Backlog
 
 - ### Phase 4: Interaction Features
-- [ ] **Task 4.6.1**: Interaction test suite (integration + coverage).
+- [ ] **Task 4.6.1**: Interaction test suite — integration tests added (router + middleware), coverage metrics pending due to Go toolchain mismatch.
 - [ ] **Task 4.6.2**: Interaction documentation + guides.
 
 ### Phase 5: Gateway (Future)
@@ -112,7 +112,7 @@ See [../OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md) for active design discussions:
 
 ## Known Issues
 
-- None currently
+- `go test ./... -cover` fails because the Go tool reports version `go1.25.0` while stdlib packages compile as `go1.25.3`. Standard `go test ./...` passes; capture coverage once the toolchain is aligned.
 
 ## Dependencies
 

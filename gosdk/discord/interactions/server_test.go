@@ -126,6 +126,54 @@ func TestServerHandlerError(t *testing.T) {
 	}
 }
 
+func TestServerWithRouterMiddleware(t *testing.T) {
+	pub, priv, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatalf("GenerateKey() error = %v", err)
+	}
+
+	router := NewRouter()
+	order := ""
+	router.Use(func(next Handler) Handler {
+		return func(ctx context.Context, i *types.Interaction) (*types.InteractionResponse, error) {
+			order += "A"
+			return next(ctx, i)
+		}
+	})
+	router.Use(func(next Handler) Handler {
+		return func(ctx context.Context, i *types.Interaction) (*types.InteractionResponse, error) {
+			order += "B"
+			return next(ctx, i)
+		}
+	})
+	router.Command("ping", func(ctx context.Context, i *types.Interaction) (*types.InteractionResponse, error) {
+		order += "C"
+		return NewMessageResponse("pong").SetEphemeral(true).Build()
+	})
+
+	server, err := NewServer(hex.EncodeToString(pub), WithRouter(router))
+	if err != nil {
+		t.Fatalf("NewServer() error = %v", err)
+	}
+
+	body, _ := json.Marshal(&types.Interaction{
+		Type: types.InteractionTypeApplicationCommand,
+		Data: &types.InteractionData{Name: "ping"},
+	})
+	req := newSignedRequest(t, priv, body)
+	rr := httptest.NewRecorder()
+
+	server.HandleInteraction(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", rr.Code)
+	}
+
+	if order != "ABC" {
+		t.Fatalf("expected middleware order ABC, got %s", order)
+	}
+}
+
 func newTestServer(t *testing.T) (*Server, ed25519.PrivateKey) {
 	t.Helper()
 	pub, priv, err := ed25519.GenerateKey(rand.Reader)

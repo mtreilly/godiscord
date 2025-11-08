@@ -61,9 +61,9 @@ Total: ~10 weeks, ~70 atomic tasks
 **Focus**: Expand test coverage across interactions packages (builders, client, server) targeting >80% coverage and integration flows.
 
 **Tasks**:
-1. Add integration-style tests that run the server + client end-to-end with signed requests.
+1. Add integration-style tests that run the server (with router + middleware) and verify end-to-end signed requests.
 2. Expand component/response builder coverage and add table-driven cases for router/middleware scenarios.
-3. Wire tests into STATUS metrics and document how to run integration targets.
+3. Capture coverage numbers (`go test ./... -cover`) once the Go tool mismatch (toolchain reports go1.25.0 vs stdlib go1.25.3) is resolved; for now rely on `go test ./...`.
 
 ### Preview
 - Task 4.6.2: Interaction documentation (guides, godoc updates, examples).
