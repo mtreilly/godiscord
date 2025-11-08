@@ -110,7 +110,10 @@ Last Updated: 2025-11-08
 		  - [x] Achieved 82.6% coverage on webhook package (`go test ./discord/webhook -cover`)
 		  - [x] Added golden JSON fixtures + benchmark + race tests + optional integration harness
 		  - [x] Documented outputs in plan + instructions
-	- [ ] **Task 2.4.2**: Documentation
+		- [x] **Task 2.4.2**: Documentation ✅
+		  - [x] Authored webhook how-to guide + linked from README
+		  - [x] Updated AGENTS.md with Phase 2 testing patterns + doc pointers
+		  - [x] Verified godoc coverage for new exports
 
 ## Backlog
 

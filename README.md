@@ -20,6 +20,7 @@ A production-ready Go SDK for Discord interactions, designed for integration wit
 - **[Quick Reference](docs/plans/QUICK_REFERENCE.md)** - Quick reference for agents
 - **[Roadmap](docs/plans/ROADMAP.md)** - High-level roadmap and milestones
 - **[Rate Limit Guide](docs/guides/RATE_LIMITS.md)** - Strategy/configuration reference
+- **[Webhook Guide](docs/guides/WEBHOOKS.md)** - End-to-end webhook workflows
 - **[Design Principles](docs/design/CLI_DESIGN_PRINCIPLES.md)** - Core design principles
 - **[Open Questions](docs/OPEN_QUESTIONS.md)** - Active design discussions
 
@@ -200,6 +201,12 @@ go test -race ./...
 
 # Test specific package
 go test -v ./discord/webhook
+
+# Golden JSON fixtures
+go test ./discord/webhook -run Golden
+
+# Live webhook smoke (requires DISCORD_WEBHOOK)
+DISCORD_WEBHOOK=... go test -tags integration ./discord/webhook
 ```
 
 ### Code Formatting

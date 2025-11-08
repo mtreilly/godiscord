@@ -152,6 +152,8 @@ Debugging
 Docs Organization
 - `docs/plans/` — project and architecture plans
 - `docs/guides/` — how-to guides (usage, integration, deployment)
+  - `docs/guides/RATE_LIMITS.md` — strategy selection + troubleshooting
+  - `docs/guides/WEBHOOKS.md` — end-to-end webhook workflows
 - `docs/manual/` — API reference and detailed manuals
 - `docs/design/` — design principles and patterns (adapted from vibe-engineering)
 - `docs/progress/` — status updates and phase tracking
@@ -238,6 +240,8 @@ Testing & Validation
 - Mock external dependencies (HTTP, Discord API)
 - Integration tests using real Discord test servers (when available)
 - Golden tests for JSON marshaling/unmarshaling
+- `go test -race ./discord/webhook` should stay green; run before handing off
+- Optional real-webhook smoke tests live behind `-tags integration` and require `DISCORD_WEBHOOK`
 
 Common Tasks
 
@@ -252,6 +256,9 @@ Run Tests
 cd gosdk
 go test ./...
 go test -v -cover ./discord/webhook
+go test -race ./discord/webhook
+go test ./discord/webhook -run Golden
+DISCORD_WEBHOOK=... go test -tags integration ./discord/webhook
 ```
 
 Format & Lint

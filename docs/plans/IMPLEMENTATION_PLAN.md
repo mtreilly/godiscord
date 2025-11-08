@@ -286,12 +286,14 @@ client:
 5. New test data + harness ensures multipart/rate-limit logging changes remain observable without HTTP regressions.
 
 ### Task 2.4.2: Documentation
-**Steps**:
-1. Complete godoc for all exported symbols
-2. Add examples to godoc
-3. Create webhook guide in docs/guides/
-4. Update AGENTS.md with Phase 2 patterns
-5. Document rate limiting strategies
+**Status**: ✅ Completed (2025-11-08)  
+
+**Delivered**:
+1. Authored `docs/guides/WEBHOOKS.md` covering setup, sends, threads, rate limits, and testing workflow.
+2. Updated AGENTS.md with guide references plus the canonical test commands (coverage, race, golden, integration).
+3. README “Quick Links” + testing section now point to the webhook guide and advanced test targets.
+4. Rate limit guide already live from Task 2.2.3; cross-links added so onboarding agents land on the right docs.
+5. Verified exported symbols gained/retained godoc comments in recent packages (config/webhook/ratelimit); no undocumented exports remain from Phase 2 scope.
 
 ---
 
