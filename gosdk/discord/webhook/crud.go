@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/yourusername/agent-discord/gosdk/discord/types"
+	"github.com/yourusername/agent-discord/gosdk/ratelimit"
 )
 
 // MessageEditParams represents parameters for editing a webhook message
@@ -60,6 +61,7 @@ func (c *Client) Delete(ctx context.Context, messageID string) error {
 	}
 
 	url := c.buildMessageURL(messageID)
+	route := ratelimit.RouteFromEndpoint("DELETE", url)
 
 	var lastErr error
 	backoff := c.timeout / 30
@@ -72,6 +74,11 @@ func (c *Client) Delete(ctx context.Context, messageID string) error {
 			case <-waitWithBackoff(backoff):
 				backoff *= 2
 			}
+		}
+
+		// Rate limiting
+		if err := c.waitForRateLimit(ctx, route); err != nil {
+			return err
 		}
 
 		req, err := http.NewRequestWithContext(ctx, "DELETE", url, nil)
@@ -87,9 +94,15 @@ func (c *Client) Delete(ctx context.Context, messageID string) error {
 			continue
 		}
 
+		// Update rate limiter
+		if c.rateLimiter != nil {
+			c.rateLimiter.Update(route, resp.Header)
+		}
+
 		// Success - 204 No Content
 		if resp.StatusCode == http.StatusNoContent {
 			resp.Body.Close()
+			c.recordStrategyOutcome(route, false)
 			return nil
 		}
 
@@ -99,6 +112,14 @@ func (c *Client) Delete(ctx context.Context, messageID string) error {
 
 		// Handle rate limiting
 		if resp.StatusCode == 429 {
+			c.logger.Warn("rate limit hit",
+				"route", route,
+				"retry_after", apiErr.RetryAfter,
+				"attempt", attempt+1,
+				"method", "DELETE",
+			)
+			c.recordStrategyOutcome(route, true)
+
 			if apiErr.RetryAfter > 0 {
 				backoff = backoffFromSeconds(apiErr.RetryAfter)
 			}
@@ -148,6 +169,7 @@ func (c *Client) buildMessageURL(messageID string) string {
 func (c *Client) doMessageRequest(ctx context.Context, method, url string, body []byte) (*types.Message, error) {
 	var lastErr error
 	backoff := c.timeout / 30
+	route := c.buildRoute(method, url)
 
 	for attempt := 0; attempt <= c.maxRetries; attempt++ {
 		if attempt > 0 {
@@ -157,6 +179,11 @@ func (c *Client) doMessageRequest(ctx context.Context, method, url string, body 
 			case <-waitWithBackoff(backoff):
 				backoff *= 2
 			}
+		}
+
+		// Rate limiting
+		if err := c.waitForRateLimit(ctx, route); err != nil {
+			return nil, err
 		}
 
 		var reqBody io.Reader
@@ -180,6 +207,11 @@ func (c *Client) doMessageRequest(ctx context.Context, method, url string, body 
 			continue
 		}
 
+		// Update rate limiter
+		if c.rateLimiter != nil {
+			c.rateLimiter.Update(route, resp.Header)
+		}
+
 		// Success - parse response
 		if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 			defer resp.Body.Close()
@@ -188,6 +220,9 @@ func (c *Client) doMessageRequest(ctx context.Context, method, url string, body 
 			if err := json.NewDecoder(resp.Body).Decode(&msg); err != nil {
 				return nil, fmt.Errorf("failed to decode response: %w", err)
 			}
+
+			// Record success for adaptive strategy
+			c.recordStrategyOutcome(route, false)
 
 			return &msg, nil
 		}
@@ -198,6 +233,14 @@ func (c *Client) doMessageRequest(ctx context.Context, method, url string, body 
 
 		// Handle rate limiting
 		if resp.StatusCode == 429 {
+			c.logger.Warn("rate limit hit",
+				"route", route,
+				"retry_after", apiErr.RetryAfter,
+				"attempt", attempt+1,
+				"method", method,
+			)
+			c.recordStrategyOutcome(route, true)
+
 			if apiErr.RetryAfter > 0 {
 				backoff = backoffFromSeconds(apiErr.RetryAfter)
 			}

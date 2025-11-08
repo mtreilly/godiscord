@@ -177,6 +177,7 @@ func (c *Client) writeFile(writer *multipart.Writer, index int, file FileAttachm
 func (c *Client) sendMultipartWithRetry(ctx context.Context, body []byte, contentType string) error {
 	var lastErr error
 	backoff := c.timeout / 30 // Start with ~1 second
+	route := c.buildRoute("POST", c.webhookURL)
 
 	for attempt := 0; attempt <= c.maxRetries; attempt++ {
 		if attempt > 0 {
@@ -186,6 +187,11 @@ func (c *Client) sendMultipartWithRetry(ctx context.Context, body []byte, conten
 			case <-waitWithBackoff(backoff):
 				backoff *= 2
 			}
+		}
+
+		// Rate limiting
+		if err := c.waitForRateLimit(ctx, route); err != nil {
+			return err
 		}
 
 		req, err := http.NewRequestWithContext(ctx, "POST", c.webhookURL, bytes.NewReader(body))
@@ -202,8 +208,14 @@ func (c *Client) sendMultipartWithRetry(ctx context.Context, body []byte, conten
 			continue
 		}
 
+		// Update rate limiter
+		if c.rateLimiter != nil {
+			c.rateLimiter.Update(route, resp.Header)
+		}
+
 		if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 			resp.Body.Close()
+			c.recordStrategyOutcome(route, false)
 			return nil
 		}
 
@@ -213,6 +225,14 @@ func (c *Client) sendMultipartWithRetry(ctx context.Context, body []byte, conten
 
 		// Handle rate limiting
 		if resp.StatusCode == 429 {
+			c.logger.Warn("rate limit hit",
+				"route", route,
+				"retry_after", apiErr.RetryAfter,
+				"attempt", attempt+1,
+				"method", "POST (multipart)",
+			)
+			c.recordStrategyOutcome(route, true)
+
 			if apiErr.RetryAfter > 0 {
 				backoff = backoffFromSeconds(apiErr.RetryAfter)
 			}

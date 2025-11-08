@@ -10,14 +10,19 @@ import (
 	"time"
 
 	"github.com/yourusername/agent-discord/gosdk/discord/types"
+	"github.com/yourusername/agent-discord/gosdk/logger"
+	"github.com/yourusername/agent-discord/gosdk/ratelimit"
 )
 
 // Client represents a Discord webhook client
 type Client struct {
-	webhookURL string
-	httpClient *http.Client
-	maxRetries int
-	timeout    time.Duration
+	webhookURL  string
+	httpClient  *http.Client
+	maxRetries  int
+	timeout     time.Duration
+	rateLimiter ratelimit.Tracker
+	strategy    ratelimit.Strategy
+	logger      *logger.Logger
 }
 
 // Option is a functional option for configuring the webhook client
@@ -44,6 +49,35 @@ func WithTimeout(timeout time.Duration) Option {
 	}
 }
 
+// WithRateLimiter sets a custom rate limiter
+func WithRateLimiter(limiter ratelimit.Tracker) Option {
+	return func(c *Client) {
+		c.rateLimiter = limiter
+	}
+}
+
+// WithStrategy sets the rate limiting strategy
+func WithStrategy(strategy ratelimit.Strategy) Option {
+	return func(c *Client) {
+		c.strategy = strategy
+	}
+}
+
+// WithStrategyName sets the rate limiting strategy by name
+// Supported: "reactive", "proactive", "adaptive"
+func WithStrategyName(name string) Option {
+	return func(c *Client) {
+		c.strategy = createStrategy(name)
+	}
+}
+
+// WithLogger sets a custom logger
+func WithLogger(log *logger.Logger) Option {
+	return func(c *Client) {
+		c.logger = log
+	}
+}
+
 // NewClient creates a new webhook client
 func NewClient(webhookURL string, opts ...Option) (*Client, error) {
 	if webhookURL == "" {
@@ -54,10 +88,13 @@ func NewClient(webhookURL string, opts ...Option) (*Client, error) {
 	}
 
 	c := &Client{
-		webhookURL: webhookURL,
-		httpClient: &http.Client{},
-		maxRetries: 3,
-		timeout:    30 * time.Second,
+		webhookURL:  webhookURL,
+		httpClient:  &http.Client{},
+		maxRetries:  3,
+		timeout:     30 * time.Second,
+		rateLimiter: ratelimit.NewMemoryTracker(),
+		strategy:    ratelimit.NewDefaultAdaptiveStrategy(),
+		logger:      logger.Default(),
 	}
 
 	for _, opt := range opts {
@@ -93,6 +130,7 @@ func (c *Client) SendSimple(ctx context.Context, content string) error {
 func (c *Client) sendWithRetry(ctx context.Context, body []byte) error {
 	var lastErr error
 	backoff := time.Second
+	route := ratelimit.RouteFromEndpoint("POST", c.webhookURL)
 
 	for attempt := 0; attempt <= c.maxRetries; attempt++ {
 		if attempt > 0 {
@@ -101,6 +139,35 @@ func (c *Client) sendWithRetry(ctx context.Context, body []byte) error {
 				return ctx.Err()
 			case <-time.After(backoff):
 				backoff *= 2
+			}
+		}
+
+		// Rate limiting: check strategy and wait if necessary
+		if c.rateLimiter != nil && c.strategy != nil {
+			bucket := c.rateLimiter.GetBucket(route)
+			if bucket != nil && c.strategy.ShouldWait(bucket) {
+				waitDuration := c.strategy.CalculateWait(bucket)
+				if waitDuration > 0 {
+					c.logger.Debug("rate limit: waiting before request",
+						"route", route,
+						"wait_duration", waitDuration,
+						"strategy", c.strategy.Name(),
+						"remaining", bucket.Remaining,
+						"limit", bucket.Limit,
+					)
+
+					select {
+					case <-ctx.Done():
+						return ctx.Err()
+					case <-time.After(waitDuration):
+						// Continue with request
+					}
+				}
+			}
+
+			// Wait for rate limit (handles both proactive and reactive waits)
+			if err := c.rateLimiter.Wait(ctx, route); err != nil {
+				return fmt.Errorf("rate limit wait failed: %w", err)
 			}
 		}
 
@@ -118,8 +185,21 @@ func (c *Client) sendWithRetry(ctx context.Context, body []byte) error {
 			continue
 		}
 
+		// Update rate limiter with response headers
+		if c.rateLimiter != nil {
+			c.rateLimiter.Update(route, resp.Header)
+		}
+
+		// Success
 		if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 			resp.Body.Close()
+
+			// Record successful request for adaptive strategy
+			if adaptive, ok := c.strategy.(*ratelimit.AdaptiveStrategy); ok {
+				bucket := c.rateLimiter.GetBucket(route)
+				adaptive.RecordRequest(bucket, false)
+			}
+
 			return nil
 		}
 
@@ -148,8 +228,20 @@ func (c *Client) sendWithRetry(ctx context.Context, body []byte) error {
 			}
 		}
 
-		// Handle rate limiting
+		// Handle rate limiting (429)
 		if resp.StatusCode == 429 {
+			c.logger.Warn("rate limit hit",
+				"route", route,
+				"retry_after", apiErr.RetryAfter,
+				"attempt", attempt+1,
+			)
+
+			// Record rate limit hit for adaptive strategy
+			if adaptive, ok := c.strategy.(*ratelimit.AdaptiveStrategy); ok {
+				bucket := c.rateLimiter.GetBucket(route)
+				adaptive.RecordRequest(bucket, true)
+			}
+
 			if apiErr.RetryAfter > 0 {
 				backoff = time.Duration(apiErr.RetryAfter) * time.Second
 			}
@@ -214,4 +306,63 @@ func waitWithBackoff(d time.Duration) <-chan time.Time {
 // backoffFromSeconds converts seconds to a duration for backoff
 func backoffFromSeconds(seconds int) time.Duration {
 	return time.Duration(seconds) * time.Second
+}
+
+// createStrategy creates a rate limiting strategy from a name
+func createStrategy(name string) ratelimit.Strategy {
+	switch name {
+	case "reactive":
+		return ratelimit.NewReactiveStrategy()
+	case "proactive":
+		return ratelimit.NewDefaultProactiveStrategy()
+	case "adaptive":
+		return ratelimit.NewDefaultAdaptiveStrategy()
+	default:
+		// Default to adaptive
+		return ratelimit.NewDefaultAdaptiveStrategy()
+	}
+}
+
+// waitForRateLimit handles rate limiting before making a request
+func (c *Client) waitForRateLimit(ctx context.Context, route string) error {
+	if c.rateLimiter == nil || c.strategy == nil {
+		return nil
+	}
+
+	bucket := c.rateLimiter.GetBucket(route)
+	if bucket != nil && c.strategy.ShouldWait(bucket) {
+		waitDuration := c.strategy.CalculateWait(bucket)
+		if waitDuration > 0 {
+			c.logger.Debug("rate limit: waiting before request",
+				"route", route,
+				"wait_duration", waitDuration,
+				"strategy", c.strategy.Name(),
+				"remaining", bucket.Remaining,
+				"limit", bucket.Limit,
+			)
+
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case <-time.After(waitDuration):
+				// Continue
+			}
+		}
+	}
+
+	// Wait for rate limit (handles reactive waits)
+	return c.rateLimiter.Wait(ctx, route)
+}
+
+// buildRoute creates a route identifier for rate limiting
+func (c *Client) buildRoute(method, url string) string {
+	return ratelimit.RouteFromEndpoint(method, url)
+}
+
+// recordStrategyOutcome records the outcome of a request for adaptive learning
+func (c *Client) recordStrategyOutcome(route string, hitLimit bool) {
+	if adaptive, ok := c.strategy.(*ratelimit.AdaptiveStrategy); ok {
+		bucket := c.rateLimiter.GetBucket(route)
+		adaptive.RecordRequest(bucket, hitLimit)
+	}
 }
