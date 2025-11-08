@@ -354,6 +354,7 @@ func (c *Client) delete(ctx context.Context, path string) error
 - Authentication header verification
 - Rate limit integration
 - Retry behavior validation
+- Middleware hook ordering + dry-run toggles
 
 **Agentic Considerations**:
 - Request/response logging to JSON
@@ -361,7 +362,8 @@ func (c *Client) delete(ctx context.Context, path string) error
 - Dry-run mode (validate without executing)
 
 ### Task 3.1.2: Client Middleware System
-**Complexity**: Medium
+**Status**: 🆕 Not started  
+**Complexity**: Medium  
 **Dependencies**: Task 3.1.1
 
 **Implementation**:
