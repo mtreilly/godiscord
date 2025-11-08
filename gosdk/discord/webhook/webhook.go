@@ -117,7 +117,41 @@ func (c *Client) Send(ctx context.Context, msg *types.WebhookMessage) error {
 		return fmt.Errorf("failed to marshal webhook message: %w", err)
 	}
 
-	return c.sendWithRetry(ctx, body)
+	// Build URL with thread_id query parameter if specified
+	url := c.buildURLWithThreadID(c.webhookURL, msg.ThreadID)
+
+	return c.sendWithRetryToURL(ctx, body, url)
+}
+
+// SendToThread sends a message to a specific thread
+func (c *Client) SendToThread(ctx context.Context, threadID string, msg *types.WebhookMessage) error {
+	if threadID == "" {
+		return &types.ValidationError{
+			Field:   "threadID",
+			Message: "thread ID is required",
+		}
+	}
+
+	// Set the thread ID on the message
+	msg.ThreadID = threadID
+
+	return c.Send(ctx, msg)
+}
+
+// CreateThread creates a new thread with a message (forum channels only)
+// Returns error if the webhook is not in a forum channel
+func (c *Client) CreateThread(ctx context.Context, threadName string, msg *types.WebhookMessage) error {
+	if threadName == "" {
+		return &types.ValidationError{
+			Field:   "threadName",
+			Message: "thread name is required",
+		}
+	}
+
+	// Set the thread name on the message
+	msg.ThreadName = threadName
+
+	return c.Send(ctx, msg)
 }
 
 // SendSimple sends a simple text message via the webhook
@@ -127,10 +161,10 @@ func (c *Client) SendSimple(ctx context.Context, content string) error {
 	})
 }
 
-func (c *Client) sendWithRetry(ctx context.Context, body []byte) error {
+func (c *Client) sendWithRetryToURL(ctx context.Context, body []byte, url string) error {
 	var lastErr error
 	backoff := time.Second
-	route := ratelimit.RouteFromEndpoint("POST", c.webhookURL)
+	route := ratelimit.RouteFromEndpoint("POST", url)
 
 	for attempt := 0; attempt <= c.maxRetries; attempt++ {
 		if attempt > 0 {
@@ -171,7 +205,7 @@ func (c *Client) sendWithRetry(ctx context.Context, body []byte) error {
 			}
 		}
 
-		req, err := http.NewRequestWithContext(ctx, "POST", c.webhookURL, bytes.NewReader(body))
+		req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
 		if err != nil {
 			return fmt.Errorf("failed to create request: %w", err)
 		}
@@ -365,4 +399,12 @@ func (c *Client) recordStrategyOutcome(route string, hitLimit bool) {
 		bucket := c.rateLimiter.GetBucket(route)
 		adaptive.RecordRequest(bucket, hitLimit)
 	}
+}
+
+// buildURLWithThreadID builds a URL with the thread_id query parameter if specified
+func (c *Client) buildURLWithThreadID(baseURL, threadID string) string {
+	if threadID == "" {
+		return baseURL
+	}
+	return baseURL + "?thread_id=" + threadID
 }

@@ -10,6 +10,14 @@ type WebhookMessage struct {
 	AllowedMentions *struct {
 		Parse []string `json:"parse,omitempty"`
 	} `json:"allowed_mentions,omitempty"`
+
+	// Thread support
+	// ThreadID sends the message to an existing thread (instead of the channel)
+	ThreadID string `json:"-"` // Sent as query parameter, not in JSON body
+
+	// ThreadName creates a new forum thread with this name (forum channels only)
+	// Only works when sending to a forum channel, ignored otherwise
+	ThreadName string `json:"thread_name,omitempty"`
 }
 
 // Validate checks if the webhook message is valid
@@ -32,6 +40,13 @@ func (w *WebhookMessage) Validate() error {
 		return &ValidationError{
 			Field:   "embeds",
 			Message: "maximum 10 embeds allowed",
+		}
+	}
+
+	if len(w.ThreadName) > 100 {
+		return &ValidationError{
+			Field:   "thread_name",
+			Message: "thread name exceeds 100 characters",
 		}
 	}
 

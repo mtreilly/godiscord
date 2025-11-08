@@ -122,8 +122,11 @@ func (c *Client) SendWithFiles(ctx context.Context, msg *types.WebhookMessage, f
 		return fmt.Errorf("failed to close multipart writer: %w", err)
 	}
 
+	// Build URL with thread_id query parameter if specified
+	url := c.buildURLWithThreadID(c.webhookURL, msg.ThreadID)
+
 	// Send with retry
-	return c.sendMultipartWithRetry(ctx, body.Bytes(), writer.FormDataContentType())
+	return c.sendMultipartWithRetry(ctx, body.Bytes(), writer.FormDataContentType(), url)
 }
 
 // writeJSONPayload writes the webhook message as JSON to the multipart form
@@ -174,10 +177,10 @@ func (c *Client) writeFile(writer *multipart.Writer, index int, file FileAttachm
 }
 
 // sendMultipartWithRetry sends a multipart request with retry logic
-func (c *Client) sendMultipartWithRetry(ctx context.Context, body []byte, contentType string) error {
+func (c *Client) sendMultipartWithRetry(ctx context.Context, body []byte, contentType, url string) error {
 	var lastErr error
 	backoff := c.timeout / 30 // Start with ~1 second
-	route := c.buildRoute("POST", c.webhookURL)
+	route := c.buildRoute("POST", url)
 
 	for attempt := 0; attempt <= c.maxRetries; attempt++ {
 		if attempt > 0 {
@@ -194,7 +197,7 @@ func (c *Client) sendMultipartWithRetry(ctx context.Context, body []byte, conten
 			return err
 		}
 
-		req, err := http.NewRequestWithContext(ctx, "POST", c.webhookURL, bytes.NewReader(body))
+		req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
 		if err != nil {
 			return fmt.Errorf("failed to create request: %w", err)
 		}
