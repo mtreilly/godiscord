@@ -1376,6 +1376,7 @@ func Error(title, description string) (*types.Embed, error)
 6. Examples
 
 ### Task 6.2.2: Utility Functions
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: Low
 **Dependencies**: Phase 3
 
@@ -1387,10 +1388,10 @@ func FormatUserMention(userID string) string
 func FormatChannelMention(channelID string) string
 func FormatRoleMention(roleID string) string
 
-func ParseEmoji(emoji string) (name, id string, animated bool)
+func ParseEmoji(emoji string) (name, id string, animated bool, ok bool)
 func FormatEmoji(name, id string, animated bool) string
 
-func Snowflake ToTime(snowflake string) time.Time
+func SnowflakeToTime(snowflake string) (time.Time, error)
 func TimeToSnowflake(t time.Time) string
 
 func ChunkSlice[T any](slice []T, size int) [][]T
@@ -1403,6 +1404,7 @@ func RateLimitDelay(remaining, limit int, reset time.Time) time.Duration
 3. Implement snowflake utilities
 4. Implement helper functions
 5. Tests for all utilities
+6. Document usage in guides or references
 
 ## 6.3: Performance & Optimization (3 days)
 
