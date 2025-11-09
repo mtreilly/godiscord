@@ -1068,6 +1068,7 @@ func (i Intent) Has(intent Intent) bool
 - Task 5.3.2 (State Cache) uses these intents along with cached guild/channel/member data to keep the client stateful.
 
 ### Task 5.3.2: State Cache
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: High
 **Dependencies**: Task 5.2.3
 
@@ -1081,31 +1082,33 @@ type Cache interface {
 
     GetChannel(channelID string) (*Channel, bool)
     SetChannel(channel *Channel)
+    RemoveChannel(channelID string)
 
     GetMember(guildID, userID string) (*Member, bool)
     SetMember(guildID string, member *Member)
+    RemoveMember(guildID, userID string)
 
-    // ... more cache methods
+    Stats() CacheStats
 }
 
 type MemoryCache struct {
-    guilds   map[string]*Guild
-    channels map[string]*Channel
-    members  map[string]map[string]*Member
+    guilds   map[string]cachedGuild
+    channels map[string]cachedChannel
+    members  map[string]map[string]cachedMember
     mu       sync.RWMutex
+    ttl      time.Duration
 }
 
-func NewMemoryCache() *MemoryCache
+func NewMemoryCache(ttl time.Duration) *MemoryCache
 ```
 
-**Steps**:
-1. Define cache interface
-2. Implement in-memory cache
-3. Handle cache updates from events
-4. TTL and eviction policies
-5. Thread-safe operations
-6. Cache statistics
-7. Tests with concurrent access
+**Delivered**:
+1. `Cache` interface with guild/channel/member CRUD + stats reporting.
+2. `MemoryCache` implementation that enforces an optional TTL, tracks hits/misses, and remains thread-safe.
+3. Tests covering lifecycle operations, expiration, and stat counters (`cache_test.go`).
+
+**Next**:
+- Task 5.4.x (Sharding) can reuse this cache for sharded event ingestion once the dispatcher is reused across shards.
 
 **Agentic Considerations**:
 - Cache dump/restore for debugging
