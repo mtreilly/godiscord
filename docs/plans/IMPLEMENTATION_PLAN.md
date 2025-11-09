@@ -1232,6 +1232,7 @@ type FixedSharding struct{ Count int }
 ## 6.1: Permission System (3 days)
 
 ### Task 6.1.1: Permission Types
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: High
 **Dependencies**: Phase 3
 
@@ -1284,10 +1285,11 @@ const (
     PermissionModerateMembers
 )
 
-func (p Permission) Has(perm Permission) bool
-func (p Permission) Add(perm Permission) Permission
-func (p Permission) Remove(perm Permission) Permission
+func (p Permission) Has(mask Permission) bool
+func (p Permission) Add(mask Permission) Permission
+func (p Permission) Remove(mask Permission) Permission
 func AllPermissions() Permission
+func PermissionFromString(value string) Permission
 ```
 
 **Steps**:
@@ -1297,6 +1299,7 @@ func AllPermissions() Permission
 4. Tests for permission operations
 
 ### Task 6.1.2: Permission Calculator
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: High
 **Dependencies**: Task 6.1.1
 
@@ -1318,7 +1321,6 @@ func (pc *PermissionCalculator) Compute() Permission
 func (pc *PermissionCalculator) Can(perm Permission) bool
 func (pc *PermissionCalculator) CanManageChannel() bool
 func (pc *PermissionCalculator) CanSendMessages() bool
-// ... convenience methods for common checks
 ```
 
 **Steps**:
