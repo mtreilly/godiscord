@@ -1577,6 +1577,7 @@ func (h *Checker) Report(ctx context.Context) (*HealthReport, error)
 ## 7.1: CLI Commands (3 days)
 
 ### Task 7.1.1: CLI Structure
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: Medium
 **Dependencies**: All SDK packages
 
@@ -1605,14 +1606,13 @@ func main() {
 }
 ```
 
-**Steps**:
-1. Set up cobra CLI framework
-2. Implement root command
-3. Implement webhook commands
-4. Implement message commands
-5. Implement channel commands
-6. Implement guild commands
-7. Tests for CLI
+**Delivered**:
+1. Cobra-based CLI registered five subcommands (`webhook`, `message`, `channel`, `guild`, `interaction`) with placeholders to be expanded once SDK clients are wired.
+2. CLI module tests exercise command execution to ensure the root command returns cleanly.
+3. Documentation plan now references the CLI docs before Phase 7 release.
+
+**Next**:
+- Task 7.1.2 (configuration) and Task 7.1.3 (output formatting) will layer in vibe config integration and structured output helpers.
 
 ### Task 7.1.2: Configuration Integration
 **Complexity**: Low
