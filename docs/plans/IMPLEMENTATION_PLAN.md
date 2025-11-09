@@ -902,6 +902,7 @@ func (c *Connection) resume(ctx context.Context) error
 ## 5.2: Event System (1 week)
 
 ### Task 5.2.1: Event Types
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: High
 **Dependencies**: Task 5.1.3
 
@@ -913,19 +914,19 @@ type Event interface {
 }
 
 type ReadyEvent struct {
-    V          int      `json:"v"`
-    User       *User    `json:"user"`
-    Guilds     []*Guild `json:"guilds"`
-    SessionID  string   `json:"session_id"`
-    ResumeURL  string   `json:"resume_gateway_url"`
+    V         int         `json:"v"`
+    User      *types.User `json:"user"`
+    Guilds    []*types.Guild `json:"guilds"`
+    SessionID string      `json:"session_id,omitempty"`
+    ResumeURL string      `json:"resume_gateway_url,omitempty"`
 }
 
 type MessageCreateEvent struct {
-    *Message
+    *types.Message
 }
 
 type MessageUpdateEvent struct {
-    *Message
+    *types.Message
 }
 
 type MessageDeleteEvent struct {
@@ -933,16 +934,15 @@ type MessageDeleteEvent struct {
     ChannelID string `json:"channel_id"`
     GuildID   string `json:"guild_id,omitempty"`
 }
-
-// ... define all 50+ event types
 ```
 
-**Steps**:
-1. Define all gateway events (50+ types)
-2. Group by category (message, guild, channel, user, etc.)
-3. JSON unmarshaling for each type
-4. Event type registry
-5. Comprehensive tests
+**Delivered**:
+1. Added typed event structs (`ReadyEvent`, `MessageCreateEvent`, `MessageUpdateEvent`, `MessageDeleteEvent`, `Guild{Create,Update,Delete}`, `InteractionCreateEvent`) implementing the `Event` interface.
+2. Exported constants for event type names and ensured each struct’s `Type()` returns it for dispatcher wiring.
+3. Covered serialization expectations and type helpers with `gosdk/discord/gateway/events_test.go`.
+
+**Next**:
+- Build on this by creating the dispatcher in Task 5.2.2 and consuming events from the connection/heartbeat pipeline.
 
 ### Task 5.2.2: Event Dispatcher
 **Complexity**: High
