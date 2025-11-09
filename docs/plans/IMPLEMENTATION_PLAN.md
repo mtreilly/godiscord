@@ -983,6 +983,7 @@ func (d *Dispatcher) Dispatch(ctx context.Context, event Event) error
 - Event persistence (optional)
 
 ### Task 5.2.3: Gateway Client
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: High
 **Dependencies**: Task 5.2.2
 
@@ -990,12 +991,12 @@ func (d *Dispatcher) Dispatch(ctx context.Context, event Event) error
 ```go
 // gosdk/discord/gateway/client.go
 type Client struct {
-    conn       *Connection
-    dispatcher *Dispatcher
-    intents    int
-    status     string
-    activity   *Activity
-    logger     *logger.Logger
+    conn           *Connection
+    dispatcher     *Dispatcher
+    intents        int
+    token          string
+    logger         *logger.Logger
+    connectionOpts []ConnectionOption
 }
 
 func NewClient(token string, intents int, opts ...ClientOption) (*Client, error)
@@ -1003,18 +1004,21 @@ func NewClient(token string, intents int, opts ...ClientOption) (*Client, error)
 func (c *Client) Connect(ctx context.Context) error
 func (c *Client) Disconnect() error
 func (c *Client) On(eventType string, handler EventHandler)
+func (c *Client) OnMessageCreate(handler func(ctx context.Context, e *MessageCreateEvent) error)
+func (c *Client) OnMessageUpdate(handler func(ctx context.Context, e *MessageUpdateEvent) error)
+func (c *Client) OnInteraction(handler func(ctx context.Context, e *InteractionCreateEvent) error)
 
 func (c *Client) UpdatePresence(ctx context.Context, status string, activity *Activity) error
 func (c *Client) RequestGuildMembers(ctx context.Context, guildID string, query string, limit int) error
 ```
 
-**Steps**:
-1. Integrate connection and dispatcher
-2. Handle identify/resume flows
-3. Implement presence updates
-4. Implement guild member requests
-5. Graceful shutdown
-6. Tests with full flow
+**Delivered**:
+1. Gateway client orchestration with configurable connection options, dispatcher, and structured logging (`gosdk/discord/gateway/client.go`).
+2. Connect/Disconnect lifecycle, identify/resume handling, presence updates, request guild members, and automatic reconnect handling (Hello/InvalidSession/Reconnect flows).
+3. Event decoding helpers with event routing tests ensuring `ReadyEvent`, `MESSAGE_CREATE`, and unknown events behave as expected (`client_test.go`).
+
+**Next**:
+- Begin Task 5.3.1 (Intent definitions and helpers) so the gateway client can be configured with the right privileged intents.
 
 ## 5.3: Intents & Caching (3 days)
 

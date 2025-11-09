@@ -6,17 +6,17 @@ import "encoding/json"
 type OpCode int
 
 const (
-	OpCodeDispatch OpCode = iota
-	OpCodeHeartbeat
-	OpCodeIdentify
-	OpCodePresenceUpdate
-	OpCodeVoiceStateUpdate
-	OpCodeResume OpCode = 6
-	OpCodeReconnect
-	OpCodeRequestGuildMembers
-	OpCodeInvalidSession
-	OpCodeHello
-	OpCodeHeartbeatAck
+	OpCodeDispatch            OpCode = 0
+	OpCodeHeartbeat           OpCode = 1
+	OpCodeIdentify            OpCode = 2
+	OpCodePresenceUpdate      OpCode = 3
+	OpCodeVoiceStateUpdate    OpCode = 4
+	OpCodeResume              OpCode = 6
+	OpCodeReconnect           OpCode = 7
+	OpCodeRequestGuildMembers OpCode = 8
+	OpCodeInvalidSession      OpCode = 9
+	OpCodeHello               OpCode = 10
+	OpCodeHeartbeatAck        OpCode = 11
 )
 
 // Payload represents the generic envelope sent over the gateway.
