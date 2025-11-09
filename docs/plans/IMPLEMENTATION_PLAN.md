@@ -1667,20 +1667,18 @@ func NewFormatter(format string) Formatter
 ## 7.2: Integration Examples (2 days)
 
 ### Task 7.2.1: Usage Examples
-**Steps**:
-1. Create webhook integration example
-2. Create bot integration example
-3. Create slash command integration example
-4. Create event listener example
-5. Document integration patterns
+**Status**: ✅ Completed (2025-11-08)  
+**Deliverables**:
+1. Documented CLI usage patterns (webhook notifications, bot commands, slash commands, event listener) in `docs/guides/CLI_EXAMPLES.md`.
+2. Showed how the CLI shares config and formatter state so automation can read JSON/Table/YAML.
+3. Examples highlight config detection, formatter usage, and how to extend commands for real handlers.
 
 ### Task 7.2.2: Migration Guide
-**Steps**:
-1. Create migration guide from Python bot
-2. Side-by-side code comparisons
-3. Common patterns translation
-4. Performance comparison
-5. Troubleshooting guide
+**Status**: ✅ Completed (2025-11-08)  
+**Deliverables**:
+1. Added `docs/guides/MIGRATION.md` comparing Python bot configuration, workflows, and event handling to the Go SDK equivalents.
+2. Explained how to reuse configs, webhooks, slash command builders, gateway clients, and resilience utilities.
+3. Provided references to `docs/guides/GATEWAY.md` and Phase 6 docs for deeper context.
 
 ## 7.3: Documentation & Release (2 days)
 
