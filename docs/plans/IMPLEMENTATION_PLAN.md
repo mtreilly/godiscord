@@ -1023,6 +1023,7 @@ func (c *Client) RequestGuildMembers(ctx context.Context, guildID string, query 
 ## 5.3: Intents & Caching (3 days)
 
 ### Task 5.3.1: Intent System
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: Medium
 **Dependencies**: Task 5.1.1
 
@@ -1053,17 +1054,18 @@ const (
     IntentAutoModerationExecution
 )
 
-func AllIntents() int
-func DefaultIntents() int
+func AllIntents() Intent
+func DefaultIntents() Intent
 func (i Intent) Has(intent Intent) bool
 ```
 
-**Steps**:
-1. Define all intent flags
-2. Helper functions for intent combinations
-3. Documentation on privileged intents
-4. Validation
-5. Tests
+**Delivered**:
+1. Defined every gateway intent as bitmasks and provided helpers (`AllIntents`, `DefaultIntents`) so clients can request full or safe sets.
+2. `Has` efficiently checks for supported intents, including zero-intent behavior.
+3. Tests verify the masks include/exclude the expected capabilities and that zero is handled (`intents_test.go`).
+
+**Next**:
+- Task 5.3.2 (State Cache) uses these intents along with cached guild/channel/member data to keep the client stateful.
 
 ### Task 5.3.2: State Cache
 **Complexity**: High
