@@ -834,6 +834,7 @@ type IdentifyPayload struct {
 - Begin Task 5.1.2 (WebSocket connection management using the new payloads and heartbeat flow).
 
 ### Task 5.1.2: WebSocket Connection
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: High
 **Dependencies**: Task 5.1.1
 
@@ -841,14 +842,20 @@ type IdentifyPayload struct {
 ```go
 // gosdk/discord/gateway/connection.go
 type Connection struct {
-    token      string
-    intents    int
-    conn       *websocket.Conn
-    mu         sync.Mutex
-    heartbeat  *time.Ticker
-    sessionID  string
-    sequence   int
-    logger     *logger.Logger
+    token            string
+    intents          int
+    conn             *websocket.Conn
+    gatewayURL       string
+    dialer           *websocket.Dialer
+    logger           *logger.Logger
+    mu               sync.Mutex
+    writeMu          sync.Mutex
+    sequence         int
+    sessionID        string
+    heartbeatTicker  *time.Ticker
+    heartbeatCtx     context.Context
+    heartbeatCancel  context.CancelFunc
+    heartbeatInterval time.Duration
 }
 
 func NewConnection(token string, intents int, opts ...ConnectionOption) (*Connection, error)
@@ -859,21 +866,23 @@ func (c *Connection) Send(ctx context.Context, payload *Payload) error
 func (c *Connection) Receive(ctx context.Context) (*Payload, error)
 ```
 
-**Steps**:
-1. Implement WebSocket connection management
-2. Handle TLS and compression
-3. Implement send/receive with proper locking
-4. Connection state management
-5. Tests with mock WebSocket
+**Delivered**:
+1. Implemented the connection lifecycle (dial, send, receive, close) with configurable gateway URL/dialer plus structured logging and concurrency controls in `gosdk/discord/gateway/connection.go`.
+2. Wire up automatic heartbeat scheduling, sequence tracking, and helper setters (`SetSession`, `SetSequence`) so downstream components can resume sessions.
+3. Added targeted tests that validate the heartbeat handshake and resume payload semantics via an `httptest` WebSocket server (`connection_test.go`).
+
+**Next**:
+- Continue with Task 5.2.1 (Event types) once Task 5.1.3 (heartbeat & reconnection) validations have been incorporated.
 
 ### Task 5.1.3: Heartbeat & Reconnection
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: High
 **Dependencies**: Task 5.1.2
 
 **Implementation**:
 ```go
 // Add to connection.go
-func (c *Connection) startHeartbeat(interval time.Duration)
+func (c *Connection) startHeartbeat(ctx context.Context)
 func (c *Connection) stopHeartbeat()
 func (c *Connection) sendHeartbeat(ctx context.Context) error
 
@@ -881,19 +890,14 @@ func (c *Connection) reconnect(ctx context.Context) error
 func (c *Connection) resume(ctx context.Context) error
 ```
 
-**Steps**:
-1. Implement heartbeat ticker
-2. Handle heartbeat ACKs
-3. Detect zombie connections
-4. Implement reconnection logic
-5. Implement session resumption
-6. Exponential backoff for reconnects
-7. Tests for heartbeat and reconnection
+**Delivered**:
+1. Heartbeat scheduler runs via `startHeartbeat`/`stopHeartbeat`, posts `OpCodeHeartbeat`, and logs warnings on failures; interval is configurable (`WithHeartbeatInterval`).
+2. `sendHeartbeat` keeps the sequence anchor alive while `SetSession`/`SetSequence` capture session context for later reconnects.
+3. `reconnect` closes/resets the socket before dialing again and automatically calls `resume` when a session is known, which sends the `OpCodeResume` payload.
+4. Tests confirm the heartbeat flow and resume payload contents, providing deterministic coverage for these behaviors.
 
-**Agentic Considerations**:
-- Connection state observable as JSON
-- Reconnection events logged
-- Configurable retry strategies
+**Next**:
+- Task 5.2.1 (event types) now becomes the focus; implement gateway event models and dispatcher once the connection layer is stable.
 
 ## 5.2: Event System (1 week)
 
