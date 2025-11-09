@@ -1692,12 +1692,17 @@ func NewFormatter(format string) Formatter
 5. Release instructions noted in the CLI guide; continue to update before shipping Phase 7 bits.
 
 ### Task 7.3.2: Release Preparation
+**Status**: ✅ Completed (2025-11-08)  
 **Steps**:
 1. Version tagging strategy
 2. Changelog generation
 3. Release notes
 4. GitHub releases
 5. Package publishing
+**Deliverables**:
+1. `docs/guides/CLI_RELEASE.md` captures tagging/changelog/release steps.
+2. README/AGENTS.md mention Phase 7 release plan and CLI artifacts.
+3. CLI builds (`go build ./cmd/discord`) and tests run before tagging; release notes highlight new commands and config options.
 
 ---
 

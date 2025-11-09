@@ -159,6 +159,7 @@ Docs Organization
   - `docs/guides/PHASE6.md` — Phase 6 advanced features/tests summary
   - `docs/guides/CLI_EXAMPLES.md` — quick usage patterns for the new CLI
   - `docs/guides/MIGRATION.md` — migrating from the Python bot to this SDK
+  - `docs/guides/CLI_RELEASE.md` — release playbook for the CLI bundle
 - `docs/manual/` — API reference and detailed manuals
 - `docs/design/` — design principles and patterns (adapted from vibe-engineering)
 - `docs/progress/` — status updates and phase tracking
