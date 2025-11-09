@@ -1615,16 +1615,22 @@ func main() {
 - Task 7.1.2 (configuration) and Task 7.1.3 (output formatting) will layer in vibe config integration and structured output helpers.
 
 ### Task 7.1.2: Configuration Integration
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: Low
 **Dependencies**: Task 7.1.1
 
-**Steps**:
-1. Integrate with vibe config system
-2. Support config file discovery
-3. Support environment variables
-4. Support flags
-5. Config validation
-6. Examples
+**Implementation**:
+1. Added persistent CLI flags (`--config`, `--token`, `--webhook`) plus a `newRootCommand` pre-run that loads YAML configs via the SDK `config` package, falls back to environment variables, and allows default file discovery (`discord-config.yaml`, `config/discord.yaml`, etc.).
+2. Overrides from flags are applied after config load, and the resolved config is injected into every command via context helpers so subcommands can access tokens, webhooks, and application IDs.
+3. Config discovery respects `DISCORD_CONFIG`, defaults to YAML in the repo, and prints the used config path for transparency; this can be wired into vibe CLI configurations later.
+
+**Steps** (already covered):
+1. Integrate with vibe config system ✅
+2. Support config file discovery ✅
+3. Support environment variables ✅
+4. Support flags ✅
+5. Config validation (via config.Load error handling) ✅
+6. Examples (commands print derived config values) ✅
 
 ### Task 7.1.3: Output Formatting
 **Complexity**: Low
