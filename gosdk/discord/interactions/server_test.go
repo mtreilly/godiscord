@@ -126,6 +126,68 @@ func TestServerHandlerError(t *testing.T) {
 	}
 }
 
+func TestServerComponentHandler(t *testing.T) {
+	server, priv := newTestServer(t)
+	server.RegisterComponent("confirm", func(ctx context.Context, i *types.Interaction) (*types.InteractionResponse, error) {
+		return NewMessageResponse("confirmed").SetEphemeral(true).Build()
+	})
+
+	body, _ := json.Marshal(&types.Interaction{
+		Type: types.InteractionTypeMessageComponent,
+		Data: &types.InteractionData{CustomID: "confirm"},
+	})
+	req := newSignedRequest(t, priv, body)
+	rr := httptest.NewRecorder()
+
+	server.HandleInteraction(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", rr.Code)
+	}
+
+	var resp types.InteractionResponse
+	if err := json.Unmarshal(rr.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
+	if resp.Data == nil || resp.Data.Content != "confirmed" {
+		t.Fatalf("unexpected response payload %+v", resp.Data)
+	}
+	if resp.Data.Flags&interactionResponseFlagEphemeral == 0 {
+		t.Fatalf("expected ephemeral flag to be set")
+	}
+}
+
+func TestServerModalHandler(t *testing.T) {
+	server, priv := newTestServer(t)
+	server.RegisterModal("modal_submit", func(ctx context.Context, i *types.Interaction) (*types.InteractionResponse, error) {
+		return NewMessageResponse("modal result").Build()
+	})
+
+	body, _ := json.Marshal(&types.Interaction{
+		Type: types.InteractionTypeModalSubmit,
+		Data: &types.InteractionData{CustomID: "modal_submit"},
+	})
+	req := newSignedRequest(t, priv, body)
+	rr := httptest.NewRecorder()
+
+	server.HandleInteraction(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", rr.Code)
+	}
+
+	var resp types.InteractionResponse
+	if err := json.Unmarshal(rr.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
+	if resp.Data == nil || resp.Data.Content != "modal result" {
+		t.Fatalf("unexpected response payload %+v", resp.Data)
+	}
+	if resp.Type != types.InteractionResponseChannelMessageWithSource {
+		t.Fatalf("expected message response, got %d", resp.Type)
+	}
+}
+
 func TestServerWithRouterMiddleware(t *testing.T) {
 	pub, priv, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
