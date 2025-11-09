@@ -231,6 +231,14 @@ func (c *Client) RequestGuildMembers(ctx context.Context, guildID string, query 
 	return c.conn.Send(ctx, payload)
 }
 
+// Send proxies a raw payload over the websocket connection.
+func (c *Client) Send(ctx context.Context, payload *Payload) error {
+	if c.conn == nil {
+		return errors.New("client not connected")
+	}
+	return c.conn.Send(ctx, payload)
+}
+
 func (c *Client) identify(ctx context.Context) error {
 	payload := &Payload{Op: OpCodeIdentify}
 	props := IdentifyPayload{

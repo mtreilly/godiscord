@@ -1130,6 +1130,7 @@ func NewMemoryCache(ttl time.Duration) *MemoryCache
 ## 5.4: Sharding (3 days)
 
 ### Task 5.4.1: Shard Manager
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: High
 **Dependencies**: Task 5.2.3
 
@@ -1137,19 +1138,21 @@ func NewMemoryCache(ttl time.Duration) *MemoryCache
 ```go
 // gosdk/discord/gateway/shard.go
 type Shard struct {
-    id     int
-    total  int
-    client *Client
+    id          int
+    totalShards int
+    client      *Client
 }
 
 type ShardManager struct {
-    shards   []*Shard
-    token    string
-    intents  int
-    logger   *logger.Logger
+    token          string
+    intents        int
+    shardCount     int
+    logger         *logger.Logger
+    dispatcher     *Dispatcher
+    connectionOpts []ConnectionOption
 }
 
-func NewShardManager(token string, shardCount int, intents int) *ShardManager
+func NewShardManager(token string, shardCount int, intents int, opts ...ShardManagerOption) *ShardManager
 
 func (sm *ShardManager) Connect(ctx context.Context) error
 func (sm *ShardManager) Disconnect() error
@@ -1157,13 +1160,13 @@ func (sm *ShardManager) On(eventType string, handler EventHandler)
 func (sm *ShardManager) Broadcast(ctx context.Context, payload *Payload) error
 ```
 
-**Steps**:
-1. Implement shard identification
-2. Implement shard manager
-3. Staggered shard connections (5s delay)
-4. Event aggregation from all shards
-5. Shard-specific operations
-6. Tests with multiple shards
+**Delivered**:
+1. `ShardManager` orchestrates `shardCount` gateway clients, each configured with the shared dispatcher/logger and shard-specific gateway URLs.
+2. Handlers registered via `On*` operate across all shards, and `Broadcast` fan-outs payloads to every shard with aggregated error reporting.
+3. The manager exposes options for injecting loggers, dispatchers, or connection tweaks, keeping sharded behavior configurable for CLI scenarios.
+
+**Next**:
+- Task 5.4.2 will add auto-sharding logic that consults `/gateway/bot`, staggers connections, and scales shard counts based on Discord recommendations.
 
 ### Task 5.4.2: Automatic Sharding
 **Complexity**: Medium
