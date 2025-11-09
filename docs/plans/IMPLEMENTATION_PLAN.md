@@ -945,6 +945,7 @@ type MessageDeleteEvent struct {
 - Build on this by creating the dispatcher in Task 5.2.2 and consuming events from the connection/heartbeat pipeline.
 
 ### Task 5.2.2: Event Dispatcher
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: High
 **Dependencies**: Task 5.2.1
 
@@ -959,24 +960,22 @@ type Dispatcher struct {
     logger   *logger.Logger
 }
 
-func NewDispatcher() *Dispatcher
+func NewDispatcher(opts ...DispatcherOption) *Dispatcher
 
 func (d *Dispatcher) On(eventType string, handler EventHandler)
 func (d *Dispatcher) OnMessageCreate(handler func(ctx context.Context, e *MessageCreateEvent) error)
-func (d *Dispatcher) OnGuildCreate(handler func(ctx context.Context, e *GuildCreateEvent) error)
-// ... type-safe handlers for common events
-
-func (d *Dispatcher) Dispatch(ctx context.Context, eventType string, data json.RawMessage) error
+func (d *Dispatcher) OnMessageUpdate(handler func(ctx context.Context, e *MessageUpdateEvent) error)
+func (d *Dispatcher) OnInteraction(handler func(ctx context.Context, e *InteractionCreateEvent) error)
+func (d *Dispatcher) Dispatch(ctx context.Context, event Event) error
 ```
 
-**Steps**:
-1. Create event dispatcher
-2. Thread-safe handler registration
-3. Type-safe handlers for common events
-4. Generic handler for all events
-5. Error handling and logging
-6. Middleware support
-7. Tests with mock events
+**Delivered**:
+1. Thread-safe dispatcher with configurable logger, generic registration, and typed helpers for message and interaction events.
+2. `Dispatch` iterates handlers, logs errors via the shared logger, and joins multiple errors so callers see aggregated failures.
+3. Tests verify handler invocation, type-specific registration, and aggregated error reporting (`dispatcher_test.go`).
+
+**Next**:
+- Use the dispatcher in Task 5.2.3 (Gateway Client) for event routing once the dispatcher is wired into the connection loop.
 
 **Agentic Considerations**:
 - Event replay capability
