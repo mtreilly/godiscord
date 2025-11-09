@@ -1422,30 +1422,17 @@ func RateLimitDelay(remaining, limit int, reset time.Time) time.Duration
 - Task 6.3.2 (request batching) can rely on the pooled client and metadata to batch writes safely across idle connections.
 
 ### Task 6.3.2: Request Batching
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: High
 **Dependencies**: Phase 3
 
 **Implementation**:
-```go
-// gosdk/discord/client/batch.go
-type Batcher struct {
-    client *Client
-    queue  chan *request
-    wg     sync.WaitGroup
-}
+1. Added `Batcher` that enqueues message/reaction requests, flushes on interval or batch size, and uses the pooled HTTP client for execution (`client/batch.go`).
+2. Exposed options for batch size and flush interval, plus `Flush`/`Stop` helpers; each request uses the client's private `do` helper to respect retries/rate limits.
+3. Tests simulate a webhook server and ensure both messages and reactions are flushed together (`client/batch_test.go`).
 
-func (c *Client) NewBatcher() *Batcher
-func (b *Batcher) AddMessage(channelID, content string)
-func (b *Batcher) AddReaction(channelID, messageID, emoji string)
-func (b *Batcher) Flush(ctx context.Context) error
-```
-
-**Steps**:
-1. Implement request batching
-2. Automatic flushing with timer
-3. Respect rate limits
-4. Tests
-5. Examples
+**Next**:
+- Task 6.3.3 (caching strategies) can reuse this batching layer for batched writes while metrics from `PoolStats` keep pools observable.
 
 ### Task 6.3.3: Caching Strategies
 **Complexity**: Medium
