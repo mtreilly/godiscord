@@ -1169,29 +1169,34 @@ func (sm *ShardManager) Broadcast(ctx context.Context, payload *Payload) error
 - Task 5.4.2 will add auto-sharding logic that consults `/gateway/bot`, staggers connections, and scales shard counts based on Discord recommendations.
 
 ### Task 5.4.2: Automatic Sharding
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: Medium
 **Dependencies**: Task 5.4.1
 
 **Implementation**:
 ```go
 // Add to shard.go
-func (sm *ShardManager) AutoScale(ctx context.Context) error
+func (sm *ShardManager) AutoScale(ctx context.Context, guildCount int, strategy ShardingStrategy) error
 
 type ShardingStrategy interface {
     Calculate(guildCount int) int
 }
 
-type RecommendedSharding struct{}
+type RecommendedSharding struct {
+    recommended int
+}
+func (r *RecommendedSharding) SetRecommended(int)
+
 type FixedSharding struct{ Count int }
 ```
 
-**Steps**:
-1. Implement GET /gateway/bot endpoint
-2. Parse recommended shard count
-3. Implement sharding strategies
-4. Auto-scale based on guild count
-5. Tests
-6. Examples
+**Delivered**:
+1. `/gateway/bot` fetcher (`fetchGatewayBotInfo`) plus shard manager options to override the endpoint/client.
+2. `AutoScale` calculates the shard count using a pluggable `ShardingStrategy`, applies Discord’s recommended count, and updates the manager before connecting.
+3. Strategies: `RecommendedSharding` honors Discord’s recommendation (or guild density) and `FixedSharding` pins to a constant. Tests cover recommended handling and HTTP integration.
+
+**Next**:
+- Phase 6 (Advanced Features) kicks off with permissions, embed builders, and the request batching utilities; continue the implementation plan there.
 
 ## 5.5: Testing & Documentation (2 days)
 

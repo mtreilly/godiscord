@@ -2,12 +2,16 @@ package gateway
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"sync"
 
 	"github.com/yourusername/agent-discord/gosdk/logger"
 )
+
+const defaultGatewayBotURL = "https://discord.com/api/v10/gateway/bot"
 
 // Shard represents a gateway shard (ID + total + client).
 type Shard struct {
@@ -44,14 +48,34 @@ func WithShardConnectionOptions(opts ...ConnectionOption) ShardManagerOption {
 	}
 }
 
+// WithShardGatewayBotURL overrides the /gateway/bot endpoint.
+func WithShardGatewayBotURL(url string) ShardManagerOption {
+	return func(sm *ShardManager) {
+		if url != "" {
+			sm.gatewayBotURL = url
+		}
+	}
+}
+
+// WithShardGatewayHTTPClient overrides the HTTP client used for gateway/bot.
+func WithShardGatewayHTTPClient(client *http.Client) ShardManagerOption {
+	return func(sm *ShardManager) {
+		if client != nil {
+			sm.gatewayBotClient = client
+		}
+	}
+}
+
 // ShardManager orchestrates multiple gateway shards.
 type ShardManager struct {
-	token          string
-	intents        int
-	shardCount     int
-	logger         *logger.Logger
-	dispatcher     *Dispatcher
-	connectionOpts []ConnectionOption
+	token            string
+	intents          int
+	shardCount       int
+	logger           *logger.Logger
+	dispatcher       *Dispatcher
+	connectionOpts   []ConnectionOption
+	gatewayBotURL    string
+	gatewayBotClient *http.Client
 
 	shards []*Shard
 	mu     sync.Mutex
@@ -60,11 +84,13 @@ type ShardManager struct {
 // NewShardManager constructs a shard manager.
 func NewShardManager(token string, shardCount int, intents int, opts ...ShardManagerOption) *ShardManager {
 	sm := &ShardManager{
-		token:      token,
-		intents:    intents,
-		shardCount: shardCount,
-		logger:     logger.Default(),
-		dispatcher: NewDispatcher(),
+		token:            token,
+		intents:          intents,
+		shardCount:       shardCount,
+		logger:           logger.Default(),
+		dispatcher:       NewDispatcher(),
+		gatewayBotURL:    defaultGatewayBotURL,
+		gatewayBotClient: http.DefaultClient,
 	}
 	for _, opt := range opts {
 		opt(sm)
@@ -157,4 +183,115 @@ func (sm *ShardManager) Broadcast(ctx context.Context, payload *Payload) error {
 		return nil
 	}
 	return errors.Join(errs...)
+}
+
+// AutoScale consults /gateway/bot and adjusts the shard count based on the provided strategy.
+func (sm *ShardManager) AutoScale(ctx context.Context, guildCount int, strategy ShardingStrategy) error {
+	if sm.token == "" {
+		return errors.New("token required for autoscaling")
+	}
+	if strategy == nil {
+		strategy = &RecommendedSharding{}
+	}
+
+	info, err := fetchGatewayBotInfo(ctx, sm.gatewayBotClient, sm.gatewayBotURL, sm.token)
+	if err != nil {
+		return fmt.Errorf("fetch gateway bot info: %w", err)
+	}
+	if setter, ok := strategy.(interface{ SetRecommended(int) }); ok {
+		setter.SetRecommended(info.Shards)
+	}
+
+	count := strategy.Calculate(guildCount)
+	if count <= 0 {
+		count = info.Shards
+	}
+	if count <= 0 {
+		count = 1
+	}
+	sm.mu.Lock()
+	sm.shardCount = count
+	sm.mu.Unlock()
+	return nil
+}
+
+// ShardingStrategy calculates shard counts.
+type ShardingStrategy interface {
+	Calculate(guildCount int) int
+}
+
+// RecommendedSharding uses Discord's recommended shard count (or guild density) to choose a value.
+type RecommendedSharding struct {
+	recommended int
+}
+
+// SetRecommended updates the recommended shard count sourced from Discord.
+func (r *RecommendedSharding) SetRecommended(count int) {
+	r.recommended = count
+}
+
+// Calculate returns the configured recommended shards or a density-based estimate.
+func (r *RecommendedSharding) Calculate(guildCount int) int {
+	if r.recommended > 0 {
+		return r.recommended
+	}
+	if guildCount <= 0 {
+		return 1
+	}
+	const perShard = 2000
+	return (guildCount / perShard) + 1
+}
+
+// FixedSharding always returns the configured count.
+type FixedSharding struct {
+	Count int
+}
+
+// Calculate returns the fixed shard count (minimum 1).
+func (f FixedSharding) Calculate(_ int) int {
+	if f.Count <= 0 {
+		return 1
+	}
+	return f.Count
+}
+
+// GatewayBotInfo describes /gateway/bot responses.
+type GatewayBotInfo struct {
+	URL               string `json:"url"`
+	Shards            int    `json:"shards"`
+	SessionStartLimit struct {
+		Total      int `json:"total"`
+		Remaining  int `json:"remaining"`
+		ResetAfter int `json:"reset_after"`
+	} `json:"session_start_limit"`
+}
+
+func fetchGatewayBotInfo(ctx context.Context, client *http.Client, endpoint, token string) (*GatewayBotInfo, error) {
+	if token == "" {
+		return nil, errors.New("token is required")
+	}
+	if client == nil {
+		client = http.DefaultClient
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bot "+token)
+	req.Header.Set("User-Agent", "agent-discord-gateway/1.0")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status %d", resp.StatusCode)
+	}
+
+	var info GatewayBotInfo
+	if err := json.NewDecoder(resp.Body).Decode(&info); err != nil {
+		return nil, err
+	}
+	return &info, nil
 }
