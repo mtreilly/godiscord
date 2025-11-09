@@ -1,17 +1,9 @@
 package main
 
-import (
-	"os"
-
-	"github.com/spf13/cobra"
-)
+import "os"
 
 func main() {
-	rootCmd := &cobra.Command{
-		Use:   "discord",
-		Short: "Discord SDK CLI",
-	}
-
+	rootCmd := newRootCommand()
 	rootCmd.AddCommand(webhookCmd())
 	rootCmd.AddCommand(messageCmd())
 	rootCmd.AddCommand(channelCmd())

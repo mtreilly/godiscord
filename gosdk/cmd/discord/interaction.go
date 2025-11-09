@@ -1,18 +1,17 @@
 package main
 
-import (
-	"fmt"
-
-	"github.com/spf13/cobra"
-)
+import "github.com/spf13/cobra"
 
 func interactionCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "interaction",
 		Short: "Respond to interactions",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("interaction command placeholder")
-			return nil
+			cfg := getConfig(cmd)
+			if len(cfg.Discord.Webhooks) > 0 {
+				return printFormatted(cmd, map[string]string{"webhook": cfg.Discord.Webhooks["default"]})
+			}
+			return printFormatted(cmd, map[string]string{"error": "no webhook configured"})
 		},
 	}
 }

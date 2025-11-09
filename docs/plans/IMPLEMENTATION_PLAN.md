@@ -1658,6 +1658,12 @@ func NewFormatter(format string) Formatter
 5. Tests
 6. Examples
 
+**Status**: ✅ Completed (2025-11-08)  
+**Delivered**:
+1. Implemented JSON/YAML/Table formatters (`output/formatter.go`) and tests ensure each format produces output.
+2. CLI exposes `--output` flag and stores the formatter in the command context for subcommands to use via `printFormatted`.
+3. Commands now render the derived config values with the requested format, closing Task 7.1.3.
+
 ## 7.2: Integration Examples (2 days)
 
 ### Task 7.2.1: Usage Examples
