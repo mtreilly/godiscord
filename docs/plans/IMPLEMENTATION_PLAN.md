@@ -1499,6 +1499,7 @@ func (rp *RetryPolicy) Execute(ctx context.Context, fn func() error) error
 - Task 6.4.2 (health checks) will surface API/gateway/webhook status reports using the resilient client stack.
 
 ### Task 6.4.2: Health Checks
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: Low
 **Dependencies**: All clients
 
