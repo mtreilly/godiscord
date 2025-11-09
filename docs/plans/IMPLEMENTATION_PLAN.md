@@ -1409,15 +1409,17 @@ func RateLimitDelay(remaining, limit int, reset time.Time) time.Duration
 ## 6.3: Performance & Optimization (3 days)
 
 ### Task 6.3.1: Connection Pooling
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: Medium
 **Dependencies**: Phase 3
 
-**Steps**:
-1. Implement HTTP connection pooling
-2. Configure MaxIdleConns and MaxIdleConnsPerHost
-3. Connection reuse metrics
-4. Benchmarks
-5. Documentation
+**Implementation**:
+1. Added `PoolConfig` + helper options to `discord/client` so the HTTP `Transport` enforces `MaxIdleConns`, `MaxIdleConnsPerHost`, `IdleConnTimeout`, and `ExpectContinueTimeout` with environment-aware defaults.
+2. Wrapped each request with `httptrace` so `PoolStats` reports total requests and reused connections (`PoolStats()` exposed to callers).
+3. Documented the behavior in the plan and ensured default pooling applies even with custom `http.Client`s by keeping existing options alive.
+
+**Next**:
+- Task 6.3.2 (request batching) can rely on the pooled client and metadata to batch writes safely across idle connections.
 
 ### Task 6.3.2: Request Batching
 **Complexity**: High

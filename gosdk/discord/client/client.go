@@ -6,8 +6,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
+	"net/http/httptrace"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/yourusername/agent-discord/gosdk/discord/types"
@@ -19,6 +22,41 @@ const (
 	defaultBaseURL   = "https://discord.com/api"
 	defaultUserAgent = "DiscordGoSDK/0.1 (+https://github.com/yourusername/agent-discord)"
 )
+
+// PoolConfig adjusts HTTP transport pooling behavior.
+type PoolConfig struct {
+	MaxIdleConns          int
+	MaxIdleConnsPerHost   int
+	IdleConnTimeout       time.Duration
+	ExpectContinueTimeout time.Duration
+}
+
+type poolStats struct {
+	totalRequests     int64
+	reusedConnections int64
+}
+
+func (ps *poolStats) record(reused bool) {
+	atomic.AddInt64(&ps.totalRequests, 1)
+	if reused {
+		atomic.AddInt64(&ps.reusedConnections, 1)
+	}
+}
+
+// PoolStats exposes connection pool metrics.
+type PoolStats struct {
+	TotalRequests     int64
+	ReusedConnections int64
+}
+
+func defaultPoolConfig() PoolConfig {
+	return PoolConfig{
+		MaxIdleConns:          100,
+		MaxIdleConnsPerHost:   20,
+		IdleConnTimeout:       90 * time.Second,
+		ExpectContinueTimeout: time.Second,
+	}
+}
 
 // Client provides authenticated access to the Discord REST API for bot workflows.
 // It mirrors the webhook client's patterns: typed errors, structured logging,
@@ -32,6 +70,8 @@ type Client struct {
 	strategy    ratelimit.Strategy
 	maxRetries  int
 	timeout     time.Duration
+	poolConfig  PoolConfig
+	poolStats   *poolStats
 
 	middlewares []Middleware
 }
@@ -109,6 +149,13 @@ func WithTimeout(d time.Duration) Option {
 	}
 }
 
+// WithPoolConfig overrides the HTTP connection pooling settings.
+func WithPoolConfig(cfg PoolConfig) Option {
+	return func(c *Client) {
+		c.poolConfig = cfg
+	}
+}
+
 // New creates a new Discord bot HTTP client.
 func New(token string, opts ...Option) (*Client, error) {
 	if strings.TrimSpace(token) == "" {
@@ -127,20 +174,70 @@ func New(token string, opts ...Option) (*Client, error) {
 		strategy:    ratelimit.NewDefaultAdaptiveStrategy(),
 		maxRetries:  3,
 		timeout:     30 * time.Second,
+		poolConfig:  defaultPoolConfig(),
+		poolStats:   &poolStats{},
 	}
 
 	for _, opt := range opts {
 		opt(c)
 	}
 
+	c.configureHTTPClient()
+
+	return c, nil
+}
+
+func (c *Client) configureHTTPClient() {
 	if c.httpClient == nil {
 		c.httpClient = &http.Client{}
+	}
+	if c.httpClient.Transport == nil {
+		c.httpClient.Transport = newPooledTransport(c.poolConfig)
+	} else if t, ok := c.httpClient.Transport.(*http.Transport); ok {
+		applyPoolConfig(t, c.poolConfig)
 	}
 	if c.httpClient.Timeout == 0 {
 		c.httpClient.Timeout = c.timeout
 	}
+}
 
-	return c, nil
+func newPooledTransport(cfg PoolConfig) *http.Transport {
+	if cfg.MaxIdleConns <= 0 {
+		cfg.MaxIdleConns = 100
+	}
+	if cfg.MaxIdleConnsPerHost <= 0 {
+		cfg.MaxIdleConnsPerHost = 20
+	}
+	if cfg.IdleConnTimeout <= 0 {
+		cfg.IdleConnTimeout = 90 * time.Second
+	}
+	if cfg.ExpectContinueTimeout <= 0 {
+		cfg.ExpectContinueTimeout = time.Second
+	}
+	return &http.Transport{
+		Proxy:                 http.ProxyFromEnvironment,
+		DialContext:           (&net.Dialer{Timeout: 30 * time.Second, KeepAlive: 30 * time.Second}).DialContext,
+		ForceAttemptHTTP2:     true,
+		MaxIdleConns:          cfg.MaxIdleConns,
+		MaxIdleConnsPerHost:   cfg.MaxIdleConnsPerHost,
+		IdleConnTimeout:       cfg.IdleConnTimeout,
+		ExpectContinueTimeout: cfg.ExpectContinueTimeout,
+	}
+}
+
+func applyPoolConfig(t *http.Transport, cfg PoolConfig) {
+	if cfg.MaxIdleConns > 0 {
+		t.MaxIdleConns = cfg.MaxIdleConns
+	}
+	if cfg.MaxIdleConnsPerHost > 0 {
+		t.MaxIdleConnsPerHost = cfg.MaxIdleConnsPerHost
+	}
+	if cfg.IdleConnTimeout > 0 {
+		t.IdleConnTimeout = cfg.IdleConnTimeout
+	}
+	if cfg.ExpectContinueTimeout > 0 {
+		t.ExpectContinueTimeout = cfg.ExpectContinueTimeout
+	}
 }
 
 // Get performs a GET request relative to the Discord API base path.
@@ -206,6 +303,15 @@ func (c *Client) do(ctx context.Context, method, path string, body interface{}, 
 		req, err := http.NewRequestWithContext(ctx, method, url, bodyReader)
 		if err != nil {
 			return fmt.Errorf("failed to create request: %w", err)
+		}
+
+		if c.poolStats != nil {
+			trace := &httptrace.ClientTrace{
+				GotConn: func(info httptrace.GotConnInfo) {
+					c.poolStats.record(info.Reused)
+				},
+			}
+			req = req.WithContext(httptrace.WithClientTrace(req.Context(), trace))
 		}
 
 		if payload != nil {
@@ -348,6 +454,17 @@ func (c *Client) recordStrategyOutcome(route string, hitLimit bool) {
 	if adaptive, ok := c.strategy.(*ratelimit.AdaptiveStrategy); ok {
 		bucket := c.rateLimiter.GetBucket(route)
 		adaptive.RecordRequest(bucket, hitLimit)
+	}
+}
+
+// PoolStats returns connection pooling metrics for the HTTP client.
+func (c *Client) PoolStats() PoolStats {
+	if c.poolStats == nil {
+		return PoolStats{}
+	}
+	return PoolStats{
+		TotalRequests:     atomic.LoadInt64(&c.poolStats.totalRequests),
+		ReusedConnections: atomic.LoadInt64(&c.poolStats.reusedConnections),
 	}
 }
 
