@@ -155,6 +155,7 @@ Docs Organization
   - `docs/guides/RATE_LIMITS.md` — strategy selection + troubleshooting
   - `docs/guides/WEBHOOKS.md` — end-to-end webhook workflows
   - `docs/guides/INTERACTIONS.md` — slash commands, components, modals, and server guidance
+  - `docs/guides/GATEWAY.md` — gateway connection, sharding, and observability
 - `docs/manual/` — API reference and detailed manuals
 - `docs/design/` — design principles and patterns (adapted from vibe-engineering)
 - `docs/progress/` — status updates and phase tracking

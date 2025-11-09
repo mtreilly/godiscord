@@ -40,3 +40,15 @@ func TestAutoScaleUpdatesShardCount(t *testing.T) {
 		t.Fatalf("expected shard count 3, got %d", sm.shardCount)
 	}
 }
+
+func TestFetchGatewayBotInfoError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer server.Close()
+
+	_, err := fetchGatewayBotInfo(context.Background(), server.Client(), server.URL, "token")
+	if err == nil {
+		t.Fatalf("expected error for non-200 response")
+	}
+}
