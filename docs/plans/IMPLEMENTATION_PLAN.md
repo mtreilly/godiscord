@@ -1338,6 +1338,7 @@ func (pc *PermissionCalculator) CanSendMessages() bool
 ## 6.2: Embed Builder & Utilities (2 days)
 
 ### Task 6.2.1: Advanced Embed Builder
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: Medium
 **Dependencies**: Phase 1
 
@@ -1346,9 +1347,11 @@ func (pc *PermissionCalculator) CanSendMessages() bool
 // gosdk/discord/embeds/builder.go
 type Builder struct {
     embed *types.Embed
+    err   error
 }
 
 func New() *Builder
+func WithEmbed(embed *types.Embed) *Builder
 func (b *Builder) SetTitle(title string) *Builder
 func (b *Builder) SetDescription(description string) *Builder
 func (b *Builder) SetColor(color int) *Builder
@@ -1362,17 +1365,13 @@ func (b *Builder) AddField(name, value string, inline bool) *Builder
 func (b *Builder) Build() (*types.Embed, error)
 
 // Presets
-func Success(title, description string) *Builder
-func Error(title, description string) *Builder
-func Warning(title, description string) *Builder
-func Info(title, description string) *Builder
+func Success(title, description string) (*types.Embed, error)
+func Error(title, description string) (*types.Embed, error)
 ```
 
 **Steps**:
-1. Create fluent builder
-2. Add validation (character limits)
-3. Add color presets
-4. Add template functions
+1. Create fluent builder with validation
+2. Provide color presets
 5. Tests
 6. Examples
 
