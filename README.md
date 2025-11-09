@@ -23,6 +23,7 @@ A production-ready Go SDK for Discord interactions, designed for integration wit
 - **[Webhook Guide](docs/guides/WEBHOOKS.md)** - End-to-end webhook workflows
 - **[Design Principles](docs/design/CLI_DESIGN_PRINCIPLES.md)** - Core design principles
 - **[Open Questions](docs/OPEN_QUESTIONS.md)** - Active design discussions
+- **[Vibe CLI Integration](docs/guides/VIBE_CLI.md)** - CLI command mappings, configs, and release notes
 
 ## Project Structure
 

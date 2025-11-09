@@ -1683,12 +1683,13 @@ func NewFormatter(format string) Formatter
 ## 7.3: Documentation & Release (2 days)
 
 ### Task 7.3.1: Integration Documentation
+**Status**: ✅ Completed (2025-11-08)  
 **Steps**:
-1. Create vibe CLI integration guide
-2. Document all CLI commands
-3. Create configuration guide
-4. Create examples repository
-5. Update README with vibe integration
+1. `docs/guides/VIBE_CLI.md` documents CLI commands, configs, formatters, and release notes.
+2. CLI subcommands (webhook/message/channel/guild/interaction) now print formatted config outputs.
+3. `docs/guides/CLI_EXAMPLES.md` shows sending notifications, bot operations, slash command workflows, and event listener guidance.
+4. README links updated to include the CLI guide.
+5. Release instructions noted in the CLI guide; continue to update before shipping Phase 7 bits.
 
 ### Task 7.3.2: Release Preparation
 **Steps**:
