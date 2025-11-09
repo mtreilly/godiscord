@@ -8,6 +8,23 @@ import (
 	"time"
 )
 
+func (b *Batcher) collect(batch *[]*batchRequest) {
+	for {
+		select {
+		case req := <-b.queue:
+			if req == nil {
+				return
+			}
+			*batch = append(*batch, req)
+			if len(*batch) >= b.batchSize {
+				return
+			}
+		default:
+			return
+		}
+	}
+}
+
 const (
 	defaultBatchSize     = 10
 	defaultFlushInterval = 250 * time.Millisecond
@@ -148,6 +165,7 @@ func (b *Batcher) run() {
 				flush()
 			}
 		case ack := <-b.flushCh:
+			b.collect(&batch)
 			flush()
 			ack <- nil
 		case <-ticker.C:

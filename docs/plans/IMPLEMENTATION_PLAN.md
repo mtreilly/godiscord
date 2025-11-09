@@ -1435,16 +1435,17 @@ func RateLimitDelay(remaining, limit int, reset time.Time) time.Duration
 - Task 6.3.3 (caching strategies) can reuse this batching layer for batched writes while metrics from `PoolStats` keep pools observable.
 
 ### Task 6.3.3: Caching Strategies
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: Medium
 **Dependencies**: Phase 5
 
-**Steps**:
-1. Implement cache warming
-2. Implement cache invalidation strategies
-3. LRU cache implementation
-4. Cache metrics (hit rate, size)
-5. Tests
-6. Examples
+**Implementation**:
+1. Added a generic `cache.LRUCache` with warming, invalidation, and hit/miss/eviction stats (`gosdk/cache/cache.go`).
+2. Supported configurable capacity, warm maps, and predicate-based invalidation so both gateway caches and future batchers can adaptively manage state caches.
+3. Tests cover eviction behavior, warm operations, invalidation, and stat snapshots (`cache_test.go`).
+
+**Next**:
+- Phase 6 continues with Task 6.4 (Error handling/resilience) or Task 6.5 (Testing & docs) once the remaining utilities are ready.
 
 ### Task 6.3.4: Benchmarks & Profiling
 **Complexity**: Medium
