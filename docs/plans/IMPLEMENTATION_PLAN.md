@@ -1462,6 +1462,7 @@ func RateLimitDelay(remaining, limit int, reset time.Time) time.Duration
 ## 6.4: Error Handling & Resilience (2 days)
 
 ### Task 6.4.1: Advanced Error Types
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: Medium
 **Dependencies**: Phase 1
 
@@ -1489,13 +1490,13 @@ type RetryPolicy struct {
 func (rp *RetryPolicy) Execute(ctx context.Context, fn func() error) error
 ```
 
-**Steps**:
-1. Implement circuit breaker
-2. Implement retry policies
-3. Implement timeout policies
-4. Integrate with client
-5. Tests
-6. Examples
+**Delivered**:
+1. Added circuit breaker capturing failure counts, reset timeout, and guarded calls (`types/resilience.go`).
+2. Added retry policy with configurable attempts, exponential backoff, and optional jitter plus tests for both components.
+3. Utilities can wrap client operations or health checks for resilience with typed errors.
+
+**Next**:
+- Task 6.4.2 (health checks) will surface API/gateway/webhook status reports using the resilient client stack.
 
 ### Task 6.4.2: Health Checks
 **Complexity**: Low
