@@ -786,6 +786,7 @@ func (b *ModalBuilder) Build() *Modal
 ## 5.1: Gateway Foundation (1 week)
 
 ### Task 5.1.1: Gateway Types
+**Status**: ✅ Completed (2025-11-08)  
 **Complexity**: High
 **Dependencies**: Phase 3
 
@@ -824,13 +825,13 @@ type IdentifyPayload struct {
 }
 ```
 
-**Steps**:
-1. Define all gateway opcodes
-2. Define payload structures
-3. Define identify/resume payloads
-4. Define intents system
-5. JSON marshaling
-6. Tests
+**Delivered**:
+1. Defined `OpCode` constants, the generic `Payload`, `IdentifyPayload`, `IdentifyProperties`, and `ResumePayload` structs in `gosdk/discord/gateway/types.go`.
+2. Added serialization tests to verify payload round-tripping and opcode values (`types_test.go`).
+3. Documented the behaviour so Phase 5 tasks can build atop these types.
+
+**Next**:
+- Begin Task 5.1.2 (WebSocket connection management using the new payloads and heartbeat flow).
 
 ### Task 5.1.2: WebSocket Connection
 **Complexity**: High
