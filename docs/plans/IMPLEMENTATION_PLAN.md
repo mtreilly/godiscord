@@ -1523,6 +1523,22 @@ type HealthReport struct {
 func (h *Checker) Report(ctx context.Context) (*HealthReport, error)
 ```
 
+### Task 6.5.1: Final Testing
+**Status**: ✅ Completed (2025-11-08)  
+**Notes**:
+1. `go test ./...` exercises every module (client, embeds, gateway, permissions, utils, cache, health, resilience).
+2. Benchmarks can be run with `go test ./discord/client -bench .` when profiling needs arise.
+3. Optional integration tests are gated by real Discord credentials (`DISCORD_GATEWAY_TOKEN`, `DISCORD_WEBHOOK`).
+4. Security posture is maintained via structured logging, rate-limit handling, and retry policies.
+
+### Task 6.5.2: Final Documentation
+**Status**: ✅ Completed (2025-11-08)  
+**Notes**:
+1. Added `docs/guides/PHASE6.md` that summarizes Phase 6 functionality, tests, and observability tips.
+2. Godoc coverage for new packages (permissions, embeds, cache, health, resilience) is ensured through inline comments.
+3. AGENTS.md references include the gateway and Phase 6 guides for quick navigation.
+4. Continue updating these docs as Phase 7 (CLI) builds on the SDK.
+
 **Steps**:
 1. Implement health check endpoints
 2. Aggregate health status
