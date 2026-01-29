@@ -5,7 +5,7 @@ Go SDK for Discord API interactions.
 ## Installation
 
 ```bash
-go get github.com/yourusername/agent-discord/gosdk
+go get github.com/mtreilly/agent-discord/gosdk
 ```
 
 ## Packages

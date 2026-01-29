@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/yourusername/agent-discord/gosdk/logger"
+	"github.com/mtreilly/agent-discord/gosdk/logger"
 )
 
 const defaultGatewayBotURL = "https://discord.com/api/v10/gateway/bot"

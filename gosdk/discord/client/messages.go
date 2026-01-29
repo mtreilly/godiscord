@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/yourusername/agent-discord/gosdk/discord/types"
+	"github.com/mtreilly/agent-discord/gosdk/discord/types"
 )
 
 // MessageService provides helpers for channel message operations.

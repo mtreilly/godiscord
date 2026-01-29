@@ -7,9 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/yourusername/agent-discord/gosdk/discord/client"
-	"github.com/yourusername/agent-discord/gosdk/discord/types"
-	"github.com/yourusername/agent-discord/gosdk/ratelimit"
+	"github.com/mtreilly/agent-discord/gosdk/discord/client"
+	"github.com/mtreilly/agent-discord/gosdk/discord/types"
+	"github.com/mtreilly/agent-discord/gosdk/ratelimit"
 )
 
 func TestInteractionClientCreateInteractionResponse(t *testing.T) {

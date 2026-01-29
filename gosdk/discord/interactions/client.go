@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/yourusername/agent-discord/gosdk/discord/client"
-	"github.com/yourusername/agent-discord/gosdk/discord/types"
+	"github.com/mtreilly/agent-discord/gosdk/discord/client"
+	"github.com/mtreilly/agent-discord/gosdk/discord/types"
 )
 
 // InteractionClient wraps the bot client with helpers for interaction callback and follow-up endpoints.

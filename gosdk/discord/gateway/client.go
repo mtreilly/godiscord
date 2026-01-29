@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yourusername/agent-discord/gosdk/discord/types"
-	"github.com/yourusername/agent-discord/gosdk/logger"
+	"github.com/mtreilly/agent-discord/gosdk/discord/types"
+	"github.com/mtreilly/agent-discord/gosdk/logger"
 )
 
 // Activity represents a Discord presence activity.

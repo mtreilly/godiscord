@@ -13,14 +13,14 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/yourusername/agent-discord/gosdk/discord/types"
-	"github.com/yourusername/agent-discord/gosdk/logger"
-	"github.com/yourusername/agent-discord/gosdk/ratelimit"
+	"github.com/mtreilly/agent-discord/gosdk/discord/types"
+	"github.com/mtreilly/agent-discord/gosdk/logger"
+	"github.com/mtreilly/agent-discord/gosdk/ratelimit"
 )
 
 const (
 	defaultBaseURL   = "https://discord.com/api"
-	defaultUserAgent = "DiscordGoSDK/0.1 (+https://github.com/yourusername/agent-discord)"
+	defaultUserAgent = "DiscordGoSDK/0.1 (+https://github.com/mtreilly/agent-discord)"
 )
 
 // PoolConfig adjusts HTTP transport pooling behavior.

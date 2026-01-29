@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/yourusername/agent-discord/gosdk/discord/types"
+	"github.com/mtreilly/agent-discord/gosdk/discord/types"
 )
 
 // Middleware wraps handlers for shared concerns (logging, recovery, etc).

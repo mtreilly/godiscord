@@ -9,9 +9,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/yourusername/agent-discord/gosdk/discord/types"
-	"github.com/yourusername/agent-discord/gosdk/logger"
-	"github.com/yourusername/agent-discord/gosdk/ratelimit"
+	"github.com/mtreilly/agent-discord/gosdk/discord/types"
+	"github.com/mtreilly/agent-discord/gosdk/logger"
+	"github.com/mtreilly/agent-discord/gosdk/ratelimit"
 )
 
 // Client represents a Discord webhook client

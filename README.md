@@ -31,8 +31,7 @@ A production-ready Go SDK for Discord interactions, designed for integration wit
 agent-discord/
 ├── AGENTS.md              # Agent collaboration guide ⭐
 ├── README.md              # This file
-├── PROJECT_STRUCTURE.md   # Detailed structure guide
-├── discord-bot/           # Old Python implementation (reference only)
+├── LICENSE                # MIT License
 ├── gosdk/                 # Go SDK (main development) ⭐
 │   ├── discord/           # Discord API packages
 │   │   ├── client/        # Core API client
@@ -88,8 +87,8 @@ import (
     "log"
     "time"
 
-    "github.com/yourusername/agent-discord/gosdk/discord/types"
-    "github.com/yourusername/agent-discord/gosdk/discord/webhook"
+    "github.com/mtreilly/agent-discord/gosdk/discord/types"
+    "github.com/mtreilly/agent-discord/gosdk/discord/webhook"
 )
 
 func main() {
@@ -342,7 +341,7 @@ Create a test Discord server and webhook:
 
 ## License
 
-[Your License Here]
+MIT License - see [LICENSE](LICENSE) for details.
 
 ## References
 
@@ -350,4 +349,3 @@ Create a test Discord server and webhook:
 - Rate Limits: https://discord.com/developers/docs/topics/rate-limits
 - Webhooks: https://discord.com/developers/docs/resources/webhook
 - Gateway: https://discord.com/developers/docs/topics/gateway
-- Old Python implementation: `discord-bot/` (reference only)

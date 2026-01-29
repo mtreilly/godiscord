@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/yourusername/agent-discord/gosdk/logger"
+	"github.com/mtreilly/agent-discord/gosdk/logger"
 )
 
 // EventHandler processes a gateway event.

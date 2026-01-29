@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/yourusername/agent-discord/gosdk/discord/types"
+	"github.com/mtreilly/agent-discord/gosdk/discord/types"
 )
 
 // Channels exposes channel-related API helpers.

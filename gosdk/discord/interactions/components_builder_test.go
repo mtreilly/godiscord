@@ -3,7 +3,7 @@ package interactions
 import (
 	"testing"
 
-	"github.com/yourusername/agent-discord/gosdk/discord/types"
+	"github.com/mtreilly/agent-discord/gosdk/discord/types"
 )
 
 func TestButtonBuilder(t *testing.T) {

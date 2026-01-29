@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/yourusername/agent-discord/gosdk/logger"
+	"github.com/mtreilly/agent-discord/gosdk/logger"
 )
 
 // Request wraps http.Request to allow middleware to override context/metadata.

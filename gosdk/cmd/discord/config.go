@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
-	"github.com/yourusername/agent-discord/gosdk/cmd/discord/output"
-	"github.com/yourusername/agent-discord/gosdk/config"
+	"github.com/mtreilly/agent-discord/gosdk/cmd/discord/output"
+	"github.com/mtreilly/agent-discord/gosdk/config"
 )
 
 type cliContextKey string

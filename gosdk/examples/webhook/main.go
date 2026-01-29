@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/yourusername/agent-discord/gosdk/discord/types"
-	"github.com/yourusername/agent-discord/gosdk/discord/webhook"
+	"github.com/mtreilly/agent-discord/gosdk/discord/types"
+	"github.com/mtreilly/agent-discord/gosdk/discord/webhook"
 )
 
 func main() {

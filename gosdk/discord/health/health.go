@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/yourusername/agent-discord/gosdk/discord/client"
+	"github.com/mtreilly/agent-discord/gosdk/discord/client"
 )
 
 const defaultGatewayURL = "https://discord.com/api/gateway"

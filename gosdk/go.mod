@@ -1,4 +1,4 @@
-module github.com/yourusername/agent-discord/gosdk
+module github.com/mtreilly/agent-discord/gosdk
 
 go 1.25.3
 
