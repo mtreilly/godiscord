@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/mtreilly/agent-discord/gosdk/logger"
+	"github.com/mtreilly/godiscord/gosdk/logger"
 )
 
 func TestRecommendedShardingUsesRecommendedCount(t *testing.T) {

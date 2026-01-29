@@ -8,8 +8,8 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/mtreilly/agent-discord/gosdk/discord/types"
-	"github.com/mtreilly/agent-discord/gosdk/ratelimit"
+	"github.com/mtreilly/godiscord/gosdk/discord/types"
+	"github.com/mtreilly/godiscord/gosdk/ratelimit"
 )
 
 func TestChannelsGetChannel(t *testing.T) {

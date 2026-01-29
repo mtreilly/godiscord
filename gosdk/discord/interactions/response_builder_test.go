@@ -3,7 +3,7 @@ package interactions
 import (
 	"testing"
 
-	"github.com/mtreilly/agent-discord/gosdk/discord/types"
+	"github.com/mtreilly/godiscord/gosdk/discord/types"
 )
 
 func TestResponseBuilder_Message(t *testing.T) {

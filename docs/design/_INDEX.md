@@ -4,7 +4,7 @@ This directory contains design principles and patterns for the Discord Go SDK.
 
 ## Documents
 
-### [CLI_DESIGN_PRINCIPLES.md](CLI_DESIGN_PRINCIPLES.md)
+### [DESIGN_PRINCIPLES.md](DESIGN_PRINCIPLES.md)
 Core design principles for building the Discord SDK:
 - Goals and philosophy
 - Package organization
@@ -14,7 +14,7 @@ Core design principles for building the Discord SDK:
 - Performance considerations
 - Anti-patterns to avoid
 
-### [CLI_PATTERNS_COOKBOOK.md](CLI_PATTERNS_COOKBOOK.md)
+### [PATTERNS_COOKBOOK.md](PATTERNS_COOKBOOK.md)
 Practical patterns and recipes:
 - Package organization examples
 - Client initialization patterns
@@ -28,8 +28,8 @@ Practical patterns and recipes:
 
 ## How to Use
 
-1. **Starting a new package?** Read CLI_DESIGN_PRINCIPLES.md first
-2. **Implementing a feature?** Check CLI_PATTERNS_COOKBOOK.md for examples
+1. **Starting a new package?** Read DESIGN_PRINCIPLES.md first
+2. **Implementing a feature?** Check PATTERNS_COOKBOOK.md for examples
 3. **Unsure about a design decision?** Add to [../OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md)
 
 ## Principles Summary
@@ -45,6 +45,5 @@ Practical patterns and recipes:
 
 ## References
 
-- Inspired by: `~/vibe-engineering/docs/design/` and `../agent-mobile/docs/design/`
 - Discord API: https://discord.com/developers/docs
 - Go best practices: https://go.dev/doc/effective_go

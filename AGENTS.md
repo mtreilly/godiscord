@@ -1,9 +1,9 @@
-AGENTS.md — Discord Go SDK (vibe CLI Integration)
+AGENTS.md — Discord Go SDK
 
 Purpose
-- Build a production-ready Go SDK for Discord interactions (webhooks, slash commands, bot APIs) to be integrated into the vibe CLI.
-- Agent-friendly: consistent APIs, JSON outputs, excellent error handling, and comprehensive testing.
-- Inspired by patterns from `../agent-mobile`, `~/vibe-engineering`, and Discord best practices.
+- Build a production-ready Go SDK for Discord interactions (webhooks, slash commands, bot APIs).
+- Developer-friendly: consistent APIs, JSON outputs, excellent error handling, and comprehensive testing.
+- Inspired by Discord best practices and Go idioms.
 
 Scope
 - Discord webhooks (send messages, embeds, files)
@@ -11,7 +11,6 @@ Scope
 - Slash commands and component interactions
 - Rate limiting, retries, and error handling
 - Configuration management (YAML, env vars)
-- Integration-ready for vibe CLI
 
 Quick Start (Local Dev)
 - Prerequisites: Go 1.21+, Discord bot token, webhook URLs
@@ -32,7 +31,7 @@ Quick Start (Local Dev)
 
 Project Structure
 ```
-agent-discord/
+godiscord/
 ├── AGENTS.md              # This file
 ├── README.md              # Project overview
 ├── discord-bot/           # Old Python implementation (reference only)
@@ -41,7 +40,7 @@ agent-discord/
 │   │   ├── client/        # Core API client
 │   │   ├── webhook/       # Webhook functionality
 │   │   ├── interactions/  # Slash commands & components
-│   │   ├── gateway/       # WebSocket gateway (future)
+│   │   ├── gateway/       # WebSocket gateway
 │   │   └── types/         # Shared types and models
 │   ├── config/            # Configuration management
 │   ├── logger/            # Structured logging
@@ -50,7 +49,7 @@ agent-discord/
 │   └── go.sum             # Dependency checksums
 └── docs/
     ├── design/            # Design principles and patterns
-    ├── plans/             # Project plans and roadmaps
+    ├── plans/             # Project plans
     ├── guides/            # How-to guides
     ├── manual/            # API reference and manuals
     └── progress/          # Status updates and tracking
@@ -157,16 +156,15 @@ Docs Organization
   - `docs/guides/INTERACTIONS.md` — slash commands, components, modals, and server guidance
   - `docs/guides/GATEWAY.md` — gateway connection, sharding, and observability
   - `docs/guides/PHASE6.md` — Phase 6 advanced features/tests summary
-  - `docs/guides/CLI_EXAMPLES.md` — quick usage patterns for the new CLI
+  - `docs/guides/CLI_EXAMPLES.md` — quick usage patterns for the CLI
   - `docs/guides/MIGRATION.md` — migrating from the Python bot to this SDK
-  - `docs/guides/CLI_RELEASE.md` — release playbook for the CLI bundle
 - `docs/manual/` — API reference and detailed manuals
-- `docs/design/` — design principles and patterns (adapted from vibe-engineering)
+- `docs/design/` — design principles and patterns
 - `docs/progress/` — status updates and phase tracking
 - Root files: `README.md` (overview), `AGENTS.md` (this guide)
 
 Design Standards (Critical)
-- Adhere to `docs/design/CLI_DESIGN_PRINCIPLES.md` and `docs/design/CLI_PATTERNS_COOKBOOK.md`
+- Adhere to `docs/design/DESIGN_PRINCIPLES.md` and `docs/design/PATTERNS_COOKBOOK.md`
 - All packages should follow these principles: context support, proper error handling, structured logging, JSON-serializable types
 - When deviating, document rationale in `docs/OPEN_QUESTIONS.md` and propose updates to design docs if needed
 
@@ -182,49 +180,6 @@ Open Questions (Living Log)
 - Keep entries concise with context, options, and next experiments
 - Close items by linking to resolving commits/PRs/docs
 - Treat this as part of handoff hygiene: leave open threads visible for the next agent
-
-Integration with vibe CLI
-- SDK designed to be imported as a Go module
-- Packages expose clean interfaces for CLI commands
-- Configuration integrates with vibe's config system
-- Logging integrates with vibe's logging framework
-- Examples demonstrate CLI integration patterns
-
-Initial Roadmap (Phases)
-
-Phase 1 (Current): Foundation
-- [x] Scaffold project structure
-- [x] Create AGENTS.md and design docs
-- [ ] Implement core types package
-- [ ] Basic webhook client with retries
-- [ ] Configuration management
-- [ ] Structured logging
-
-Phase 2: Core Features
-- [ ] Full webhook API (messages, embeds, files)
-- [ ] Bot API client (messages, channels)
-- [ ] Rate limiting and backoff
-- [ ] Comprehensive error types
-- [ ] Unit tests for core packages
-
-Phase 3: Advanced Features
-- [ ] Slash commands registration and handling
-- [ ] Component interactions (buttons, select menus)
-- [ ] Embed builder with validation
-- [ ] File uploads and attachments
-
-Phase 4: Integration & Polish
-- [ ] Integration examples
-- [ ] vibe CLI integration guide
-- [ ] Performance benchmarks
-- [ ] Documentation completion
-- [ ] API stability review
-
-Phase 5: Gateway (Future)
-- [ ] WebSocket gateway connection
-- [ ] Event handling framework
-- [ ] Presence and status management
-- [ ] Voice support (if needed)
 
 Next Actions for Agents
 - Review `docs/OPEN_QUESTIONS.md` for active discussions
@@ -323,10 +278,4 @@ Test Individual Package
 cd gosdk
 go test -v ./discord/webhook
 go test -v -race ./discord/client
-```
-
-Build for vibe CLI Integration
-```bash
-cd gosdk
-go build -o ../bin/discord-cli ./cmd/cli
 ```

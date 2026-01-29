@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/mtreilly/agent-discord/gosdk/discord/types"
+	"github.com/mtreilly/godiscord/gosdk/discord/types"
 )
 
 func BenchmarkClientSend(b *testing.B) {

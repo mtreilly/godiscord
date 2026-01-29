@@ -1,7 +1,7 @@
 OPEN_QUESTIONS.md — Discord Go SDK
 
 Purpose
-- Track unresolved questions, assumptions, and decisions needed across SDK design, vibe CLI integration, and Discord API patterns. This is a living document for agents to update continuously.
+- Track unresolved questions, assumptions, and decisions needed across SDK design, CLI integration, and Discord API patterns. This is a living document for agents to update continuously.
 
 How To Use
 - Add an entry whenever you encounter uncertainty, a blocked decision, or a design tradeoff.
@@ -47,7 +47,7 @@ Seed Questions
 Scope: SDK | Owner: unassigned | Last Updated: 2025-11-08
 
 Context
-- Discord has per-route rate limits and global rate limits. SDK needs to handle these gracefully without exposing complexity to vibe CLI users. We need to decide between client-side tracking vs reactive handling.
+- Discord has per-route rate limits and global rate limits. SDK needs to handle these gracefully without exposing complexity to CLI users. We need to decide between client-side tracking vs reactive handling.
 
 Open Question(s)
 - Should we implement proactive rate limit tracking or reactive backoff?
@@ -66,7 +66,7 @@ Hypotheses / Options
 
 Proposed Experiment(s)
 - Implement reactive approach first in webhook package
-- Measure 429 frequency in real usage (vibe CLI integration)
+- Measure 429 frequency in real usage (CLI integration)
 - Add proactive tracking if 429s are frequent (>5% of requests)
 
 Signals / Success Criteria
@@ -85,31 +85,30 @@ Status
 Scope: SDK|Integration | Owner: unassigned | Last Updated: 2025-11-08
 
 Context
-- SDK needs configuration (tokens, timeouts, retry counts). vibe CLI has its own config system. We need to decide how gosdk config integrates with vibe's config without tight coupling.
+- SDK needs configuration (tokens, timeouts, retry counts). CLI tools have their own config systems. We need to decide how gosdk config integrates with CLI configs without tight coupling.
 
 Open Question(s)
-- Should gosdk have its own config package or rely on vibe's?
+- Should gosdk have its own config package or rely on CLI tools'?
 - How do we handle config precedence (env vars, config files, params)?
 - Should we support multiple config formats (YAML, JSON, TOML)?
 
 Hypotheses / Options
-- A) SDK has minimal config package, vibe CLI maps vibe config → SDK options (loose coupling, flexible)
-- B) SDK uses vibe config directly via import (tight coupling, simpler for vibe users)
+- A) SDK has minimal config package, CLI maps config → SDK options (loose coupling, flexible)
+- B) SDK uses CLI config directly via import (tight coupling, simpler for CLI users)
 - C) SDK accepts functional options only, no config files (code-first, explicit)
 
 Proposed Experiment(s)
 - Implement option A: gosdk/config with YAML support + functional options
-- Create example showing vibe CLI integration with config mapping
+- Create example showing CLI integration with config mapping
 - Evaluate ergonomics and maintainability
 
 Signals / Success Criteria
-- Clear separation between SDK and vibe CLI concerns
+- Clear separation between SDK and CLI concerns
 - Configuration is easy to understand and override
-- No config duplication or drift between SDK and vibe CLI
+- No config duplication or drift between SDK and CLI tools
 
 Links
 - gosdk/config (to be implemented)
-- vibe CLI config system (check ~/vibe-engineering)
 
 Status
 - open
@@ -153,11 +152,11 @@ Status
 Scope: Gateway | Owner: unassigned | Last Updated: 2025-11-08
 
 Context
-- Discord Gateway provides real-time events via WebSocket. Webhooks and REST API cover many use cases. Gateway is complex and may not be needed for initial vibe CLI integration.
+- Discord Gateway provides real-time events via WebSocket. Webhooks and REST API cover many use cases. Gateway is complex and may not be needed for initial CLI integration.
 
 Open Question(s)
 - Is Gateway support required for v1.0 of the SDK?
-- What use cases in vibe CLI would require Gateway?
+- What use cases in CLI tools would require Gateway?
 - Should we design SDK structure anticipating Gateway, even if not implemented yet?
 
 Hypotheses / Options
@@ -166,19 +165,19 @@ Hypotheses / Options
 - C) Design package structure for Gateway, implement stub/placeholder (future-proof, minimal cost)
 
 Proposed Experiment(s)
-- Survey vibe CLI use cases: which need real-time events vs request/response?
+- Survey CLI use cases: which need real-time events vs request/response?
 - Estimate Gateway implementation complexity (time + testing burden)
 - Design gosdk/discord/gateway package structure without implementation
 
 Signals / Success Criteria
-- Clear understanding of vibe CLI Gateway requirements
+- Clear understanding of CLI Gateway requirements
 - Package structure supports Gateway addition without breaking changes
-- Decision documented and communicated to vibe CLI team
+- Decision documented and communicated to CLI team
 
 Links
 - Discord Gateway docs: https://discord.com/developers/docs/topics/gateway
 - Old Python bot implementation: discord-bot/coordinator/discord/bot.py
-- docs/plans/ROADMAP.md (to be created)
+- docs/plans/IMPLEMENTATION_PLAN.md
 
 Status
 - open
@@ -187,7 +186,7 @@ Status
 Scope: SDK | Owner: unassigned | Last Updated: 2025-11-08
 
 Context
-- SDK will encounter various errors: network failures, API errors (4xx, 5xx), rate limits, invalid tokens, etc. We need consistent error handling that allows vibe CLI to handle errors programmatically.
+- SDK will encounter various errors: network failures, API errors (4xx, 5xx), rate limits, invalid tokens, etc. We need consistent error handling that allows CLI tools to handle errors programmatically.
 
 Open Question(s)
 - Should we use sentinel errors, error types, or both?
@@ -207,7 +206,7 @@ Proposed Experiment(s)
 Signals / Success Criteria
 - Errors are easy to handle programmatically (errors.Is, errors.As work)
 - Error messages are actionable for developers
-- Vibe CLI can distinguish rate limits from auth errors from network failures
+- CLI tools can distinguish rate limits from auth errors from network failures
 
 Links
 - Go errors package: https://pkg.go.dev/errors

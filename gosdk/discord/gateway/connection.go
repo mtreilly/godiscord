@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/mtreilly/agent-discord/gosdk/logger"
+	"github.com/mtreilly/godiscord/gosdk/logger"
 )
 
 const (
@@ -102,7 +102,7 @@ func (c *Connection) Connect(ctx context.Context) error {
 	c.mu.Unlock()
 
 	headers := http.Header{}
-	headers.Set("User-Agent", "agent-discord-gateway/1.0")
+	headers.Set("User-Agent", "godiscord-gateway/1.0")
 
 	conn, _, err := c.dialer.DialContext(ctx, c.gatewayURL, headers)
 	if err != nil {

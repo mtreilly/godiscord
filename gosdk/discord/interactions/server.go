@@ -10,8 +10,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/mtreilly/agent-discord/gosdk/discord/types"
-	"github.com/mtreilly/agent-discord/gosdk/logger"
+	"github.com/mtreilly/godiscord/gosdk/discord/types"
+	"github.com/mtreilly/godiscord/gosdk/logger"
 )
 
 const (

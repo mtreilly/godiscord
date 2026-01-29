@@ -1,6 +1,6 @@
 # CLI Integration Examples
 
-This guide shows how to wire the new `discord` CLI commands into real workflows.
+This guide shows how to wire the `discord` CLI commands into real workflows.
 
 ## Webhook Notifications
 

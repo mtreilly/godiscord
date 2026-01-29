@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mtreilly/agent-discord/gosdk/discord/types"
-	"github.com/mtreilly/agent-discord/gosdk/logger"
+	"github.com/mtreilly/godiscord/gosdk/discord/types"
+	"github.com/mtreilly/godiscord/gosdk/logger"
 )
 
 // Activity represents a Discord presence activity.
@@ -245,8 +245,8 @@ func (c *Client) identify(ctx context.Context) error {
 		Token: c.token,
 		Properties: IdentifyProperties{
 			OS:      runtime.GOOS,
-			Browser: "agent-discord",
-			Device:  "agent-discord",
+			Browser: "godiscord",
+			Device:  "godiscord",
 		},
 		Intents: c.intents,
 	}

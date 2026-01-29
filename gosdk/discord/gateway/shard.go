@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/mtreilly/agent-discord/gosdk/logger"
+	"github.com/mtreilly/godiscord/gosdk/logger"
 )
 
 const defaultGatewayBotURL = "https://discord.com/api/v10/gateway/bot"
@@ -278,7 +278,7 @@ func fetchGatewayBotInfo(ctx context.Context, client *http.Client, endpoint, tok
 		return nil, err
 	}
 	req.Header.Set("Authorization", "Bot "+token)
-	req.Header.Set("User-Agent", "agent-discord-gateway/1.0")
+	req.Header.Set("User-Agent", "godiscord-gateway/1.0")
 
 	resp, err := client.Do(req)
 	if err != nil {

@@ -33,7 +33,7 @@ client, err := webhook.NewClient(
 )
 ```
 
-Inject a custom `ratelimit.Tracker` or logger with the existing option helpers when integrating into the vibe CLI.
+Inject a custom `ratelimit.Tracker` or logger with the existing option helpers when integrating into CLI tools.
 
 ## 3. Send Messages
 

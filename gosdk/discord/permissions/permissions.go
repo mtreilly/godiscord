@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mtreilly/agent-discord/gosdk/discord/types"
+	"github.com/mtreilly/godiscord/gosdk/discord/types"
 )
 
 // Permission represents a Discord permission bitfield.

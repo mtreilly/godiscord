@@ -47,7 +47,7 @@ Phase 6: Advanced Features & Polish [2 weeks]
 ├── 6.4: Error handling & resilience (2 days)
 └── 6.5: Testing & docs (2 days)
 
-Phase 7: vibe CLI Integration [1 week]
+Phase 7: CLI Integration [1 week]
 ├── 7.1: CLI commands (3 days)
 ├── 7.2: Integration examples (2 days)
 └── 7.3: Documentation & release (2 days)
@@ -122,7 +122,7 @@ gosdk/
 | 2 | Rate limiting strategy effectiveness | OPEN_QUESTIONS.md |
 | 3 | Bot API completeness | OPEN_QUESTIONS.md |
 | 4 | Component patterns | OPEN_QUESTIONS.md |
-| 5 | Gateway priority for vibe CLI | ROADMAP.md |
+| 5 | Gateway priority for CLI | STATUS.md |
 | 6 | Performance targets met | STATUS.md |
 | 7 | v1.0 readiness | STATUS.md |
 
@@ -196,7 +196,7 @@ if err != nil {
 - **Full Implementation Plan**: [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)
 - **Development Roadmap**: [ROADMAP.md](ROADMAP.md)
 - **Current Status**: [../progress/STATUS.md](../progress/STATUS.md)
-- **Design Principles**: [../design/CLI_DESIGN_PRINCIPLES.md](../design/CLI_DESIGN_PRINCIPLES.md)
-- **Patterns Cookbook**: [../design/CLI_PATTERNS_COOKBOOK.md](../design/CLI_PATTERNS_COOKBOOK.md)
+- **Design Principles**: [../design/DESIGN_PRINCIPLES.md](../design/DESIGN_PRINCIPLES.md)
+- **Patterns Cookbook**: [../design/PATTERNS_COOKBOOK.md](../design/PATTERNS_COOKBOOK.md)
 - **Open Questions**: [../OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md)
 - **Agent Guide**: [../../AGENTS.md](../../AGENTS.md)

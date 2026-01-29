@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/mtreilly/agent-discord/gosdk/discord/client"
+	"github.com/mtreilly/godiscord/gosdk/discord/client"
 )
 
 func TestCheckerReportSuccess(t *testing.T) {

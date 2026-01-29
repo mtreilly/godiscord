@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/mtreilly/agent-discord/gosdk/discord/types"
-	"github.com/mtreilly/agent-discord/gosdk/ratelimit"
+	"github.com/mtreilly/godiscord/gosdk/discord/types"
+	"github.com/mtreilly/godiscord/gosdk/ratelimit"
 )
 
 // MessageEditParams represents parameters for editing a webhook message

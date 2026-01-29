@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/mtreilly/agent-discord/gosdk/discord/types"
+	"github.com/mtreilly/godiscord/gosdk/discord/types"
 )
 
 const (

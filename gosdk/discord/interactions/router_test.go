@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/mtreilly/agent-discord/gosdk/discord/types"
+	"github.com/mtreilly/godiscord/gosdk/discord/types"
 )
 
 func TestRouterCommandResolution(t *testing.T) {

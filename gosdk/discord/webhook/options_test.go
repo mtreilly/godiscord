@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mtreilly/agent-discord/gosdk/logger"
-	"github.com/mtreilly/agent-discord/gosdk/ratelimit"
+	"github.com/mtreilly/godiscord/gosdk/logger"
+	"github.com/mtreilly/godiscord/gosdk/ratelimit"
 )
 
 func TestWithHTTPClient(t *testing.T) {

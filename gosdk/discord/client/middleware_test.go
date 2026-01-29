@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mtreilly/agent-discord/gosdk/logger"
+	"github.com/mtreilly/godiscord/gosdk/logger"
 )
 
 func TestLoggingMiddleware(t *testing.T) {

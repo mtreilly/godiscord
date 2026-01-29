@@ -1,6 +1,6 @@
 # CLI Patterns Cookbook (Discord SDK)
 
-Source inspiration: `~/vibe-engineering/docs/design/CLI_PATTERNS_COOKBOOK.md` and `../agent-mobile/docs/design/CLI_PATTERNS_COOKBOOK.md`
+Source inspiration: Go SDK design patterns
 
 ## Package Organization
 

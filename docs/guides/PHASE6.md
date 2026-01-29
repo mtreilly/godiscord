@@ -25,5 +25,5 @@ This guide recaps Phase 6 (Advanced Features & Polish), covering the permission 
 
 ## Next Steps
 
-1. Phase 7 (vibe CLI integration) builds on these foundations; share the above guides in PRs to help future agents.
+1. Phase 7 (CLI integration) builds on these foundations; share the above guides in PRs to help future agents.
 2. Continue maintaining >85% coverage and extend benchmarks/health checks as CLI commands get wired up.

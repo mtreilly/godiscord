@@ -1,12 +1,12 @@
 # CLI Design Principles (Discord SDK)
 
-Source inspiration: `~/vibe-engineering/docs/design/CLI_DESIGN_PRINCIPLES.md` and `../agent-mobile/docs/design/CLI_DESIGN_PRINCIPLES.md`
+Source inspiration: Go SDK design patterns
 
 ## Goals
 - Fast, ergonomic Discord SDK that is safe to automate and easy to reason about
 - Consistent API: same patterns, types, and error semantics across packages
 - Agent-friendly: JSON-first, deterministic outputs, excellent logs
-- CLI-ready: designed to integrate seamlessly into the vibe CLI
+- CLI-ready: designed to integrate seamlessly with CLI tools
 
 ## Package Model
 - Clear hierarchy: `gosdk/<feature>/<package>`
