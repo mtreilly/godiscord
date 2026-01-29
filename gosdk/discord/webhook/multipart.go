@@ -3,10 +3,12 @@ package webhook
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
+	"time"
 
 	"github.com/mtreilly/godiscord/gosdk/discord/types"
 )
@@ -198,7 +200,7 @@ func (c *Client) writeJSONPayload(writer *multipart.Writer, msg *types.WebhookMe
 	}
 
 	// Marshal message to JSON
-	data, err := marshalJSON(msg)
+	data, err := json.Marshal(msg)
 	if err != nil {
 		return err
 	}
@@ -248,7 +250,7 @@ func (c *Client) sendMultipartWithRetry(ctx context.Context, body []byte, conten
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
-			case <-waitWithBackoff(backoff):
+			case <-time.After(backoff):
 				backoff *= 2
 			}
 		}
@@ -298,7 +300,7 @@ func (c *Client) sendMultipartWithRetry(ctx context.Context, body []byte, conten
 			c.recordStrategyOutcome(route, true)
 
 			if apiErr.RetryAfter > 0 {
-				backoff = backoffFromSeconds(apiErr.RetryAfter)
+				backoff = time.Duration(apiErr.RetryAfter) * time.Second
 			}
 			lastErr = apiErr
 			continue

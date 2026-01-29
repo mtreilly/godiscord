@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/mtreilly/godiscord/gosdk/discord/types"
 	"github.com/mtreilly/godiscord/gosdk/logger"
 )
 
@@ -82,7 +83,7 @@ type ShardManager struct {
 }
 
 // NewShardManager constructs a shard manager.
-func NewShardManager(token string, shardCount int, intents int, opts ...ShardManagerOption) *ShardManager {
+func NewShardManager(token string, shardCount, intents int, opts ...ShardManagerOption) *ShardManager {
 	sm := &ShardManager{
 		token:            token,
 		intents:          intents,
@@ -103,7 +104,7 @@ func (sm *ShardManager) Connect(ctx context.Context) error {
 	sm.mu.Lock()
 	if len(sm.shards) > 0 {
 		sm.mu.Unlock()
-		return errors.New("shard manager already connected")
+		return types.ErrAlreadyConnected
 	}
 	sm.mu.Unlock()
 
@@ -188,7 +189,10 @@ func (sm *ShardManager) Broadcast(ctx context.Context, payload *Payload) error {
 // AutoScale consults /gateway/bot and adjusts the shard count based on the provided strategy.
 func (sm *ShardManager) AutoScale(ctx context.Context, guildCount int, strategy ShardingStrategy) error {
 	if sm.token == "" {
-		return errors.New("token required for autoscaling")
+		return &types.ValidationError{
+			Field:   "token",
+			Message: "token is required for autoscaling",
+		}
 	}
 	if strategy == nil {
 		strategy = &RecommendedSharding{}
@@ -268,7 +272,7 @@ type GatewayBotInfo struct {
 
 func fetchGatewayBotInfo(ctx context.Context, client *http.Client, endpoint, token string) (*GatewayBotInfo, error) {
 	if token == "" {
-		return nil, errors.New("token is required")
+		return nil, types.ErrTokenRequired
 	}
 	if client == nil {
 		client = http.DefaultClient

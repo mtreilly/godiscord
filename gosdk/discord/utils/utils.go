@@ -45,7 +45,7 @@ func FormatRoleMention(roleID string) string {
 }
 
 // ParseEmoji extracts name, ID, and animation flag from a custom emoji string.
-func ParseEmoji(emoji string) (name, id string, animated bool, ok bool) {
+func ParseEmoji(emoji string) (name, id string, animated, ok bool) {
 	if !strings.HasPrefix(emoji, "<") || !strings.HasSuffix(emoji, ">") {
 		return "", "", false, false
 	}

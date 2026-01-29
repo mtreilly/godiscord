@@ -1,5 +1,9 @@
 # Discord Go SDK
 
+[![Go Version](https://img.shields.io/badge/go-%3E%3D1.21-blue)](https://golang.org/)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mtreilly/godiscord)](https://goreportcard.com/report/github.com/mtreilly/godiscord)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A production-ready Go SDK for Discord interactions.
 
 ## Features
@@ -7,11 +11,32 @@ A production-ready Go SDK for Discord interactions.
 - **Webhooks**: Send messages, embeds, and files via Discord webhooks
 - **Bot API**: Interact with channels, messages, and guilds
 - **Slash Commands**: Register and handle slash commands
-- **Rate Limiting**: Automatic rate limit handling with exponential backoff
+- **Rate Limiting**: Automatic rate limit handling with adaptive/proactive/reactive strategies
 - **Error Handling**: Comprehensive typed errors for programmatic handling
 - **Context Support**: Full context support for cancellation and timeouts
-- **Testing**: Comprehensive test coverage with table-driven tests
+- **Gateway**: WebSocket gateway client with auto-reconnect and sharding
+- **Testing**: Comprehensive test coverage (>80% for core packages)
 - **Developer-Friendly**: JSON outputs, structured logging, deterministic behavior
+
+## Why this SDK?
+
+Compared to other Discord Go libraries:
+
+| Feature | godiscord | [discordgo](https://github.com/bwmarrin/discordgo) | [disgo](https://github.com/disgoorg/disgo) |
+|---------|-----------|---------------------------------------------------|--------------------------------------------|
+| Webhook-focused | ✅ First-class | ⚠️ Secondary | ✅ First-class |
+| Context support | ✅ Native | ⚠️ Partial | ✅ Native |
+| Rate limiting | ✅ Adaptive strategy | ✅ Basic | ✅ |
+| Error types | ✅ Typed errors | ⚠️ Generic | ✅ Typed |
+| Gateway sharding | ✅ Built-in | ✅ | ✅ |
+| Structured logging | ✅ Built-in | ❌ | ⚠️ External |
+| Module depth | ⚠️ Nested (`/gosdk`) | ✅ Flat | ✅ Flat |
+
+**Choose godiscord when:**
+- You primarily use webhooks (CI/CD notifications, alerts)
+- You want modern Go patterns (context-first, structured logging)
+- You need advanced rate limit handling
+- You prefer typed errors for programmatic error handling
 
 ## Quick Links
 
@@ -45,6 +70,19 @@ godiscord/
     └── OPEN_QUESTIONS.md  # Active design discussions ⭐
 ```
 
+### Package Overview
+
+| Package | Import Path | Description | Stability |
+|---------|-------------|-------------|-----------|
+| `webhook` | `discord/webhook` | Send messages via webhooks | ✅ Stable |
+| `client` | `discord/client` | Bot REST API client | ✅ Stable |
+| `interactions` | `discord/interactions` | Slash commands & components | ✅ Stable |
+| `gateway` | `discord/gateway` | WebSocket gateway | ✅ Stable |
+| `types` | `discord/types` | Shared types & errors | ✅ Stable |
+| `embeds` | `discord/embeds` | Embed builder | ✅ Stable |
+| `config` | `config` | Configuration management | ✅ Stable |
+| `ratelimit` | `ratelimit` | Rate limiting strategies | ✅ Stable |
+
 ## Quick Start
 
 ### Prerequisites
@@ -56,15 +94,29 @@ godiscord/
 ### Installation
 
 ```bash
+go get github.com/mtreilly/godiscord/gosdk
+```
+
+Or install the CLI tool:
+
+```bash
+go install github.com/mtreilly/godiscord/gosdk/cmd/discord@latest
+```
+
+**Note:** This SDK uses a nested module path (`/gosdk`). We plan to flatten this in a future release.
+
+### Development Setup
+
+```bash
 # Clone the repository
 git clone https://github.com/mtreilly/godiscord.git
-cd godiscord
-
-# Navigate to Go SDK
-cd gosdk
+cd godiscord/gosdk
 
 # Download dependencies
 go mod download
+
+# Run tests
+go test ./...
 ```
 
 ### Usage
@@ -281,6 +333,36 @@ Create a test Discord server and webhook:
 3. Set `DISCORD_BOT_TOKEN` environment variable
 4. Invite bot to your test server
 5. Run bot examples
+
+## Troubleshooting
+
+### Common Errors
+
+**Error: `validation error on field 'token': token is required`**
+```bash
+# Make sure DISCORD_BOT_TOKEN is set
+export DISCORD_BOT_TOKEN="your-bot-token"
+```
+
+**Error: `rate limited by Discord API`**
+- The SDK automatically handles rate limits with exponential backoff
+- To reduce rate limit hits, use the `adaptive` rate limit strategy (default)
+- Check your retry configuration: `webhook.WithMaxRetries(5)`
+
+**Error: `webhook URL is required`**
+```bash
+# Set the webhook URL
+export DISCORD_WEBHOOK="https://discord.com/api/webhooks/..."
+```
+
+**Module import errors**
+```go
+// Correct import path (note the /gosdk suffix)
+import "github.com/mtreilly/godiscord/gosdk/discord/webhook"
+
+// Incorrect (missing /gosdk)
+import "github.com/mtreilly/godiscord/discord/webhook" // ❌ Won't work
+```
 
 ## License
 

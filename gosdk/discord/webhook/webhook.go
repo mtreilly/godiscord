@@ -297,21 +297,6 @@ func (c *Client) parseErrorResponse(resp *http.Response) *types.APIError {
 	return apiErr
 }
 
-// marshalJSON marshals a value to JSON
-func marshalJSON(v interface{}) ([]byte, error) {
-	return json.Marshal(v)
-}
-
-// waitWithBackoff returns a channel that closes after the specified duration
-func waitWithBackoff(d time.Duration) <-chan time.Time {
-	return time.After(d)
-}
-
-// backoffFromSeconds converts seconds to a duration for backoff
-func backoffFromSeconds(seconds int) time.Duration {
-	return time.Duration(seconds) * time.Second
-}
-
 // createStrategy creates a rate limiting strategy from a name
 func createStrategy(name string) ratelimit.Strategy {
 	switch name {

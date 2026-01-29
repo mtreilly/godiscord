@@ -246,17 +246,17 @@ func (c *Client) Get(ctx context.Context, path string, out interface{}) error {
 }
 
 // Post performs a POST request.
-func (c *Client) Post(ctx context.Context, path string, body interface{}, out interface{}) error {
+func (c *Client) Post(ctx context.Context, path string, body, out interface{}) error {
 	return c.do(ctx, http.MethodPost, path, body, out, nil)
 }
 
 // Put performs a PUT request.
-func (c *Client) Put(ctx context.Context, path string, body interface{}, out interface{}) error {
+func (c *Client) Put(ctx context.Context, path string, body, out interface{}) error {
 	return c.do(ctx, http.MethodPut, path, body, out, nil)
 }
 
 // Patch performs a PATCH request.
-func (c *Client) Patch(ctx context.Context, path string, body interface{}, out interface{}) error {
+func (c *Client) Patch(ctx context.Context, path string, body, out interface{}) error {
 	return c.do(ctx, http.MethodPatch, path, body, out, nil)
 }
 
@@ -265,7 +265,7 @@ func (c *Client) Delete(ctx context.Context, path string) error {
 	return c.do(ctx, http.MethodDelete, path, nil, nil, nil)
 }
 
-func (c *Client) do(ctx context.Context, method, path string, body interface{}, out interface{}, headers http.Header) error {
+func (c *Client) do(ctx context.Context, method, path string, body, out interface{}, headers http.Header) error {
 	route := c.buildRoute(method, path)
 	url := c.buildURL(path)
 

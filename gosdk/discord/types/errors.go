@@ -23,6 +23,21 @@ var (
 
 	// ErrNetworkError indicates a network/connection error
 	ErrNetworkError = errors.New("network error")
+
+	// ErrNotConnected indicates the client is not connected
+	ErrNotConnected = errors.New("client not connected")
+
+	// ErrAlreadyConnected indicates the client is already connected
+	ErrAlreadyConnected = errors.New("client already connected")
+
+	// ErrConnectionNotConfigured indicates the connection is not configured
+	ErrConnectionNotConfigured = errors.New("connection is not configured")
+
+	// ErrTokenRequired indicates a token is required but was not provided
+	ErrTokenRequired = errors.New("token is required")
+
+	// ErrCircuitBreakerOpen indicates the circuit breaker is open
+	ErrCircuitBreakerOpen = errors.New("circuit breaker is open")
 )
 
 // APIError represents a Discord API error response

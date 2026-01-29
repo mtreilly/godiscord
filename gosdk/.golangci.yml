@@ -1,0 +1,263 @@
+# golangci-lint v2 configuration for Discord Go SDK
+# Run: golangci-lint run
+# Fix auto-fixable issues: golangci-lint run --fix
+# Full documentation: https://golangci-lint.run/usage/configuration/
+
+version: "2"
+
+run:
+  # Timeout for analysis
+  timeout: 5m
+  # Go version to use
+  go: "1.21"
+  # Modules download mode
+  modules-download-mode: readonly
+
+output:
+  # Format: text, json, line-number, github-actions, etc.
+  formats:
+    text:
+      path: stdout
+      # Print lines of code with issue
+      print-issued-lines: true
+      # Print linter name
+      print-linter-name: true
+  # Show all issues
+  show-stats: true
+
+linters:
+  # Default set of linters
+  default: all
+  
+  # Disable specific linters
+  disable:
+    # Linters we don't want (too opinionated or noisy)
+    - containedctx     # We intentionally store contexts in some structs
+    - depguard         # We don't need import restrictions  
+    - err113           # Dynamic errors are fine for formatted messages
+    - exhaustruct      # Too verbose for DTOs
+    - forbidigo        # We don't forbid specific identifiers
+    - funlen           # Function length limits are too restrictive
+    - gochecknoglobals # Globals are sometimes needed for defaults
+    - gocognit         # Cognitive complexity limits are too strict
+    - lll              # Line length limits are too restrictive
+    - mnd              # Magic number detection is too noisy
+    - nestif           # Nesting depth limits are too strict
+    - nlreturn         # Blank lines before returns are opinionated
+    - paralleltest     # We handle parallelism manually
+    - tagliatelle      # JSON tag naming is too opinionated
+    - testpackage      # Tests in same package is fine
+    - tparallel        # Same as above
+    - varnamelen       # Short variable names are fine
+    - wrapcheck        # We wrap errors manually when needed
+    - wsl              # Whitespace style is very opinionated
+    - wsl_v5           # Same as wsl (v5 version)
+    - funcorder        # Method ordering is opinionated
+    - goconst          # String constant detection is noisy
+    - godot            # Comments ending in periods is minor
+    - inamedparam      # Named interface params are optional
+    - perfsprint       # Premature optimization suggestions
+    - revive           # Many rules are opinionated
+    - usestdlibvars    # "GET" vs http.MethodGet is fine
+    - modernize        # Modern Go syntax suggestions
+    - noinlineerr      # Inline error handling is fine
+    - exhaustive       # Exhaustive switches not always needed
+    - gochecknoinits   # Init functions sometimes needed
+    - gocritic         # Various style suggestions
+    - gocyclo          # Already checked by cyclop
+    - nilnil           # Returning nil, nil is sometimes intentional
+    - unused           # Unused code detection (handled by IDE)
+    - bodyclose        # Often false positives for response bodies
+    - errchkjson       # JSON marshal error checking is noisy
+    - errorlint        # Error wrapping checks (we handle manually)
+    - gosec            # Security (handled by separate review)
+    - predeclared      # Predeclared identifier usage (minor issue)
+    - staticcheck      # Various style checks (handled by other linters)
+    - unparam          # Unused parameter detection
+
+  settings:
+    # Error checking
+    errcheck:
+      # Report about not checking of errors in type assertions
+      check-type-assertions: true
+      # Report about assignment of errors to blank identifier
+      check-blank: true
+      # Exclude known errors (e.g., deferred Close)
+      exclude-functions:
+        - io.Copy
+        - "(*os.File).Close"
+        - "(*github.com/gorilla/websocket.Conn).Close"
+
+    # Go vet settings
+    govet:
+      # Report about shadowed variables
+      enable:
+        - shadow
+
+    # Cyclomatic complexity
+    cyclop:
+      max-complexity: 20
+      skip-tests: true
+
+    # Naked returns
+    nakedret:
+      max-func-lines: 30
+
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    
+    rules:
+      # Exclude some linters from test files
+      - path: _test\.go
+        linters:
+          - gocyclo
+          - cyclop
+          - dupl
+          - gosec
+          - errcheck
+          - bodyclose
+      
+      # Exclude shadow checking in test files
+      - path: _test\.go
+        linters:
+          - govet
+        text: "shadow"
+      
+      # Exclude complexity in gateway (inherently complex)
+      - path: discord/gateway/
+        linters:
+          - cyclop
+          - gocyclo
+
+      # Known patterns we allow
+      - text: "Error return value of `io\\.Copy` is not checked"
+        linters:
+          - errcheck
+      
+      - text: "Error return value of `.*\\.Close` is not checked"
+        linters:
+          - errcheck
+      
+      - text: "Error return value of `resp\\.Body\\.Close` is not checked"
+        linters:
+          - errcheck
+
+      # Ignore context in struct warnings for specific patterns
+      - path: discord/gateway/connection.go
+        linters:
+          - containedctx
+      
+      - path: discord/client/middleware.go
+        linters:
+          - containedctx
+
+      - path: discord/client/batch.go
+        linters:
+          - containedctx
+
+      # Discord API uses X-RateLimit-* headers (not canonical X-Ratelimit-*)
+      - path: ratelimit/
+        linters:
+          - canonicalheader
+
+      # The do() function is inherently complex (handles retries, rate limits, etc)
+      - path: discord/client/client.go
+        linters:
+          - cyclop
+          - contextcheck
+      
+      # Permission name function is a large switch statement (inherently complex)
+      - path: discord/permissions/permissions.go
+        linters:
+          - cyclop
+          - gocyclo
+      
+      # Shadow variable warnings in specific files
+      - path: cmd/discord/config.go
+        linters:
+          - govet
+      
+      - path: discord/interactions/server.go
+        linters:
+          - govet
+      
+      # Interface return warnings (these are intentional design choices)
+      - path: cache/cache.go
+        linters:
+          - ireturn
+      
+      - path: cmd/discord/
+        linters:
+          - ireturn
+          - nonamedreturns
+      
+      - path: discord/client/client.go
+        linters:
+          - ireturn
+      
+      - path: discord/gateway/client.go
+        linters:
+          - ireturn
+      
+      - path: discord/webhook/webhook.go
+        linters:
+          - ireturn
+      
+      - path: discord/utils/utils.go
+        linters:
+          - nonamedreturns
+
+      # Unchecked errors in deferred cleanup are acceptable
+      - text: "Error return value of `io\\.ReadAll` is not checked"
+        linters:
+          - errcheck
+      
+      - text: "Error return value of `json\\.Marshal` is not checked"
+        linters:
+          - errcheck
+          - errchkjson
+      
+      - text: "Error return value of `s\\.writeJSON` is not checked"
+        linters:
+          - errcheck
+
+      - text: "Error return value is not checked"
+        linters:
+          - errcheck
+
+    paths:
+      - vendor$
+      - third_party$
+      - examples$
+      - \.cache$
+
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/mtreilly/godiscord)
+      custom-order: true
+    
+    gofumpt:
+      module-path: github.com/mtreilly/godiscord/gosdk
+      extra-rules: true
+  
+  exclusions:
+    generated: lax
+    paths:
+      - vendor$
+      - third_party$
+      - examples$

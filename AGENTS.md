@@ -135,10 +135,34 @@ go test -race ./...               # Race detection
 ```
 
 Linting & Formatting
+
+**Required: golangci-lint**
+```bash
+# Install (one-time)
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+# Run all linters (MUST PASS before push)
+cd gosdk
+golangci-lint run ./...
+
+# Auto-fix issues where possible
+golangci-lint run --fix ./...
+
+# Format imports and code
+golangci-lint fmt ./...
+```
+
+Configuration is in `gosdk/.golangci.yml`. Key settings:
+- Enables all linters by default
+- Disables opinionated/noisy linters (wsl, funlen, etc.)
+- Sets complexity limits (cyclop: 20)
+- Excludes test files from certain checks
+- Excludes Discord API specific patterns (X-RateLimit-* headers)
+
+**Basic formatting (fallback)**
 ```bash
 gofmt -w .                        # Format code
 go vet ./...                      # Static analysis
-golangci-lint run                 # Comprehensive linting (if installed)
 ```
 
 Debugging
@@ -203,6 +227,46 @@ Testing & Validation
 - Golden tests for JSON marshaling/unmarshaling
 - `go test -race ./discord/webhook` should stay green; run before handing off
 - Optional real-webhook smoke tests live behind `-tags integration` and require `DISCORD_WEBHOOK`
+
+Pre-commit Checklist (REQUIRED)
+Before pushing code, ensure ALL of the following pass:
+
+1. **Tests Pass**
+   ```bash
+   cd gosdk
+   go test ./...
+   ```
+
+2. **Race Detector Clean**
+   ```bash
+   cd gosdk
+   go test -race ./...
+   ```
+
+3. **golangci-lint Clean** ⭐ CRITICAL
+   ```bash
+   cd gosdk
+   golangci-lint run ./...
+   ```
+   - Configuration is in `.golangci.yml`
+   - Install: `go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest`
+   - Auto-fix some issues: `golangci-lint run --fix ./...`
+   - Format code: `golangci-lint fmt ./...`
+   - **ZERO ISSUES POLICY**: All linter warnings must be fixed or explicitly excluded in config
+
+4. **Go Vet Clean**
+   ```bash
+   cd gosdk
+   go vet ./...
+   ```
+
+5. **Build Success**
+   ```bash
+   cd gosdk
+   go build ./...
+   ```
+
+**DO NOT PUSH** if any of the above fail. Fix issues first.
 
 Common Tasks
 

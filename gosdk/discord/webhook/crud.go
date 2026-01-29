@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/mtreilly/godiscord/gosdk/discord/types"
 	"github.com/mtreilly/godiscord/gosdk/ratelimit"
@@ -15,8 +16,8 @@ import (
 
 // MessageEditParams represents parameters for editing a webhook message
 type MessageEditParams struct {
-	Content         *string        `json:"content,omitempty"`
-	Embeds          []types.Embed  `json:"embeds,omitempty"`
+	Content         *string       `json:"content,omitempty"`
+	Embeds          []types.Embed `json:"embeds,omitempty"`
 	AllowedMentions *struct {
 		Parse []string `json:"parse,omitempty"`
 	} `json:"allowed_mentions,omitempty"`
@@ -71,7 +72,7 @@ func (c *Client) Delete(ctx context.Context, messageID string) error {
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
-			case <-waitWithBackoff(backoff):
+			case <-time.After(backoff):
 				backoff *= 2
 			}
 		}
@@ -121,7 +122,7 @@ func (c *Client) Delete(ctx context.Context, messageID string) error {
 			c.recordStrategyOutcome(route, true)
 
 			if apiErr.RetryAfter > 0 {
-				backoff = backoffFromSeconds(apiErr.RetryAfter)
+				backoff = time.Duration(apiErr.RetryAfter) * time.Second
 			}
 			lastErr = apiErr
 			continue
@@ -176,7 +177,7 @@ func (c *Client) doMessageRequest(ctx context.Context, method, url string, body 
 			select {
 			case <-ctx.Done():
 				return nil, ctx.Err()
-			case <-waitWithBackoff(backoff):
+			case <-time.After(backoff):
 				backoff *= 2
 			}
 		}
@@ -242,7 +243,7 @@ func (c *Client) doMessageRequest(ctx context.Context, method, url string, body 
 			c.recordStrategyOutcome(route, true)
 
 			if apiErr.RetryAfter > 0 {
-				backoff = backoffFromSeconds(apiErr.RetryAfter)
+				backoff = time.Duration(apiErr.RetryAfter) * time.Second
 			}
 			lastErr = apiErr
 			continue

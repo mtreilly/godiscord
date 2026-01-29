@@ -125,7 +125,7 @@ func (m *MessageService) DeleteUserReaction(ctx context.Context, channelID, mess
 }
 
 // DeleteAllReactions removes every reaction from a message (optionally limited to emoji when provided).
-func (m *MessageService) DeleteAllReactions(ctx context.Context, channelID, messageID string, emoji string) error {
+func (m *MessageService) DeleteAllReactions(ctx context.Context, channelID, messageID, emoji string) error {
 	if err := validateID("channelID", channelID); err != nil {
 		return err
 	}

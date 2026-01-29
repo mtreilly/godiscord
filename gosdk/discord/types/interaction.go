@@ -433,7 +433,7 @@ func validateResponseContent(content string) error {
 	return nil
 }
 
-func validateComponentLayout(components []MessageComponent, allowTextInputs bool, requireComponents bool, field string) error {
+func validateComponentLayout(components []MessageComponent, allowTextInputs, requireComponents bool, field string) error {
 	if len(components) == 0 {
 		if requireComponents {
 			return &ValidationError{Field: field, Message: "at least one component is required"}

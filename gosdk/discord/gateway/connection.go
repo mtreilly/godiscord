@@ -3,13 +3,14 @@ package gateway
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
+
+	"github.com/mtreilly/godiscord/gosdk/discord/types"
 	"github.com/mtreilly/godiscord/gosdk/logger"
 )
 
@@ -71,7 +72,10 @@ func WithHeartbeatInterval(interval time.Duration) ConnectionOption {
 
 func NewConnection(token string, intents int, opts ...ConnectionOption) (*Connection, error) {
 	if token == "" {
-		return nil, errors.New("token is required")
+		return nil, &types.ValidationError{
+			Field:   "token",
+			Message: "token is required",
+		}
 	}
 
 	c := &Connection{
@@ -97,7 +101,7 @@ func (c *Connection) Connect(ctx context.Context) error {
 	c.mu.Lock()
 	if c.conn != nil {
 		c.mu.Unlock()
-		return errors.New("already connected")
+		return types.ErrAlreadyConnected
 	}
 	c.mu.Unlock()
 
@@ -134,7 +138,10 @@ func (c *Connection) Close() error {
 
 func (c *Connection) Send(ctx context.Context, payload *Payload) error {
 	if payload == nil {
-		return errors.New("payload is required")
+		return &types.ValidationError{
+			Field:   "payload",
+			Message: "payload is required",
+		}
 	}
 
 	c.mu.Lock()
@@ -142,7 +149,7 @@ func (c *Connection) Send(ctx context.Context, payload *Payload) error {
 	c.mu.Unlock()
 
 	if conn == nil {
-		return errors.New("not connected")
+		return types.ErrNotConnected
 	}
 
 	c.writeMu.Lock()
@@ -160,7 +167,7 @@ func (c *Connection) Receive(ctx context.Context) (*Payload, error) {
 	c.mu.Unlock()
 
 	if conn == nil {
-		return nil, errors.New("not connected")
+		return nil, types.ErrNotConnected
 	}
 
 	var payload Payload
@@ -187,6 +194,7 @@ func (c *Connection) startHeartbeat(ctx context.Context) {
 	c.heartbeatCtx = ctx
 	c.heartbeatCancel = cancel
 	c.heartbeatTicker = time.NewTicker(c.heartbeatInterval)
+	ticker := c.heartbeatTicker
 	c.mu.Unlock()
 
 	go func() {
@@ -194,7 +202,7 @@ func (c *Connection) startHeartbeat(ctx context.Context) {
 			select {
 			case <-ctx.Done():
 				return
-			case <-c.heartbeatTicker.C:
+			case <-ticker.C:
 				if err := c.sendHeartbeat(ctx); err != nil {
 					c.logger.Warn("heartbeat failed", "error", err)
 				}
@@ -253,7 +261,10 @@ func (c *Connection) resume(ctx context.Context) error {
 	c.mu.Unlock()
 
 	if session == "" {
-		return errors.New("session id required to resume")
+		return &types.ValidationError{
+			Field:   "session_id",
+			Message: "session ID required to resume",
+		}
 	}
 
 	payload := &Payload{Op: OpCodeResume}

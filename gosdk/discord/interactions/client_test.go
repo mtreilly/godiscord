@@ -3,6 +3,7 @@ package interactions
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,6 +12,33 @@ import (
 	"github.com/mtreilly/godiscord/gosdk/discord/types"
 	"github.com/mtreilly/godiscord/gosdk/ratelimit"
 )
+
+func TestNewInteractionClient(t *testing.T) {
+	t.Run("nil client returns error", func(t *testing.T) {
+		_, err := NewInteractionClient(nil)
+		if err == nil {
+			t.Fatal("expected error for nil client")
+		}
+		var validationErr *types.ValidationError
+		if !errors.As(err, &validationErr) {
+			t.Fatalf("expected ValidationError, got %T", err)
+		}
+	})
+
+	t.Run("valid client", func(t *testing.T) {
+		c, err := client.New("test-token", client.WithBaseURL("http://example.com"))
+		if err != nil {
+			t.Fatalf("client.New error: %v", err)
+		}
+		ic, err := NewInteractionClient(c)
+		if err != nil {
+			t.Fatalf("NewInteractionClient error: %v", err)
+		}
+		if ic == nil {
+			t.Fatal("expected non-nil InteractionClient")
+		}
+	})
+}
 
 func TestInteractionClientCreateInteractionResponse(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
@@ -34,7 +62,10 @@ func TestInteractionClientCreateInteractionResponse(t *testing.T) {
 		}))
 		defer server.Close()
 
-		ic := NewInteractionClient(newInteractionTestClient(t, server.URL))
+		ic, err := NewInteractionClient(newInteractionTestClient(t, server.URL))
+		if err != nil {
+			t.Fatalf("NewInteractionClient error: %v", err)
+		}
 		resp := &types.InteractionResponse{
 			Type: types.InteractionResponseChannelMessageWithSource,
 			Data: &types.InteractionApplicationCommandCallbackData{
@@ -50,8 +81,11 @@ func TestInteractionClientCreateInteractionResponse(t *testing.T) {
 	})
 
 	t.Run("validation", func(t *testing.T) {
-		ic := NewInteractionClient(newInteractionTestClient(t, "http://example.com"))
-		err := ic.CreateInteractionResponse(context.Background(), "", "token", &types.InteractionResponse{})
+		ic, err := NewInteractionClient(newInteractionTestClient(t, "http://example.com"))
+		if err != nil {
+			t.Fatalf("NewInteractionClient error: %v", err)
+		}
+		err = ic.CreateInteractionResponse(context.Background(), "", "token", &types.InteractionResponse{})
 		if err == nil {
 			t.Fatal("expected validation error for missing interaction ID")
 		}
@@ -78,7 +112,10 @@ func TestInteractionClientOriginalResponse(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ic := NewInteractionClient(newInteractionTestClient(t, server.URL))
+	ic, err := NewInteractionClient(newInteractionTestClient(t, server.URL))
+	if err != nil {
+		t.Fatalf("NewInteractionClient error: %v", err)
+	}
 
 	msg, err := ic.GetOriginalInteractionResponse(context.Background(), "app", "token")
 	if err != nil {
@@ -128,7 +165,10 @@ func TestInteractionClientFollowupMessages(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ic := NewInteractionClient(newInteractionTestClient(t, server.URL))
+	ic, err := NewInteractionClient(newInteractionTestClient(t, server.URL))
+	if err != nil {
+		t.Fatalf("NewInteractionClient error: %v", err)
+	}
 
 	created, err := ic.CreateFollowupMessage(context.Background(), "app", "token", &types.MessageCreateParams{Content: "follow up"})
 	if err != nil {

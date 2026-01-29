@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
+
 	"github.com/mtreilly/godiscord/gosdk/cmd/discord/output"
 	"github.com/mtreilly/godiscord/gosdk/config"
 )

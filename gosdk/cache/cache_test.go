@@ -24,7 +24,7 @@ func TestLRUCacheWarmInvalidate(t *testing.T) {
 	if _, ok := cache.Get("x"); !ok {
 		t.Fatalf("expected warm entry")
 	}
-	cache.Invalidate(func(key string, value string) bool {
+	cache.Invalidate(func(key, value string) bool {
 		return value == "2"
 	})
 	if _, ok := cache.Get("y"); ok {

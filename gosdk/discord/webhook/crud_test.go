@@ -384,8 +384,8 @@ func isErrorType(err error, target interface{}) bool {
 		if !ok {
 			// Check if error message contains validation-related keywords
 			return strings.Contains(errStr, "validation") ||
-				   strings.Contains(errStr, "required") ||
-				   strings.Contains(errStr, "invalid")
+				strings.Contains(errStr, "required") ||
+				strings.Contains(errStr, "invalid")
 		}
 		return ok
 	case **types.APIError:
@@ -394,7 +394,7 @@ func isErrorType(err error, target interface{}) bool {
 		if !ok {
 			// Check if error wraps an APIError
 			return strings.Contains(errStr, "Discord API error") ||
-				   strings.Contains(errStr, "status code")
+				strings.Contains(errStr, "status code")
 		}
 		return ok
 	default:

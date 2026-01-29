@@ -2,12 +2,12 @@ package health
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/mtreilly/godiscord/gosdk/discord/client"
+	"github.com/mtreilly/godiscord/gosdk/discord/types"
 )
 
 const defaultGatewayURL = "https://discord.com/api/gateway"
@@ -56,7 +56,10 @@ func WithGatewayURL(url string) Option {
 // CheckAPI validates the REST API by hitting /gateway/bot.
 func (h *Checker) CheckAPI(ctx context.Context) error {
 	if h.apiClient == nil {
-		return errors.New("api client is not configured")
+		return &types.ValidationError{
+			Field:   "apiClient",
+			Message: "API client is not configured",
+		}
 	}
 	var resp map[string]interface{}
 	return h.apiClient.Get(ctx, "/gateway/bot", &resp)
@@ -65,7 +68,10 @@ func (h *Checker) CheckAPI(ctx context.Context) error {
 // CheckGateway validates the gateway endpoint is reachable.
 func (h *Checker) CheckGateway(ctx context.Context) error {
 	if h.httpClient == nil {
-		return errors.New("http client is not configured")
+		return &types.ValidationError{
+			Field:   "httpClient",
+			Message: "HTTP client is not configured",
+		}
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, h.gatewayURL, nil)
 	if err != nil {
@@ -85,10 +91,16 @@ func (h *Checker) CheckGateway(ctx context.Context) error {
 // CheckWebhook validates a webhook URL by issuing a GET request.
 func (h *Checker) CheckWebhook(ctx context.Context, webhookURL string) error {
 	if webhookURL == "" {
-		return errors.New("webhook URL is required")
+		return &types.ValidationError{
+			Field:   "webhookURL",
+			Message: "webhook URL is required",
+		}
 	}
 	if h.httpClient == nil {
-		return errors.New("http client is not configured")
+		return &types.ValidationError{
+			Field:   "httpClient",
+			Message: "HTTP client is not configured",
+		}
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, webhookURL, nil)
 	if err != nil {

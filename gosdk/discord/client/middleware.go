@@ -11,6 +11,7 @@ import (
 // Request wraps http.Request to allow middleware to override context/metadata.
 type Request struct {
 	*http.Request
+
 	ctx context.Context
 }
 

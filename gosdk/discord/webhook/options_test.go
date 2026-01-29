@@ -151,27 +151,6 @@ func TestCreateStrategy(t *testing.T) {
 	}
 }
 
-func TestBackoffFromSeconds(t *testing.T) {
-	tests := []struct {
-		seconds int
-		want    time.Duration
-	}{
-		{1, 1 * time.Second},
-		{5, 5 * time.Second},
-		{60, 60 * time.Second},
-		{0, 0},
-	}
-
-	for _, tt := range tests {
-		t.Run("", func(t *testing.T) {
-			got := backoffFromSeconds(tt.seconds)
-			if got != tt.want {
-				t.Errorf("backoffFromSeconds(%d) = %v, want %v", tt.seconds, got, tt.want)
-			}
-		})
-	}
-}
-
 func TestMultipleOptions(t *testing.T) {
 	customClient := &http.Client{Timeout: 5 * time.Second}
 	customLogger := logger.New(logger.DebugLevel, "json", nil)
@@ -185,7 +164,6 @@ func TestMultipleOptions(t *testing.T) {
 		WithRateLimiter(customLimiter),
 		WithStrategyName("proactive"),
 	)
-
 	if err != nil {
 		t.Fatalf("NewClient() with multiple options error = %v", err)
 	}

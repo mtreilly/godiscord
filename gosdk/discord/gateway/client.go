@@ -3,7 +3,6 @@ package gateway
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"runtime"
 	"sync"
@@ -83,7 +82,10 @@ type Client struct {
 // NewClient builds a gateway client configured with the given token and intents.
 func NewClient(token string, intents int, opts ...ClientOption) (*Client, error) {
 	if token == "" {
-		return nil, errors.New("token is required")
+		return nil, &types.ValidationError{
+			Field:   "token",
+			Message: "token is required",
+		}
 	}
 
 	c := &Client{
@@ -111,10 +113,10 @@ func NewClient(token string, intents int, opts ...ClientOption) (*Client, error)
 // Connect opens the gateway connection and starts event processing.
 func (c *Client) Connect(ctx context.Context) error {
 	if c.conn == nil {
-		return errors.New("connection is not configured")
+		return types.ErrConnectionNotConfigured
 	}
 	if c.eventCancel != nil {
-		return errors.New("client already connected")
+		return types.ErrAlreadyConnected
 	}
 
 	runCtx, cancel := context.WithCancel(ctx)
@@ -185,7 +187,7 @@ func (c *Client) UpdatePresence(ctx context.Context, status string, activity *Ac
 	c.mu.Unlock()
 
 	if c.conn == nil {
-		return errors.New("client is not connected")
+		return types.ErrNotConnected
 	}
 
 	update := PresenceUpdate{
@@ -207,9 +209,12 @@ func (c *Client) UpdatePresence(ctx context.Context, status string, activity *Ac
 }
 
 // RequestGuildMembers sends a GUILD_MEMBERS request to the gateway.
-func (c *Client) RequestGuildMembers(ctx context.Context, guildID string, query string, limit int) error {
+func (c *Client) RequestGuildMembers(ctx context.Context, guildID, query string, limit int) error {
 	if guildID == "" {
-		return errors.New("guild_id is required")
+		return &types.ValidationError{
+			Field:   "guild_id",
+			Message: "guild_id is required",
+		}
 	}
 
 	payload := &Payload{Op: OpCodeRequestGuildMembers}
@@ -234,7 +239,7 @@ func (c *Client) RequestGuildMembers(ctx context.Context, guildID string, query 
 // Send proxies a raw payload over the websocket connection.
 func (c *Client) Send(ctx context.Context, payload *Payload) error {
 	if c.conn == nil {
-		return errors.New("client not connected")
+		return types.ErrNotConnected
 	}
 	return c.conn.Send(ctx, payload)
 }

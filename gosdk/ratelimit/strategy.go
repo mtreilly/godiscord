@@ -180,11 +180,11 @@ type AdaptiveStrategy struct {
 }
 
 type requestOutcome struct {
-	timestamp   time.Time
-	hitLimit    bool
-	remaining   int
-	limit       int
-	resetAfter  time.Duration
+	timestamp  time.Time
+	hitLimit   bool
+	remaining  int
+	limit      int
+	resetAfter time.Duration
 }
 
 // NewAdaptiveStrategy creates a new adaptive rate limiting strategy

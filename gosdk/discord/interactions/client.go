@@ -16,11 +16,14 @@ type InteractionClient struct {
 }
 
 // NewInteractionClient creates a new interaction client bound to the provided bot client.
-func NewInteractionClient(c *client.Client) *InteractionClient {
+func NewInteractionClient(c *client.Client) (*InteractionClient, error) {
 	if c == nil {
-		panic("client.Client is required")
+		return nil, &types.ValidationError{
+			Field:   "client",
+			Message: "client is required",
+		}
 	}
-	return &InteractionClient{base: c}
+	return &InteractionClient{base: c}, nil
 }
 
 // CreateInteractionResponse sends the initial callback payload for an interaction.

@@ -2,7 +2,6 @@ package types
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"math/rand"
 	"sync"
@@ -46,7 +45,7 @@ func (cb *CircuitBreaker) Call(fn func() error) error {
 	cb.mu.Lock()
 	if cb.state == stateOpen && time.Since(cb.lastFailure) < cb.resetTimeout {
 		cb.mu.Unlock()
-		return errors.New("circuit breaker is open")
+		return ErrCircuitBreakerOpen
 	}
 	if cb.state == stateOpen {
 		cb.state = stateHalfOpen

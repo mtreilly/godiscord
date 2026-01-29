@@ -62,21 +62,21 @@ type Role struct {
 
 // RoleCreateParams represents payload for creating a role.
 type RoleCreateParams struct {
-	Name        string `json:"name,omitempty"`
-	Permissions string `json:"permissions,omitempty"`
-	Color       int    `json:"color,omitempty"`
-	Hoist       bool   `json:"hoist,omitempty"`
-	Mentionable bool   `json:"mentionable,omitempty"`
+	Name           string `json:"name,omitempty"`
+	Permissions    string `json:"permissions,omitempty"`
+	Color          int    `json:"color,omitempty"`
+	Hoist          bool   `json:"hoist,omitempty"`
+	Mentionable    bool   `json:"mentionable,omitempty"`
 	AuditLogReason string `json:"-"`
 }
 
 // RoleModifyParams represents payload for updating a role.
 type RoleModifyParams struct {
-	Name        string `json:"name,omitempty"`
-	Permissions string `json:"permissions,omitempty"`
-	Color       int    `json:"color,omitempty"`
-	Hoist       bool   `json:"hoist,omitempty"`
-	Mentionable bool   `json:"mentionable,omitempty"`
+	Name           string `json:"name,omitempty"`
+	Permissions    string `json:"permissions,omitempty"`
+	Color          int    `json:"color,omitempty"`
+	Hoist          bool   `json:"hoist,omitempty"`
+	Mentionable    bool   `json:"mentionable,omitempty"`
 	AuditLogReason string `json:"-"`
 }
 
